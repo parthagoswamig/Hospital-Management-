@@ -1,18 +1,17 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, NestApplication } from '@nestjs/core';
 import { AppModule } from '../src/app.module';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import express from 'express';
-import type { INestApplication } from '@nestjs/core';
 
 const server = express();
 
 // Global app cache for serverless
 declare global {
   // eslint-disable-next-line no-var
-  var cachedApp: INestApplication | undefined;
+  var cachedApp: NestApplication | undefined;
 }
 
-async function getApp(): Promise<INestApplication> {
+async function getApp(): Promise<NestApplication> {
   if (!globalThis.cachedApp) {
     const app = await NestFactory.create(
       AppModule,
