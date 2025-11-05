@@ -3,7 +3,7 @@ const nextConfig = {
   reactStrictMode: false, // Temporarily disabled - re-enable for production
   poweredByHeader: false,
   compress: true,
-  output: 'standalone', // Fix for Windows build issues
+  // Removed standalone output for Vercel serverless compatibility
 
   // ESLint configuration
   eslint: {
