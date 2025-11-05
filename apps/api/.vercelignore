@@ -1,0 +1,40 @@
+# Development and test files
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
+test/
+__tests__/
+
+# Development scripts
+*.dev.js
+*.dev.ts
+
+# Environment files (except production)
+.env.local
+.env.development
+.env.staging
+.env.backup
+.env.example
+.env.razorpay.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# IDE files
+.vscode/
+.idea/
+
+# Temporary files
+temp/
+tmp/
+*.tmp
+
+# Database files
+*.sqlite
+*.sqlite3
+*.db
+
+# SQL files
+*.sql
