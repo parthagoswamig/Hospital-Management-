@@ -1,48 +1,67 @@
 import { NestFactory } from '@nestjs/core';
-import { ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from '../src/app.module';
 import { ValidationPipe } from '@nestjs/common';
-import express, { Request, Response } from 'express';
 
-const server = express();
-let isInitialized = false;
+let cachedApp: any;
+let initError: any = null;
 
 async function bootstrap() {
-  if (!isInitialized) {
-    try {
-      console.log('Initializing NestJS...');
-      
-      const app = await NestFactory.create(
-        AppModule,
-        new ExpressAdapter(server),
-        {
-          logger: ['error', 'warn', 'log'],
-        }
-      );
+  if (initError) {
+    throw initError;
+  }
 
-      app.enableCors({
+  if (!cachedApp) {
+    try {
+      console.log('Starting NestJS initialization...');
+      console.log('Environment:', {
+        nodeEnv: process.env.NODE_ENV,
+        hasDatabaseUrl: !!process.env.DATABASE_URL,
+        hasDirectUrl: !!process.env.DIRECT_URL,
+      });
+      
+      cachedApp = await NestFactory.create(AppModule, {
+        logger: ['error', 'warn', 'log'],
+      });
+
+      console.log('NestJS app created, setting up CORS...');
+
+      cachedApp.enableCors({
         origin: true,
         credentials: true,
       });
 
-      app.useGlobalPipes(
+      console.log('Setting up validation pipe...');
+
+      cachedApp.useGlobalPipes(
         new ValidationPipe({
           transform: true,
           whitelist: true,
         })
       );
 
-      await app.init();
-      isInitialized = true;
-      console.log('NestJS initialized');
+      console.log('Initializing app...');
+      await cachedApp.init();
+      console.log('✅ NestJS app initialized successfully');
     } catch (error) {
-      console.error('Bootstrap failed:', error);
+      console.error('❌ Bootstrap failed:', error);
+      initError = error;
       throw error;
     }
   }
+  
+  return cachedApp.getHttpAdapter().getInstance();
 }
 
-export default async (req: Request, res: Response) => {
-  await bootstrap();
-  server(req, res);
+module.exports = async (req: any, res: any) => {
+  try {
+    const server = await bootstrap();
+    return server(req, res);
+  } catch (error) {
+    console.error('Handler error:', error);
+    res.status(500).json({
+      error: 'Serverless function initialization failed',
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+  }
 };

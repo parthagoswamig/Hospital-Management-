@@ -1,31 +1,42 @@
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 
+// Singleton instance for serverless optimization
+let prismaInstance: PrismaClient | null = null;
+
 @Injectable()
-export class PrismaService
-  extends PrismaClient
-  implements OnModuleInit, OnModuleDestroy
-{
+export class PrismaService extends PrismaClient implements OnModuleDestroy {
   constructor() {
+    // Return existing instance if available (serverless optimization)
+    if (prismaInstance) {
+      return prismaInstance as PrismaService;
+    }
+
     super({
-      log: process.env.NODE_ENV === 'production' 
-        ? ['error', 'warn'] 
-        : ['query', 'info', 'warn', 'error'],
+      log: process.env.NODE_ENV === 'production' ? ['error'] : ['error', 'warn'],
       errorFormat: 'minimal',
       datasources: {
         db: {
-          url: process.env.DATABASE_URL || process.env.DATABASE_URL_POOLING,
+          url: process.env.DATABASE_URL,
         },
       },
     });
+
+    prismaInstance = this;
   }
 
-  // Add tokenBlacklist property with proper typing
-  tokenBlacklist: {
-    findUnique: (args: {
-      where: { jti: string; tenantId: string };
-    }) => Promise<any>;
-    upsert: (args: {
+  // TokenBlacklist helper methods for auth module
+  tokenBlacklist = {
+    findUnique: async (args: { where: { jti: string; tenantId: string } }) => {
+      return this.refreshToken.findFirst({
+        where: {
+          jti: args.where.jti,
+          tenantId: args.where.tenantId,
+        },
+      });
+    },
+
+    upsert: async (args: {
       where: { jti: string; tenantId: string };
       update: { revoked: boolean; reason: string; updatedAt: Date };
       create: {
@@ -37,93 +48,29 @@ export class PrismaService
         revoked: boolean;
         reason: string;
       };
-    }) => Promise<any>;
-    updateMany: (args: {
+    }) => {
+      return this.refreshToken.upsert({
+        where: {
+          jti: args.where.jti,
+        },
+        update: args.update,
+        create: args.create,
+      });
+    },
+
+    updateMany: async (args: {
       where: { userId: string; tenantId: string };
       data: { revoked: boolean; reason: string; updatedAt: Date };
-    }) => Promise<any>;
+    }) => {
+      return this.refreshToken.updateMany({
+        where: {
+          userId: args.where.userId,
+          tenantId: args.where.tenantId,
+        },
+        data: args.data,
+      });
+    },
   };
-
-  async onModuleInit() {
-    // Serverless optimization: lazy connection with retry
-    const maxRetries = 3;
-    let retries = 0;
-
-    while (retries < maxRetries) {
-      try {
-        console.log(`Attempting to connect to database... (attempt ${retries + 1}/${maxRetries})`);
-        await this.$connect();
-        console.log('✅ Database connected successfully');
-        break;
-      } catch (error) {
-        retries++;
-        console.error(`Failed to connect to database (attempt ${retries}/${maxRetries}): ${error.message}`);
-
-        if (retries < maxRetries) {
-          const delay = retries * 2000;
-          console.log(`Retrying in ${delay / 1000} seconds...`);
-          await new Promise((resolve) => setTimeout(resolve, delay));
-        } else {
-          console.error('❌ Failed to connect to database after all retries');
-          console.warn('⚠️ Continuing without database connection - some features may not work');
-          return;
-        }
-      }
-    }
-
-    // Initialize tokenBlacklist with proper typing
-    this.tokenBlacklist = {
-      findUnique: async (args: {
-        where: { jti: string; tenantId: string };
-      }) => {
-        return this.refreshToken.findFirst({
-          where: {
-            jti: args.where.jti,
-            tenantId: args.where.tenantId,
-          },
-        });
-      },
-
-      upsert: async (args: {
-        where: { jti: string; tenantId: string };
-        update: {
-          revoked: boolean;
-          reason: string;
-          updatedAt: Date;
-        };
-        create: {
-          jti: string;
-          userId: string;
-          tenantId: string;
-          token: string;
-          expiresAt: Date;
-          revoked: boolean;
-          reason: string;
-        };
-      }) => {
-        return this.refreshToken.upsert({
-          where: {
-            jti: args.where.jti,
-          },
-          update: args.update,
-          create: args.create,
-        });
-      },
-
-      updateMany: async (args: {
-        where: { userId: string; tenantId: string };
-        data: { revoked: boolean; reason: string; updatedAt: Date };
-      }) => {
-        return this.refreshToken.updateMany({
-          where: {
-            userId: args.where.userId,
-            tenantId: args.where.tenantId,
-          },
-          data: args.data,
-        });
-      },
-    };
-  }
 
   async onModuleDestroy() {
     // In serverless, don't disconnect - reuse connections
