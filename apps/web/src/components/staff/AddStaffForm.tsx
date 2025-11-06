@@ -189,12 +189,15 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ onSuccess, onCancel }) => {
     } catch (error: any) {
       console.error('❌ Error creating staff:', error);
       console.error('❌ Error response:', error.response?.data);
+      console.error('❌ Full error object:', JSON.stringify(error.response?.data, null, 2));
       
       // Extract detailed error message
       let errorMessage = 'Failed to add staff member';
       
       if (error.response?.data?.message) {
         const msg = error.response.data.message;
+        console.log('❌ Validation errors:', msg);
+        
         if (Array.isArray(msg)) {
           errorMessage = msg.join('\n• ');
           errorMessage = '• ' + errorMessage;
@@ -209,7 +212,7 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ onSuccess, onCancel }) => {
         title: 'Error Creating Staff',
         message: errorMessage,
         color: 'red',
-        autoClose: 10000, // Show for 10 seconds
+        autoClose: 15000, // Show for 15 seconds
       });
     } finally {
       setLoading(false);
