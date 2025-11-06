@@ -69,35 +69,41 @@ async function bootstrap() {
       maxAge: 3600,
     });
 
-    // Global Validation Pipe
+    // Global validation pipe
     app.useGlobalPipes(
       new ValidationPipe({
-        transform: true,
         whitelist: true,
         forbidNonWhitelisted: true,
+        transform: true,
         transformOptions: {
           enableImplicitConversion: true,
         },
-      })
+      }),
     );
 
-    // Swagger/OpenAPI Documentation
+    // Swagger documentation
     const config = new DocumentBuilder()
       .setTitle('HMS SaaS API')
-      .setDescription('Hospital Management System - Multi-tenant SaaS API')
+      .setDescription('Hospital Management System SaaS API Documentation')
       .setVersion('1.0')
       .addBearerAuth()
       .addServer(process.env.PUBLIC_API_URL || 'https://hma-saas-api.vercel.app', 'Production')
-      .addServer('http://localhost:3001', 'Development')
+      .addServer('http://localhost:3000', 'Local Development')
       .build();
     
     const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('docs', app, document);
+    SwaggerModule.setup('docs', app, document, {
+      swaggerOptions: {
+        persistAuthorization: true,
+      },
+    });
 
+    // Initialize without Express middleware registration
     await app.init();
     logger.log('✅ NestJS application initialized successfully');
   }
-  return app;
+  
+  return expressApp;
 }
 
 export default async (req: Request, res: Response) => {
