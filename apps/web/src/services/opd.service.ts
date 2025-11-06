@@ -5,31 +5,30 @@ import { enhancedApiClient } from '../lib/api-client';
  * Handles all OPD operations including visit management and queue tracking
  */
 
-// Types
+// Types matching backend DTOs
 export interface CreateOpdVisitDto {
   patientId: string;
   doctorId: string;
   departmentId?: string;
-  visitDate: string;
-  reason: string;
-  chiefComplaint?: string;
-  vitalSigns?: {
-    temperature?: number;
-    bloodPressure?: string;
-    heartRate?: number;
-    respiratoryRate?: number;
-    weight?: number;
-    height?: number;
-  };
+  chiefComplaint: string;
+  symptoms?: string;
+  diagnosis?: string;
+  treatment?: string;
   notes?: string;
+  followUpDate?: string;
+  status?: 'WAITING' | 'ARRIVED' | 'IN_CONSULTATION' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW';
 }
 
 export interface UpdateOpdVisitDto {
-  status?: 'WAITING' | 'IN_CONSULTATION' | 'COMPLETED' | 'CANCELLED';
+  doctorId?: string;
+  departmentId?: string;
+  chiefComplaint?: string;
+  symptoms?: string;
   diagnosis?: string;
-  prescription?: string;
-  followUpDate?: string;
+  treatment?: string;
   notes?: string;
+  followUpDate?: string;
+  status?: 'WAITING' | 'ARRIVED' | 'IN_CONSULTATION' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW';
 }
 
 export interface OpdVisitFilters {

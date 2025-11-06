@@ -68,6 +68,10 @@ import staffService from '../../../services/staff.service';
 import { Staff } from '../../../types/staff';
 import { UserRole, Status } from '../../../types/common';
 
+// Import Forms
+import AddStaffForm from '../../../components/staff/AddStaffForm';
+import EditStaffForm from '../../../components/staff/EditStaffForm';
+
 // Fallback empty data
 
 const StaffManagement = () => {
@@ -1156,151 +1160,29 @@ const StaffManagement = () => {
 
       {/* Add Staff Modal */}
       <Modal opened={addStaffOpened} onClose={closeAddStaff} title="Add New Staff" size="lg">
-        <Stack gap="md">
-          <SimpleGrid cols={2}>
-            <TextInput label="First Name" placeholder="Enter first name" required />
-            <TextInput label="Last Name" placeholder="Enter last name" required />
-          </SimpleGrid>
-
-          <SimpleGrid cols={2}>
-            <TextInput label="Email" placeholder="Enter email" required />
-            <TextInput label="Phone" placeholder="Enter phone number" required />
-          </SimpleGrid>
-
-          <SimpleGrid cols={2}>
-            <Select
-              label="Role"
-              placeholder="Select role"
-              data={[
-                { value: 'DOCTOR', label: 'Doctor' },
-                { value: 'NURSE', label: 'Nurse' },
-                { value: 'TECHNICIAN' as any, label: 'Technician' },
-                { value: 'PHARMACIST', label: 'Pharmacist' },
-              ]}
-              required
-            />
-            <Select
-              label="Department"
-              placeholder="Select department"
-              data={[].map(
-                /* TODO: Fetch from API */ (dept) => ({ value: dept.name, label: dept.name })
-              )}
-              required
-            />
-          </SimpleGrid>
-
-          <NumberInput
-            label="Experience (years)"
-            placeholder="Enter years of experience"
-            min={0}
-            max={50}
-          />
-
-          <Group justify="flex-end">
-            <Button variant="light" onClick={closeAddStaff}>
-              Cancel
-            </Button>
-            <Button
-              onClick={() => {
-                notifications.show({
-                  title: 'Success',
-                  message: 'New staff member added successfully',
-                  color: 'green',
-                });
-                closeAddStaff();
-              }}
-            >
-              Add Staff
-            </Button>
-          </Group>
-        </Stack>
+        <AddStaffForm
+          onSuccess={() => {
+            closeAddStaff();
+            fetchStaff();
+            fetchStats();
+          }}
+          onCancel={closeAddStaff}
+        />
       </Modal>
 
       {/* Edit Staff Modal */}
       <Modal opened={editStaffOpened} onClose={closeEditStaff} title="Edit Staff" size="lg">
         {selectedStaff && (
-          <Stack gap="md">
-            <SimpleGrid cols={2}>
-              <TextInput
-                label="First Name"
-                placeholder="Enter first name"
-                defaultValue={selectedStaff.firstName}
-                required
-              />
-              <TextInput
-                label="Last Name"
-                placeholder="Enter last name"
-                defaultValue={selectedStaff.lastName}
-                required
-              />
-            </SimpleGrid>
-
-            <SimpleGrid cols={2}>
-              <TextInput
-                label="Email"
-                placeholder="Enter email"
-                defaultValue={selectedStaff.contactInfo?.email}
-                required
-              />
-              <TextInput
-                label="Phone"
-                placeholder="Enter phone number"
-                defaultValue={selectedStaff.contactInfo?.phone}
-                required
-              />
-            </SimpleGrid>
-
-            <SimpleGrid cols={2}>
-              <Select
-                label="Role"
-                placeholder="Select role"
-                data={[
-                  { value: 'DOCTOR', label: 'Doctor' },
-                  { value: 'NURSE', label: 'Nurse' },
-                  { value: 'TECHNICIAN', label: 'Technician' },
-                  { value: 'PHARMACIST', label: 'Pharmacist' },
-                ]}
-                defaultValue={selectedStaff.role}
-                required
-              />
-              <Select
-                label="Department"
-                placeholder="Select department"
-                data={[].map(
-                  /* TODO: Fetch from API */ (dept) => ({ value: dept.name, label: dept.name })
-                )}
-                defaultValue={selectedStaff.department?.name}
-                required
-              />
-            </SimpleGrid>
-
-            <NumberInput
-              label="Experience (years)"
-              placeholder="Enter years of experience"
-              defaultValue={selectedStaff.experience}
-              min={0}
-              max={50}
-            />
-
-            <Group justify="flex-end">
-              <Button variant="light" onClick={closeEditStaff}>
-                Cancel
-              </Button>
-              <Button
-                onClick={() => {
-                  notifications.show({
-                    title: 'Success',
-                    message: 'Staff member updated successfully',
-                    color: 'green',
-                  });
-                  closeEditStaff();
-                  fetchStaff(); // Refresh the list
-                }}
-              >
-                Update Staff
-              </Button>
-            </Group>
-          </Stack>
+          <EditStaffForm
+            staffId={selectedStaff.id}
+            initialData={selectedStaff}
+            onSuccess={() => {
+              closeEditStaff();
+              fetchStaff();
+              fetchStats();
+            }}
+            onCancel={closeEditStaff}
+          />
         )}
       </Modal>
     </Container>

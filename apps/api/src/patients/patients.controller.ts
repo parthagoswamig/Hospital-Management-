@@ -16,9 +16,13 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiHeader,
 } from '@nestjs/swagger';
 import { PatientsService } from './patients.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Roles } from '../core/rbac/decorators/roles.decorator';
+import { RolesGuard } from '../core/rbac/guards/roles.guard';
+import { UserRole } from '../core/rbac/enums/roles.enum';
 import { CreatePatientDto, UpdatePatientDto, PatientQueryDto } from './dto';
 import { CurrentUser } from '../shared/decorators/current-user.decorator';
 import { TenantId } from '../shared/decorators/tenant-id.decorator';
@@ -32,13 +36,19 @@ interface User {
 
 @ApiTags('Patients')
 @ApiBearerAuth()
+@ApiHeader({
+  name: 'X-Tenant-Id',
+  description: 'Tenant ID for multi-tenancy',
+  required: true,
+})
 @Controller('patients')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class PatientsController {
   constructor(private readonly patientsService: PatientsService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_ADMIN, UserRole.RECEPTIONIST)
   @ApiOperation({ summary: 'Create a new patient' })
   @ApiResponse({ status: 201, description: 'Patient created successfully' })
   @ApiResponse({ status: 400, description: 'Bad request' })
@@ -50,6 +60,7 @@ export class PatientsController {
   }
 
   @Get()
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_ADMIN, UserRole.DOCTOR, UserRole.NURSE, UserRole.RECEPTIONIST)
   @ApiOperation({ summary: 'Get all patients with pagination' })
   @ApiResponse({ status: 200, description: 'Patients retrieved successfully' })
   async findAll(@TenantId() tenantId: string, @Query() query: PatientQueryDto) {
@@ -57,6 +68,7 @@ export class PatientsController {
   }
 
   @Get('search')
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_ADMIN, UserRole.DOCTOR, UserRole.NURSE, UserRole.RECEPTIONIST)
   @ApiOperation({ summary: 'Search patients by query' })
   @ApiResponse({ status: 200, description: 'Search results retrieved' })
   async search(@TenantId() tenantId: string, @Query('q') query: string) {
@@ -64,6 +76,7 @@ export class PatientsController {
   }
 
   @Get('stats')
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_ADMIN, UserRole.DOCTOR, UserRole.NURSE, UserRole.RECEPTIONIST)
   @ApiOperation({ summary: 'Get patient statistics' })
   @ApiResponse({
     status: 200,
@@ -74,6 +87,7 @@ export class PatientsController {
   }
 
   @Get(':id')
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_ADMIN, UserRole.DOCTOR, UserRole.NURSE, UserRole.RECEPTIONIST)
   @ApiOperation({ summary: 'Get patient by ID' })
   @ApiResponse({ status: 200, description: 'Patient retrieved successfully' })
   @ApiResponse({ status: 404, description: 'Patient not found' })
@@ -82,6 +96,7 @@ export class PatientsController {
   }
 
   @Patch(':id')
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_ADMIN, UserRole.RECEPTIONIST)
   @ApiOperation({ summary: 'Update patient by ID' })
   @ApiResponse({ status: 200, description: 'Patient updated successfully' })
   @ApiResponse({ status: 404, description: 'Patient not found' })
@@ -95,6 +110,7 @@ export class PatientsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @Roles(UserRole.SUPER_ADMIN)
   @ApiOperation({ summary: 'Soft delete patient by ID' })
   @ApiResponse({ status: 204, description: 'Patient deleted successfully' })
   @ApiResponse({ status: 404, description: 'Patient not found' })

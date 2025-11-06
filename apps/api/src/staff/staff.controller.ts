@@ -21,16 +21,20 @@ import { StaffService } from './staff.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateStaffDto, UpdateStaffDto, StaffQueryDto } from './dto';
 import { TenantId } from '../shared/decorators/tenant-id.decorator';
+import { Roles } from '../core/rbac/decorators/roles.decorator';
+import { RolesGuard } from '../core/rbac/guards/roles.guard';
+import { UserRole } from '../core/rbac/enums/roles.enum';
 
 @ApiTags('Staff')
 @ApiBearerAuth()
 @Controller('staff')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class StaffController {
   constructor(private readonly staffService: StaffService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_ADMIN, UserRole.HOSPITAL_ADMIN, UserRole.HR_MANAGER)
   @ApiOperation({ summary: 'Create a new staff member' })
   @ApiResponse({
     status: 201,
@@ -83,6 +87,7 @@ export class StaffController {
   }
 
   @Patch(':id')
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_ADMIN, UserRole.HOSPITAL_ADMIN, UserRole.HR_MANAGER)
   @ApiOperation({ summary: 'Update staff member by ID' })
   @ApiResponse({
     status: 200,
@@ -99,6 +104,7 @@ export class StaffController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_ADMIN, UserRole.HOSPITAL_ADMIN)
   @ApiOperation({ summary: 'Soft delete staff member by ID' })
   @ApiResponse({
     status: 204,

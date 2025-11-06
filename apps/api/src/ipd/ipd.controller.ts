@@ -16,10 +16,14 @@ import {
   ApiResponse,
   ApiBearerAuth,
   ApiParam,
+  ApiHeader,
 } from '@nestjs/swagger';
 import { IpdService } from './ipd.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { TenantId } from '../shared/decorators/tenant-id.decorator';
+import { Roles } from '../core/rbac/decorators/roles.decorator';
+import { RolesGuard } from '../core/rbac/guards/roles.guard';
+import { UserRole } from '../core/rbac/enums/roles.enum';
 import {
   CreateWardDto,
   UpdateWardDto,
@@ -27,12 +31,22 @@ import {
   UpdateBedStatusDto,
   WardFilterDto,
   BedFilterDto,
+  CreateAdmissionDto,
+  UpdateAdmissionDto,
+  DischargePatientDto,
+  TransferPatientDto,
+  AdmissionFilterDto,
 } from './dto';
 
 @ApiTags('IPD')
 @ApiBearerAuth()
+@ApiHeader({
+  name: 'X-Tenant-Id',
+  description: 'Tenant ID for multi-tenancy',
+  required: true,
+})
 @Controller('ipd')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class IpdController {
   constructor(private readonly service: IpdService) {}
 
@@ -221,6 +235,177 @@ export class IpdController {
     @TenantId() tenantId: string,
   ) {
     return this.service.updateBedStatus(id, updateBedStatusDto, tenantId);
+  }
+
+  // ==================== Admission Management ====================
+
+  /**
+   * Admit a patient
+   */
+  @Post('admissions')
+  @HttpCode(HttpStatus.CREATED)
+  @Roles(
+    UserRole.TENANT_ADMIN,
+    UserRole.HOSPITAL_ADMIN,
+    UserRole.DOCTOR,
+    UserRole.NURSE,
+    UserRole.RECEPTIONIST,
+  )
+  @ApiOperation({
+    summary: 'Admit a patient',
+    description: 'Admits a patient to a specific bed',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Patient admitted successfully',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - Invalid data provided',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Patient, bed, or doctor not found',
+  })
+  createAdmission(
+    @Body() createAdmissionDto: CreateAdmissionDto,
+    @TenantId() tenantId: string,
+  ) {
+    return this.service.createAdmission(createAdmissionDto, tenantId);
+  }
+
+  /**
+   * Get all admissions with filters
+   */
+  @Get('admissions')
+  @ApiOperation({
+    summary: 'Get all admissions',
+    description: 'Retrieves paginated list of admissions with optional filters',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Admissions retrieved successfully',
+  })
+  findAllAdmissions(
+    @Query() filters: AdmissionFilterDto,
+    @TenantId() tenantId: string,
+  ) {
+    return this.service.findAllAdmissions(tenantId, filters);
+  }
+
+  /**
+   * Get admission by ID
+   */
+  @Get('admissions/:id')
+  @ApiOperation({
+    summary: 'Get admission by ID',
+    description: 'Retrieves a specific admission with all details',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Admission retrieved successfully',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Admission not found',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Admission ID',
+    example: 'admission-uuid-123',
+  })
+  findOneAdmission(@Param('id') id: string, @TenantId() tenantId: string) {
+    return this.service.findOneAdmission(id, tenantId);
+  }
+
+  /**
+   * Update admission
+   */
+  @Patch('admissions/:id')
+  @Roles(UserRole.TENANT_ADMIN, UserRole.HOSPITAL_ADMIN, UserRole.DOCTOR)
+  @ApiOperation({
+    summary: 'Update admission',
+    description: 'Updates an existing admission',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Admission updated successfully',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Admission not found',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Admission ID',
+    example: 'admission-uuid-123',
+  })
+  updateAdmission(
+    @Param('id') id: string,
+    @Body() updateAdmissionDto: UpdateAdmissionDto,
+    @TenantId() tenantId: string,
+  ) {
+    return this.service.updateAdmission(id, updateAdmissionDto, tenantId);
+  }
+
+  /**
+   * Discharge patient
+   */
+  @Post('admissions/:id/discharge')
+  @Roles(UserRole.TENANT_ADMIN, UserRole.HOSPITAL_ADMIN, UserRole.DOCTOR)
+  @ApiOperation({
+    summary: 'Discharge patient',
+    description: 'Discharges a patient and frees up the bed',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Patient discharged successfully',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Admission not found',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Admission ID',
+    example: 'admission-uuid-123',
+  })
+  dischargePatient(
+    @Param('id') id: string,
+    @Body() dischargeDto: DischargePatientDto,
+    @TenantId() tenantId: string,
+  ) {
+    return this.service.dischargePatient(id, dischargeDto, tenantId);
+  }
+
+  /**
+   * Transfer patient to another bed
+   */
+  @Post('admissions/:id/transfer')
+  @Roles(UserRole.TENANT_ADMIN, UserRole.HOSPITAL_ADMIN, UserRole.DOCTOR, UserRole.NURSE)
+  @ApiOperation({
+    summary: 'Transfer patient',
+    description: 'Transfers a patient to a different bed/ward',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Patient transferred successfully',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Admission or new bed not found',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Admission ID',
+    example: 'admission-uuid-123',
+  })
+  transferPatient(
+    @Param('id') id: string,
+    @Body() transferDto: TransferPatientDto,
+    @TenantId() tenantId: string,
+  ) {
+    return this.service.transferPatient(id, transferDto, tenantId);
   }
 
   /**

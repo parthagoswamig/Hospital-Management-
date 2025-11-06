@@ -142,6 +142,100 @@ export interface IpdStatsResponse {
   };
 }
 
+// ==================== ADMISSION TYPES ====================
+
+export interface CreateAdmissionDto {
+  patientId: string;
+  bedId: string;
+  doctorId: string;
+  reason: string;
+  diagnosis?: string;
+  notes?: string;
+  expectedDischargeDate?: string;
+}
+
+export interface UpdateAdmissionDto {
+  doctorId?: string;
+  diagnosis?: string;
+  notes?: string;
+  expectedDischargeDate?: string;
+}
+
+export interface DischargePatientDto {
+  dischargeSummary: string;
+  dischargeInstructions?: string;
+  followUpDate?: string;
+}
+
+export interface TransferPatientDto {
+  newBedId: string;
+  reason: string;
+  notes?: string;
+}
+
+export interface AdmissionFilters {
+  page?: number;
+  limit?: number;
+  status?: 'ADMITTED' | 'DISCHARGED' | 'TRANSFERRED';
+  wardId?: string;
+  doctorId?: string;
+  patientId?: string;
+  search?: string;
+}
+
+export interface AdmissionResponse {
+  success: boolean;
+  message?: string;
+  data: {
+    id: string;
+    patientId: string;
+    doctorId: string;
+    bedId?: string;
+    recordType: string;
+    title: string;
+    description?: string;
+    date: string;
+    status?: string;
+    patient?: {
+      id: string;
+      firstName: string;
+      lastName: string;
+      phone?: string;
+      email?: string;
+      medicalRecordNumber?: string;
+    };
+    doctor?: {
+      id: string;
+      firstName: string;
+      lastName: string;
+      specialization?: string;
+    };
+    bed?: {
+      id: string;
+      bedNumber: string;
+      ward: {
+        id: string;
+        name: string;
+      };
+    };
+    createdAt: string;
+    updatedAt: string;
+  };
+}
+
+export interface AdmissionsListResponse {
+  success: boolean;
+  data: {
+    admissions: AdmissionResponse['data'][];
+    pagination: {
+      total: number;
+      page: number;
+      limit: number;
+      pages: number;
+    };
+  };
+}
+
 const ipdService = {
   // ==================== WARD OPERATIONS ====================
 
@@ -210,6 +304,50 @@ const ipdService = {
    */
   getStats: async (): Promise<IpdStatsResponse> => {
     return enhancedApiClient.get('/ipd/stats');
+  },
+
+  // ==================== ADMISSION OPERATIONS ====================
+
+  /**
+   * Admit a patient
+   */
+  admitPatient: async (data: CreateAdmissionDto): Promise<AdmissionResponse> => {
+    return enhancedApiClient.post('/ipd/admissions', data);
+  },
+
+  /**
+   * Get all admissions with filters
+   */
+  getAdmissions: async (filters?: AdmissionFilters): Promise<AdmissionsListResponse> => {
+    return enhancedApiClient.get('/ipd/admissions', filters);
+  },
+
+  /**
+   * Get admission by ID
+   */
+  getAdmissionById: async (id: string): Promise<AdmissionResponse> => {
+    return enhancedApiClient.get(`/ipd/admissions/${id}`);
+  },
+
+  /**
+   * Update admission
+   */
+  updateAdmission: async (id: string, data: UpdateAdmissionDto): Promise<AdmissionResponse> => {
+    return enhancedApiClient.patch(`/ipd/admissions/${id}`, data);
+  },
+
+  /**
+   * Discharge patient
+   */
+  dischargePatient: async (id: string, data: DischargePatientDto): Promise<AdmissionResponse> => {
+    return enhancedApiClient.post(`/ipd/admissions/${id}/discharge`, data);
+  },
+
+  /**
+   * Transfer patient to another bed
+   */
+  transferPatient: async (id: string, data: TransferPatientDto): Promise<AdmissionResponse> => {
+    return enhancedApiClient.post(`/ipd/admissions/${id}/transfer`, data);
   },
 };
 

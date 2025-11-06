@@ -150,7 +150,7 @@ export class OpdService {
       }
 
       // Verify doctor exists
-      const doctor = await this.prisma.staff.findFirst({
+      const doctor = await this.prisma.user.findFirst({
         where: { id: createDto.doctorId, tenantId },
       });
       if (!doctor) {

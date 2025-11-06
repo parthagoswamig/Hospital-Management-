@@ -17,10 +17,14 @@ import {
   ApiResponse,
   ApiBearerAuth,
   ApiParam,
+  ApiHeader,
 } from '@nestjs/swagger';
 import { OpdService } from './opd.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { TenantId } from '../shared/decorators/tenant-id.decorator';
+import { Roles } from '../core/rbac/decorators/roles.decorator';
+import { RolesGuard } from '../core/rbac/guards/roles.guard';
+import { UserRole } from '../core/rbac/enums/roles.enum';
 import {
   CreateOpdVisitDto,
   UpdateOpdVisitDto,
@@ -30,8 +34,13 @@ import {
 
 @ApiTags('OPD')
 @ApiBearerAuth()
+@ApiHeader({
+  name: 'X-Tenant-Id',
+  description: 'Tenant ID for multi-tenancy',
+  required: true,
+})
 @Controller('opd')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class OpdController {
   constructor(private readonly opdService: OpdService) {}
 
@@ -40,6 +49,12 @@ export class OpdController {
    */
   @Post('visits')
   @HttpCode(HttpStatus.CREATED)
+  @Roles(
+    UserRole.TENANT_ADMIN,
+    UserRole.HOSPITAL_ADMIN,
+    UserRole.DOCTOR,
+    UserRole.RECEPTIONIST,
+  )
   @ApiOperation({
     summary: 'Create a new OPD visit',
     description: 'Creates a new outpatient department visit for a patient',
@@ -111,6 +126,11 @@ export class OpdController {
    * Update OPD visit
    */
   @Patch('visits/:id')
+  @Roles(
+    UserRole.TENANT_ADMIN,
+    UserRole.HOSPITAL_ADMIN,
+    UserRole.DOCTOR,
+  )
   @ApiOperation({
     summary: 'Update OPD visit',
     description: 'Updates an existing OPD visit',
@@ -140,6 +160,11 @@ export class OpdController {
    * Cancel OPD visit
    */
   @Delete('visits/:id')
+  @Roles(
+    UserRole.TENANT_ADMIN,
+    UserRole.HOSPITAL_ADMIN,
+    UserRole.DOCTOR,
+  )
   @ApiOperation({
     summary: 'Cancel OPD visit',
     description: 'Cancels an existing OPD visit',

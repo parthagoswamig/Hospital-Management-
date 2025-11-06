@@ -296,7 +296,21 @@ const pharmacyService = {
    * Get pharmacy statistics
    */
   getPharmacyStats: async (): Promise<PharmacyStatsResponse> => {
-    return enhancedApiClient.get('/pharmacy/orders/stats');
+    return enhancedApiClient.get('/pharmacy/stats');
+  },
+
+  /**
+   * Get expiring medications
+   */
+  getExpiringMedications: async (days?: number): Promise<MedicationsListResponse> => {
+    return enhancedApiClient.get('/pharmacy/medications/expiring', { days });
+  },
+
+  /**
+   * Get low stock medications
+   */
+  getLowStockMedications: async (): Promise<MedicationsListResponse> => {
+    return enhancedApiClient.get('/pharmacy/medications/low-stock');
   },
 };
 

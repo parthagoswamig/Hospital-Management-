@@ -321,3 +321,235 @@ export class BedFilterDto {
   @Type(() => Boolean)
   isActive?: boolean;
 }
+
+/**
+ * Enum for admission status
+ */
+export enum AdmissionStatus {
+  ADMITTED = 'ADMITTED',
+  DISCHARGED = 'DISCHARGED',
+  TRANSFERRED = 'TRANSFERRED',
+}
+
+/**
+ * DTO for creating admission
+ */
+export class CreateAdmissionDto {
+  @ApiProperty({
+    example: 'patient-uuid-123',
+    description: 'ID of the patient being admitted',
+  })
+  @IsString()
+  @IsNotEmpty()
+  patientId: string;
+
+  @ApiProperty({
+    example: 'bed-uuid-123',
+    description: 'ID of the bed assigned to the patient',
+  })
+  @IsString()
+  @IsNotEmpty()
+  bedId: string;
+
+  @ApiProperty({
+    example: 'doctor-uuid-123',
+    description: 'ID of the admitting doctor',
+  })
+  @IsString()
+  @IsNotEmpty()
+  doctorId: string;
+
+  @ApiProperty({
+    example: 'Severe pneumonia requiring hospitalization',
+    description: 'Reason for admission',
+  })
+  @IsString()
+  @IsNotEmpty()
+  reason: string;
+
+  @ApiPropertyOptional({
+    example: 'Pneumonia with respiratory distress',
+    description: 'Initial diagnosis',
+  })
+  @IsOptional()
+  @IsString()
+  diagnosis?: string;
+
+  @ApiPropertyOptional({
+    example: 'Patient requires IV antibiotics and oxygen support',
+    description: 'Additional notes about the admission',
+  })
+  @IsOptional()
+  @IsString()
+  notes?: string;
+
+  @ApiPropertyOptional({
+    example: '2024-12-15',
+    description: 'Expected discharge date',
+  })
+  @IsOptional()
+  @IsString()
+  expectedDischargeDate?: string;
+}
+
+/**
+ * DTO for updating admission
+ */
+export class UpdateAdmissionDto {
+  @ApiPropertyOptional({
+    example: 'doctor-uuid-456',
+    description: 'Updated doctor ID',
+  })
+  @IsOptional()
+  @IsString()
+  doctorId?: string;
+
+  @ApiPropertyOptional({
+    example: 'Updated diagnosis: Severe pneumonia with complications',
+    description: 'Updated diagnosis',
+  })
+  @IsOptional()
+  @IsString()
+  diagnosis?: string;
+
+  @ApiPropertyOptional({
+    example: 'Patient showing improvement',
+    description: 'Updated notes',
+  })
+  @IsOptional()
+  @IsString()
+  notes?: string;
+
+  @ApiPropertyOptional({
+    example: '2024-12-20',
+    description: 'Updated expected discharge date',
+  })
+  @IsOptional()
+  @IsString()
+  expectedDischargeDate?: string;
+}
+
+/**
+ * DTO for discharging patient
+ */
+export class DischargePatientDto {
+  @ApiProperty({
+    example: 'Patient fully recovered',
+    description: 'Discharge summary',
+  })
+  @IsString()
+  @IsNotEmpty()
+  dischargeSummary: string;
+
+  @ApiPropertyOptional({
+    example: 'Continue medication for 7 days, follow-up in 2 weeks',
+    description: 'Discharge instructions',
+  })
+  @IsOptional()
+  @IsString()
+  dischargeInstructions?: string;
+
+  @ApiPropertyOptional({
+    example: '2024-12-25T10:00:00.000Z',
+    description: 'Follow-up date',
+  })
+  @IsOptional()
+  @IsString()
+  followUpDate?: string;
+}
+
+/**
+ * DTO for transferring patient
+ */
+export class TransferPatientDto {
+  @ApiProperty({
+    example: 'bed-uuid-456',
+    description: 'ID of the new bed',
+  })
+  @IsString()
+  @IsNotEmpty()
+  newBedId: string;
+
+  @ApiProperty({
+    example: 'Patient requires ICU care',
+    description: 'Reason for transfer',
+  })
+  @IsString()
+  @IsNotEmpty()
+  reason: string;
+
+  @ApiPropertyOptional({
+    example: 'Transferred to ICU for closer monitoring',
+    description: 'Additional notes about the transfer',
+  })
+  @IsOptional()
+  @IsString()
+  notes?: string;
+}
+
+/**
+ * DTO for filtering admissions
+ */
+export class AdmissionFilterDto {
+  @ApiPropertyOptional({
+    example: 1,
+    minimum: 1,
+    default: 1,
+    description: 'Page number for pagination',
+  })
+  @IsOptional()
+  @Type(() => Number)
+  page?: number = 1;
+
+  @ApiPropertyOptional({
+    example: 10,
+    minimum: 1,
+    maximum: 100,
+    default: 10,
+    description: 'Number of items per page',
+  })
+  @IsOptional()
+  @Type(() => Number)
+  limit?: number = 10;
+
+  @ApiPropertyOptional({
+    enum: AdmissionStatus,
+    example: AdmissionStatus.ADMITTED,
+    description: 'Filter by admission status',
+  })
+  @IsOptional()
+  @IsEnum(AdmissionStatus)
+  status?: AdmissionStatus;
+
+  @ApiPropertyOptional({
+    example: 'ward-uuid-123',
+    description: 'Filter by ward ID',
+  })
+  @IsOptional()
+  @IsString()
+  wardId?: string;
+
+  @ApiPropertyOptional({
+    example: 'doctor-uuid-123',
+    description: 'Filter by doctor ID',
+  })
+  @IsOptional()
+  @IsString()
+  doctorId?: string;
+
+  @ApiPropertyOptional({
+    example: 'patient-uuid-123',
+    description: 'Filter by patient ID',
+  })
+  @IsOptional()
+  @IsString()
+  patientId?: string;
+
+  @ApiPropertyOptional({
+    example: 'John Doe',
+    description: 'Search in patient name or admission reason',
+  })
+  @IsOptional()
+  @IsString()
+  search?: string;
+}

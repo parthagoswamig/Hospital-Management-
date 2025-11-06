@@ -16,9 +16,13 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiHeader,
 } from '@nestjs/swagger';
 import { AppointmentsService } from './appointments.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Roles } from '../core/rbac/decorators/roles.decorator';
+import { RolesGuard } from '../core/rbac/guards/roles.guard';
+import { UserRole } from '../core/rbac/enums/roles.enum';
 import {
   CreateAppointmentDto,
   UpdateAppointmentDto,
@@ -31,13 +35,19 @@ import { TenantId } from '../shared/decorators/tenant-id.decorator';
 
 @ApiTags('Appointments')
 @ApiBearerAuth()
+@ApiHeader({
+  name: 'X-Tenant-Id',
+  description: 'Tenant ID for multi-tenancy',
+  required: true,
+})
 @Controller('appointments')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class AppointmentsController {
   constructor(private readonly appointmentsService: AppointmentsService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_ADMIN, UserRole.RECEPTIONIST, UserRole.DOCTOR)
   @ApiOperation({ summary: 'Create a new appointment' })
   @ApiResponse({ status: 201, description: 'Appointment created successfully' })
   @ApiResponse({ status: 400, description: 'Bad request' })
@@ -85,6 +95,7 @@ export class AppointmentsController {
   }
 
   @Get('stats')
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_ADMIN, UserRole.RECEPTIONIST, UserRole.DOCTOR)
   @ApiOperation({ summary: 'Get appointment statistics' })
   @ApiResponse({
     status: 200,
@@ -106,6 +117,7 @@ export class AppointmentsController {
   }
 
   @Patch(':id')
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_ADMIN, UserRole.RECEPTIONIST, UserRole.DOCTOR)
   @ApiOperation({ summary: 'Update appointment by ID' })
   @ApiResponse({ status: 200, description: 'Appointment updated successfully' })
   @ApiResponse({ status: 404, description: 'Appointment not found' })
@@ -118,6 +130,7 @@ export class AppointmentsController {
   }
 
   @Patch(':id/status')
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_ADMIN, UserRole.RECEPTIONIST, UserRole.DOCTOR)
   @ApiOperation({ summary: 'Update appointment status' })
   @ApiResponse({ status: 200, description: 'Status updated successfully' })
   @ApiResponse({ status: 404, description: 'Appointment not found' })
@@ -135,7 +148,8 @@ export class AppointmentsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Delete appointment by ID' })
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_ADMIN, UserRole.RECEPTIONIST)
+  @ApiOperation({ summary: 'Cancel/Delete appointment by ID' })
   @ApiResponse({ status: 204, description: 'Appointment deleted successfully' })
   @ApiResponse({ status: 404, description: 'Appointment not found' })
   async remove(@Param('id') id: string, @TenantId() tenantId: string) {

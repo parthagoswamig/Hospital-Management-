@@ -16,9 +16,13 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiHeader,
 } from '@nestjs/swagger';
 import { PharmacyService } from './pharmacy.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Roles } from '../core/rbac/decorators/roles.decorator';
+import { RolesGuard } from '../core/rbac/guards/roles.guard';
+import { UserRole } from '../core/rbac/enums/roles.enum';
 import {
   CreateMedicationDto,
   UpdateMedicationDto,
@@ -32,8 +36,13 @@ import { TenantId } from '../shared/decorators/tenant-id.decorator';
 
 @ApiTags('Pharmacy')
 @ApiBearerAuth()
+@ApiHeader({
+  name: 'X-Tenant-Id',
+  description: 'Tenant ID for multi-tenancy',
+  required: true,
+})
 @Controller('pharmacy')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class PharmacyController {
   constructor(private readonly pharmacyService: PharmacyService) {}
 
@@ -41,6 +50,7 @@ export class PharmacyController {
 
   @Post('medications')
   @HttpCode(HttpStatus.CREATED)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_ADMIN, UserRole.PHARMACIST)
   @ApiOperation({ summary: 'Create a new medication' })
   @ApiResponse({ status: 201, description: 'Medication created successfully' })
   @ApiResponse({ status: 400, description: 'Bad request' })
@@ -79,6 +89,7 @@ export class PharmacyController {
   }
 
   @Patch('medications/:id')
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_ADMIN, UserRole.PHARMACIST)
   @ApiOperation({ summary: 'Update medication by ID' })
   @ApiResponse({ status: 200, description: 'Medication updated successfully' })
   @ApiResponse({ status: 404, description: 'Medication not found' })
@@ -96,6 +107,7 @@ export class PharmacyController {
 
   @Delete('medications/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_ADMIN)
   @ApiOperation({ summary: 'Soft delete medication by ID' })
   @ApiResponse({ status: 204, description: 'Medication deleted successfully' })
   @ApiResponse({ status: 404, description: 'Medication not found' })
@@ -110,6 +122,7 @@ export class PharmacyController {
 
   @Post('orders')
   @HttpCode(HttpStatus.CREATED)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_ADMIN, UserRole.DOCTOR, UserRole.PHARMACIST)
   @ApiOperation({ summary: 'Create a new pharmacy order' })
   @ApiResponse({
     status: 201,
@@ -164,6 +177,7 @@ export class PharmacyController {
   }
 
   @Patch('orders/:id')
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_ADMIN, UserRole.PHARMACIST)
   @ApiOperation({ summary: 'Update pharmacy order by ID' })
   @ApiResponse({
     status: 200,
@@ -183,7 +197,8 @@ export class PharmacyController {
   }
 
   @Patch('orders/:orderId/items/:itemId')
-  @ApiOperation({ summary: 'Update pharmacy order item status' })
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_ADMIN, UserRole.PHARMACIST, UserRole.DOCTOR)
+  @ApiOperation({ summary: 'Update pharmacy order item status (Dispense)' })
   @ApiResponse({ status: 200, description: 'Order item updated successfully' })
   @ApiResponse({ status: 404, description: 'Order or item not found' })
   async updatePharmacyOrderItem(
@@ -202,6 +217,7 @@ export class PharmacyController {
 
   @Delete('orders/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TENANT_ADMIN, UserRole.PHARMACIST)
   @ApiOperation({ summary: 'Cancel pharmacy order by ID' })
   @ApiResponse({
     status: 204,
@@ -213,5 +229,40 @@ export class PharmacyController {
     @TenantId() tenantId: string,
   ) {
     return this.pharmacyService.cancelPharmacyOrder(id, tenantId);
+  }
+
+  // ==================== Additional Endpoints ====================
+
+  @Get('medications/expiring')
+  @ApiOperation({ summary: 'Get medications expiring soon' })
+  @ApiResponse({
+    status: 200,
+    description: 'Expiring medications retrieved successfully',
+  })
+  async getExpiringMedications(
+    @TenantId() tenantId: string,
+    @Query('days') days?: number,
+  ) {
+    return this.pharmacyService.getExpiringMedications(tenantId, days || 30);
+  }
+
+  @Get('medications/low-stock')
+  @ApiOperation({ summary: 'Get low stock medications' })
+  @ApiResponse({
+    status: 200,
+    description: 'Low stock medications retrieved successfully',
+  })
+  async getLowStockMedications(@TenantId() tenantId: string) {
+    return this.pharmacyService.getLowStockMedications(tenantId);
+  }
+
+  @Get('stats')
+  @ApiOperation({ summary: 'Get pharmacy statistics' })
+  @ApiResponse({
+    status: 200,
+    description: 'Statistics retrieved successfully',
+  })
+  async getStats(@TenantId() tenantId: string) {
+    return this.pharmacyService.getPharmacyStats(tenantId);
   }
 }
