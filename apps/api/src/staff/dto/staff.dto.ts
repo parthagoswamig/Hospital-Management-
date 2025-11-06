@@ -208,8 +208,8 @@ export class StaffQueryDto {
   @IsUUID()
   departmentId?: string;
 
-  @ApiPropertyOptional({ enum: ['active', 'inactive'], example: 'active' })
+  @ApiPropertyOptional({ enum: ['active', 'inactive', 'deactivated'], example: 'active' })
   @IsOptional()
   @IsString()
-  status?: 'active' | 'inactive';
+  status?: 'active' | 'inactive' | 'deactivated';
 }

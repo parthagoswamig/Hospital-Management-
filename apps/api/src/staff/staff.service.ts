@@ -344,12 +344,21 @@ export class StaffService {
   }
 
   private buildWhereClause(tenantId: string, query: StaffQueryDto) {
-    const { search, role, departmentId, status = 'active' } = query;
+    const { search, role, departmentId, status } = query;
 
     const where: any = {
       tenantId,
-      isActive: status === 'active',
     };
+
+    // Handle status filter
+    if (status) {
+      // Support 'active', 'inactive', and 'deactivated'
+      if (status === 'active') {
+        where.isActive = true;
+      } else if (status === 'inactive' || status === 'deactivated') {
+        where.isActive = false;
+      }
+    }
 
     if (departmentId) {
       where.departmentId = departmentId;

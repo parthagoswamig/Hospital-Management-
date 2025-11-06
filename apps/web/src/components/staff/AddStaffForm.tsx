@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Stack,
   SimpleGrid,
@@ -9,9 +9,13 @@ import {
   Button,
   Group,
   PasswordInput,
+  Modal,
+  ActionIcon,
+  Tooltip,
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { notifications } from '@mantine/notifications';
+import { IconPlus } from '@tabler/icons-react';
 import staffService, { CreateStaffDto } from '../../services/staff.service';
 
 interface AddStaffFormProps {
@@ -21,6 +25,9 @@ interface AddStaffFormProps {
 
 const AddStaffForm: React.FC<AddStaffFormProps> = ({ onSuccess, onCancel }) => {
   const [loading, setLoading] = useState(false);
+  const [departments, setDepartments] = useState<any[]>([]);
+  const [showAddDepartment, setShowAddDepartment] = useState(false);
+  const [newDepartment, setNewDepartment] = useState({ name: '', code: '', description: '' });
   const [formData, setFormData] = useState<CreateStaffDto>({
     email: '',
     password: '',
@@ -29,11 +36,84 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ onSuccess, onCancel }) => {
     role: 'DOCTOR',
     designation: '',
     specialization: '',
+    departmentId: '',
     licenseNumber: '',
     qualification: '',
     experience: '',
     joiningDate: new Date().toISOString().split('T')[0],
+    employeeId: '',
   });
+
+  // Fetch departments on mount
+  useEffect(() => {
+    fetchDepartments();
+  }, []);
+
+  const fetchDepartments = async () => {
+    try {
+      // You'll need to create this API endpoint
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/departments`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+          'X-Tenant-Id': localStorage.getItem('tenantId') || '',
+        },
+      });
+      const data = await response.json();
+      setDepartments(data.data || []);
+    } catch (error) {
+      console.error('Error fetching departments:', error);
+      setDepartments([]);
+    }
+  };
+
+  const handleCreateDepartment = async () => {
+    if (!newDepartment.name || !newDepartment.code) {
+      notifications.show({
+        title: 'Validation Error',
+        message: 'Department name and code are required',
+        color: 'red',
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/departments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+          'X-Tenant-Id': localStorage.getItem('tenantId') || '',
+        },
+        body: JSON.stringify(newDepartment),
+      });
+
+      if (!response.ok) throw new Error('Failed to create department');
+
+      const data = await response.json();
+      
+      notifications.show({
+        title: 'Success',
+        message: 'Department created successfully',
+        color: 'green',
+      });
+
+      // Refresh departments list
+      await fetchDepartments();
+      
+      // Select the newly created department
+      setFormData(prev => ({ ...prev, departmentId: data.data.id }));
+      
+      // Close modal and reset form
+      setShowAddDepartment(false);
+      setNewDepartment({ name: '', code: '', description: '' });
+    } catch (error: any) {
+      notifications.show({
+        title: 'Error',
+        message: error.message || 'Failed to create department',
+        color: 'red',
+      });
+    }
+  };
 
   const handleChange = (field: keyof CreateStaffDto, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -184,6 +264,32 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ onSuccess, onCancel }) => {
           />
         </SimpleGrid>
 
+        {/* Department Selection with Add New Option */}
+        <Group align="flex-end" grow>
+          <Select
+            label="Department"
+            placeholder="Select department (optional)"
+            value={formData.departmentId}
+            onChange={(value) => handleChange('departmentId', value || '')}
+            data={departments.map(dept => ({
+              value: dept.id,
+              label: dept.name,
+            }))}
+            clearable
+            searchable
+            style={{ flex: 1 }}
+          />
+          <Tooltip label="Add New Department">
+            <Button
+              variant="light"
+              leftSection={<IconPlus size={16} />}
+              onClick={() => setShowAddDepartment(true)}
+            >
+              Add Department
+            </Button>
+          </Tooltip>
+        </Group>
+
         {/* Professional Information */}
         <SimpleGrid cols={2}>
           <TextInput
@@ -242,6 +348,45 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ onSuccess, onCancel }) => {
           </Button>
         </Group>
       </Stack>
+
+      {/* Add Department Modal */}
+      <Modal
+        opened={showAddDepartment}
+        onClose={() => setShowAddDepartment(false)}
+        title="Add New Department"
+        size="md"
+      >
+        <Stack gap="md">
+          <TextInput
+            label="Department Name"
+            placeholder="e.g., Cardiology"
+            value={newDepartment.name}
+            onChange={(e) => setNewDepartment(prev => ({ ...prev, name: e.target.value }))}
+            required
+          />
+          <TextInput
+            label="Department Code"
+            placeholder="e.g., CARD"
+            value={newDepartment.code}
+            onChange={(e) => setNewDepartment(prev => ({ ...prev, code: e.target.value.toUpperCase() }))}
+            required
+          />
+          <TextInput
+            label="Description (Optional)"
+            placeholder="e.g., Heart and cardiovascular care"
+            value={newDepartment.description}
+            onChange={(e) => setNewDepartment(prev => ({ ...prev, description: e.target.value }))}
+          />
+          <Group justify="flex-end" mt="md">
+            <Button variant="light" onClick={() => setShowAddDepartment(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleCreateDepartment}>
+              Create Department
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
     </form>
   );
 };

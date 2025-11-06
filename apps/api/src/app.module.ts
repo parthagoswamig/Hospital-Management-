@@ -13,6 +13,7 @@ import { AuthModule as OldAuthModule } from './auth/auth.module';
 import { PatientsModule } from './patients/patients.module';
 import { AppointmentsModule } from './appointments/appointments.module';
 import { StaffModule } from './staff/staff.module';
+import { DepartmentModule } from './department/department.module';
 import { LaboratoryModule } from './laboratory/laboratory.module';
 import { PharmacyModule } from './pharmacy/pharmacy.module';
 import { BillingModule } from './billing/billing.module';
@@ -104,6 +105,7 @@ import { AppService } from './app.service';
     PatientsModule,
     AppointmentsModule,
     StaffModule,
+    DepartmentModule,
     LaboratoryModule,
     PharmacyModule,
     BillingModule,
