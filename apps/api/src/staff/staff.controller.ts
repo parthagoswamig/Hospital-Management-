@@ -16,6 +16,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiHeader,
 } from '@nestjs/swagger';
 import { StaffService } from './staff.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -23,12 +24,18 @@ import { CreateStaffDto, UpdateStaffDto, StaffQueryDto } from './dto';
 import { TenantId } from '../shared/decorators/tenant-id.decorator';
 import { Roles } from '../core/rbac/decorators/roles.decorator';
 import { RolesGuard } from '../core/rbac/guards/roles.guard';
+import { TenantGuard } from '../core/rbac/guards/tenant.guard';
 import { UserRole } from '../core/rbac/enums/roles.enum';
 
 @ApiTags('Staff')
 @ApiBearerAuth()
+@ApiHeader({
+  name: 'X-Tenant-Id',
+  description: 'Tenant ID for multi-tenancy',
+  required: true,
+})
 @Controller('staff')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, TenantGuard, RolesGuard)
 export class StaffController {
   constructor(private readonly staffService: StaffService) {}
 

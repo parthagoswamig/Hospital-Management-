@@ -45,10 +45,31 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ onSuccess, onCancel }) => {
     e.preventDefault();
 
     // Validation
-    if (!formData.email || !formData.password || !formData.firstName || !formData.lastName) {
+    if (!formData.email || !formData.password || !formData.firstName || !formData.lastName || !formData.role) {
       notifications.show({
         title: 'Validation Error',
-        message: 'Please fill in all required fields',
+        message: 'Please fill in all required fields (First Name, Last Name, Email, Password, Role)',
+        color: 'red',
+      });
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      notifications.show({
+        title: 'Validation Error',
+        message: 'Please enter a valid email address',
+        color: 'red',
+      });
+      return;
+    }
+
+    // Password validation
+    if (formData.password.length < 8) {
+      notifications.show({
+        title: 'Validation Error',
+        message: 'Password must be at least 8 characters long',
         color: 'red',
       });
       return;
@@ -67,9 +88,12 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ onSuccess, onCancel }) => {
       onSuccess();
     } catch (error: any) {
       console.error('Error creating staff:', error);
+      const errorMessage = error.response?.data?.message || 
+                          error.message || 
+                          'Failed to add staff member';
       notifications.show({
         title: 'Error',
-        message: error.response?.data?.message || 'Failed to add staff member',
+        message: Array.isArray(errorMessage) ? errorMessage.join(', ') : errorMessage,
         color: 'red',
       });
     } finally {

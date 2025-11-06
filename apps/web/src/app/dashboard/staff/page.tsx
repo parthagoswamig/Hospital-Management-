@@ -472,9 +472,8 @@ const StaffManagement = () => {
                   <Select
                     placeholder="Status"
                     data={[
-                      { value: 'ACTIVE', label: 'Active' },
-                      { value: 'INACTIVE', label: 'Inactive' },
-                      { value: 'PENDING', label: 'Pending' },
+                      { value: 'active', label: 'Active' },
+                      { value: 'inactive', label: 'Inactive' },
                     ]}
                     value={selectedStatus}
                     onChange={setSelectedStatus}
@@ -536,35 +535,44 @@ const StaffManagement = () => {
                           </Table.Td>
                         </Table.Tr>
                       ) : (
-                        filteredStaff.map((staff) => (
-                          <Table.Tr key={staff.id}>
+                        filteredStaff.map((staffMember) => {
+                          const firstName = staffMember.user?.firstName || staffMember.firstName || '';
+                          const lastName = staffMember.user?.lastName || staffMember.lastName || '';
+                          const email = staffMember.user?.email || staffMember.email || '';
+                          const role = staffMember.user?.role || staffMember.role || 'N/A';
+                          const departmentName = staffMember.department?.name || 'N/A';
+                          const experience = staffMember.experience || staffMember.user?.experience || '0';
+                          const isActive = staffMember.isActive !== undefined ? staffMember.isActive : true;
+                          
+                          return (
+                          <Table.Tr key={staffMember.id}>
                             <Table.Td>
                               <Group>
                                 <Avatar color="blue" radius="xl">
-                                  {staff.firstName[0]}
-                                  {staff.lastName[0]}
+                                  {firstName[0] || '?'}
+                                  {lastName[0] || '?'}
                                 </Avatar>
                                 <div>
                                   <Text fw={500}>
-                                    {staff.firstName} {staff.lastName}
+                                    {firstName} {lastName}
                                   </Text>
                                   <Text size="sm" c="dimmed">
-                                    {staff.contactInfo.email}
+                                    {email}
                                   </Text>
                                 </div>
                               </Group>
                             </Table.Td>
-                            <Table.Td>{staff.staffId}</Table.Td>
+                            <Table.Td>{staffMember.employeeId || 'N/A'}</Table.Td>
                             <Table.Td>
-                              <Badge color={getRoleBadgeColor(staff.role)} variant="light">
-                                {staff.role ? staff.role.replace('_', ' ') : 'N/A'}
+                              <Badge color={getRoleBadgeColor(role as any)} variant="light">
+                                {role.replace('_', ' ')}
                               </Badge>
                             </Table.Td>
-                            <Table.Td>{staff.department.name}</Table.Td>
-                            <Table.Td>{staff.experience} years</Table.Td>
+                            <Table.Td>{departmentName}</Table.Td>
+                            <Table.Td>{experience} years</Table.Td>
                             <Table.Td>
-                              <Badge color={getStatusBadgeColor(staff.status)} variant="light">
-                                {staff.status}
+                              <Badge color={isActive ? 'green' : 'red'} variant="light">
+                                {isActive ? 'Active' : 'Inactive'}
                               </Badge>
                             </Table.Td>
                             <Table.Td>
@@ -572,11 +580,15 @@ const StaffManagement = () => {
                                 <ActionIcon
                                   variant="subtle"
                                   color="blue"
-                                  onClick={() => handleViewStaff(staff)}
+                                  onClick={() => handleViewStaff(staffMember)}
                                 >
                                   <IconEye size={16} />
                                 </ActionIcon>
-                                <ActionIcon variant="subtle" color="green">
+                                <ActionIcon 
+                                  variant="subtle" 
+                                  color="green"
+                                  onClick={() => handleEditStaff(staffMember)}
+                                >
                                   <IconEdit size={16} />
                                 </ActionIcon>
                                 <Menu>
@@ -589,7 +601,7 @@ const StaffManagement = () => {
                                     <Menu.Item
                                       leftSection={<IconTrash size={14} />}
                                       color="red"
-                                      onClick={() => handleDeleteStaff(staff)}
+                                      onClick={() => handleDeleteStaff(staffMember)}
                                     >
                                       Delete
                                     </Menu.Item>
@@ -598,7 +610,8 @@ const StaffManagement = () => {
                               </Group>
                             </Table.Td>
                           </Table.Tr>
-                        ))
+                        );
+                        })
                       )}
                     </Table.Tbody>
                   </Table>

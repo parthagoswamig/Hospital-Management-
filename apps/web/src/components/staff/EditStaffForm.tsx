@@ -75,6 +75,16 @@ const EditStaffForm: React.FC<EditStaffFormProps> = ({
       return;
     }
 
+    // Name validation
+    if (formData.firstName.length < 2 || formData.lastName.length < 2) {
+      notifications.show({
+        title: 'Validation Error',
+        message: 'First name and last name must be at least 2 characters long',
+        color: 'red',
+      });
+      return;
+    }
+
     try {
       setLoading(true);
       await staffService.updateStaff(staffId, formData);
@@ -88,9 +98,12 @@ const EditStaffForm: React.FC<EditStaffFormProps> = ({
       onSuccess();
     } catch (error: any) {
       console.error('Error updating staff:', error);
+      const errorMessage = error.response?.data?.message || 
+                          error.message || 
+                          'Failed to update staff member';
       notifications.show({
         title: 'Error',
-        message: error.response?.data?.message || 'Failed to update staff member',
+        message: Array.isArray(errorMessage) ? errorMessage.join(', ') : errorMessage,
         color: 'red',
       });
     } finally {

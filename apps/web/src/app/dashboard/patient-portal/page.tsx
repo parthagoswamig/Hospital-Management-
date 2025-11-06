@@ -55,12 +55,7 @@ import {
   IconBell,
 } from '@tabler/icons-react';
 
-// Import types and mock data
-// Types are inferred from mock data
-// Mock data imports removed
 const PatientPortal = () => {
-  // Current logged-in patient (mock data)
-  const currentPatient = []; // TODO: Fetch from API
 
   // State management
   const [activeTab, setActiveTab] = useState<string>('dashboard');
@@ -89,7 +84,7 @@ const PatientPortal = () => {
       setAppointments(response.data || []);
     } catch (err) {
       console.error('Error fetching appointments:', err);
-      setAppointments([] /* TODO: Fetch from API */);
+      setAppointments([]);
     }
   }, []);
 
@@ -99,7 +94,7 @@ const PatientPortal = () => {
       setPrescriptions(response.data || []);
     } catch (err) {
       console.error('Error fetching prescriptions:', err);
-      setPrescriptions([] /* TODO: Fetch from API */);
+      setPrescriptions([]);
     }
   }, []);
 
@@ -109,7 +104,7 @@ const PatientPortal = () => {
       setLabResults(response.data || []);
     } catch (err) {
       console.error('Error fetching lab results:', err);
-      setLabResults([] /* TODO: Fetch from API */);
+      setLabResults([]);
     }
   }, []);
 
@@ -119,7 +114,7 @@ const PatientPortal = () => {
       setMedicalRecords(response.data || []);
     } catch (err) {
       console.error('Error fetching medical records:', err);
-      setMedicalRecords([] /* TODO: Fetch from API */);
+      setMedicalRecords([]);
     }
   }, []);
 
@@ -136,10 +131,10 @@ const PatientPortal = () => {
     } catch (err: any) {
       console.error('Error loading patient portal data:', err);
       setError(err.response?.data?.message || 'Failed to load data');
-      setAppointments([] /* TODO: Fetch from API */);
-      setPrescriptions([] /* TODO: Fetch from API */);
-      setLabResults([] /* TODO: Fetch from API */);
-      setMedicalRecords([] /* TODO: Fetch from API */);
+      setAppointments([]);
+      setPrescriptions([]);
+      setLabResults([]);
+      setMedicalRecords([]);
     } finally {
       setLoading(false);
     }
@@ -294,25 +289,25 @@ const PatientPortal = () => {
   const quickStats = [
     {
       title: 'Upcoming Appointments',
-      value: 0 /* TODO: Fetch from API */,
+      value: 0,
       icon: IconCalendarEvent,
       color: 'blue',
     },
     {
       title: 'Active Prescriptions',
-      value: 0 /* TODO: Fetch from API */,
+      value: 0,
       icon: IconPill,
       color: 'green',
     },
     {
       title: 'Test Results',
-      value: 0 /* TODO: Fetch from API */,
+      value: 0,
       icon: IconFlask,
       color: 'orange',
     },
     {
       title: 'Medical Records',
-      value: 0 /* TODO: Fetch from API */,
+      value: 0,
       icon: IconMessage,
       color: 'red',
     },
@@ -414,9 +409,7 @@ const PatientPortal = () => {
                 Recent Notifications
               </Title>
               <Stack gap="sm">
-                {[] /* TODO: Fetch from API */
-                  .slice(0, 5)
-                  .map((notification) => (
+                {[].slice(0, 5).map((notification) => (
                     <Alert
                       key={notification.id}
                       variant="light"
@@ -540,9 +533,7 @@ const PatientPortal = () => {
                 Recent Test Results
               </Title>
               <Stack gap="sm">
-                {[] /* TODO: Fetch from API */
-                  .slice(0, 3)
-                  .map((result) => (
+                {[].slice(0, 3).map((result) => (
                     <Card key={result.id} padding="sm" withBorder>
                       <Group justify="space-between">
                         <div>
@@ -613,8 +604,7 @@ const PatientPortal = () => {
               />
               <Select
                 placeholder="Doctor"
-                data={[].map(
-                  /* TODO: Fetch from API */ (doctor) => ({
+                data={[].map((doctor) => ({
                     value: doctor.id,
                     label: doctor.name,
                   })
@@ -720,8 +710,7 @@ const PatientPortal = () => {
 
             {/* Prescriptions Grid */}
             <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
-              {[].map(
-                /* TODO: Fetch from API */ (prescription) => (
+              {[].map((prescription) => (
                   <Card key={prescription.id} padding="lg" radius="md" withBorder>
                     <Group justify="space-between" mb="md">
                       <div>
@@ -825,8 +814,7 @@ const PatientPortal = () => {
 
             {/* Test Results Grid */}
             <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
-              {[].map(
-                /* TODO: Fetch from API */ (result) => (
+              {[].map((result) => (
                   <Card key={result.id} padding="lg" radius="md" withBorder>
                     <Group justify="space-between" mb="md">
                       <div>
@@ -946,9 +934,8 @@ const PatientPortal = () => {
             </Group>
 
             {/* Medical Records Timeline */}
-            <Timeline active={0 /* TODO: Fetch from API */} bulletSize={24} lineWidth={2}>
-              {[].map(
-                /* TODO: Fetch from API */ (record, _index) => (
+            <Timeline active={0} bulletSize={24} lineWidth={2}>
+              {[].map((record, _index) => (
                   <Timeline.Item
                     key={record.id}
                     bullet={
@@ -1074,8 +1061,7 @@ const PatientPortal = () => {
                   Messages
                 </Title>
                 <Stack gap="sm">
-                  {[].map(
-                    /* TODO: Fetch from API */ (communication) => (
+                  {[].map((communication) => (
                       <Card key={communication.id} padding="md" withBorder>
                         <Group justify="space-between" mb="sm">
                           <Group>

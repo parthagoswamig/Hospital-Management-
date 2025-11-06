@@ -62,36 +62,31 @@ export class CreateStaffDto {
   @MaxLength(500)
   experience?: string;
 
-  // User creation fields
-  @ApiPropertyOptional({ example: 'doctor@example.com' })
-  @IsOptional()
+  // User creation fields - REQUIRED
+  @ApiProperty({ example: 'doctor@example.com', required: true })
   @IsEmail()
-  email?: string;
+  email: string;
 
-  @ApiPropertyOptional({ example: 'Password123!' })
-  @IsOptional()
+  @ApiProperty({ example: 'Password123!', required: true })
   @IsString()
   @MinLength(8)
-  password?: string;
+  password: string;
 
-  @ApiPropertyOptional({ example: 'John' })
-  @IsOptional()
+  @ApiProperty({ example: 'John', required: true })
   @IsString()
   @MinLength(2)
   @MaxLength(50)
-  firstName?: string;
+  firstName: string;
 
-  @ApiPropertyOptional({ example: 'Doe' })
-  @IsOptional()
+  @ApiProperty({ example: 'Doe', required: true })
   @IsString()
   @MinLength(2)
   @MaxLength(50)
-  lastName?: string;
+  lastName: string;
 
-  @ApiPropertyOptional({ enum: StaffRole, example: StaffRole.DOCTOR })
-  @IsOptional()
+  @ApiProperty({ enum: StaffRole, example: StaffRole.DOCTOR, required: true })
   @IsEnum(StaffRole)
-  role?: StaffRole;
+  role: StaffRole;
 
   @ApiPropertyOptional({ example: 'Cardiology' })
   @IsOptional()
