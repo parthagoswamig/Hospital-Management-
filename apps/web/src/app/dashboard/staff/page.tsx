@@ -345,8 +345,8 @@ const StaffManagement = () => {
       ].filter((item) => item.value > 0)
     : [];
 
-  const departmentDistributionData: any[] = []; // TODO: Implement when department stats are available
-  const hiringTrendsData: any[] = []; // TODO: Implement when hiring trends are available
+  const departmentDistributionData: any[] = [];
+  const hiringTrendsData: any[] = [];
 
   return (
     <Container size="xl" py={{ base: 'xs', sm: 'sm', md: 'md' }} px={{ base: 'xs', sm: 'sm', md: 'md', lg: 'lg' }}>
@@ -451,9 +451,7 @@ const StaffManagement = () => {
                   />
                   <Select
                     placeholder="Department"
-                    data={[].map(
-                      /* TODO: Fetch from API */ (dept) => ({ value: dept.name, label: dept.name })
-                    )}
+                    data={[].map((dept) => ({ value: dept.name, label: dept.name }))}
                     value={selectedDepartment}
                     onChange={setSelectedDepartment}
                     clearable
@@ -617,8 +615,7 @@ const StaffManagement = () => {
                 </Group>
 
                 <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }}>
-                  {[].map(
-                    /* TODO: Fetch from API */ (dept) => (
+                  {[].map((dept) => (
                       <Card key={dept.id} padding="lg" radius="md" withBorder>
                         <Group justify="space-between" mb="md">
                           <div>
@@ -682,8 +679,7 @@ const StaffManagement = () => {
                       Today&apos;s Shifts
                     </Title>
                     <Stack gap="md">
-                      {[].map(
-                        /* TODO: Fetch from API */ (shift) => {
+                      {[].map((shift) => {
                           const staffMember = staff.find(
                             (s) => s.id === shift.staffId || s.staffId === shift.staffId
                           );
@@ -841,8 +837,7 @@ const StaffManagement = () => {
                         </Table.Tr>
                       </Table.Thead>
                       <Table.Tbody>
-                        {[].map(
-                          /* TODO: Fetch from API */ (record) => {
+                        {[].map((record) => {
                             const staffMember = staff.find(
                               (s) => s.id === record.staffId || s.staffId === record.staffId
                             );

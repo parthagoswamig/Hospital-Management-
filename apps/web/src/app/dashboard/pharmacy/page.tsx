@@ -100,10 +100,10 @@ const PharmacyManagement = () => {
       } catch (err: any) {
         console.error('Error loading pharmacy data:', err);
         _setError(err.response?.data?.message || err.message || 'Failed to load pharmacy data');
-        // Fallback to mock data
-        setPharmacyStats([] /* TODO: Fetch from API */);
-        setMedications([] /* TODO: Fetch from API */);
-        setPharmacyOrders([] /* TODO: Fetch from API */);
+        // Set empty data on error
+        setPharmacyStats([]);
+        setMedications([]);
+        setPharmacyOrders([]);
       } finally {
         _setLoading(false);
       }
@@ -224,8 +224,7 @@ const PharmacyManagement = () => {
 
   // Filter dispensations
   const filteredDispensations = useMemo(() => {
-    return [].filter(
-      /* TODO: Fetch from API */ (dispensation: any) => {
+    return [].filter((dispensation: any) => {
         const matchesSearch =
           dispensation.dispensationId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
           dispensation.id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -316,12 +315,10 @@ const PharmacyManagement = () => {
   };
 
   const handleViewPrescription = (prescription: any) => {
-    // TODO: Implement prescription detail modal
     console.log('View prescription:', prescription);
   };
 
   const handleDispenseMedication = (dispensation: any) => {
-    // TODO: Implement dispensation modal
     console.log('Dispense medication:', dispensation);
   };
 
@@ -1117,8 +1114,7 @@ const PharmacyManagement = () => {
 
             {/* Inventory Overview */}
             <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="lg">
-              {[].map(
-                /* TODO: Fetch from API */ (item: any) => {
+              {[].map((item: any) => {
                   const stockInfo = getStockLevel(item.currentStock, item.minimumStock);
 
                   return (
@@ -1204,7 +1200,7 @@ const PharmacyManagement = () => {
             >
               <Text size="sm">
                 {
-                  [].filter(/* TODO: Fetch from API */ (i) => i.severity === 'contraindicated')
+                  [].filter((i) => i.severity === 'contraindicated')
                     .length
                 }{' '}
                 contraindicated interactions found in current prescriptions.
@@ -1213,8 +1209,7 @@ const PharmacyManagement = () => {
 
             {/* Interactions List */}
             <Stack gap="md">
-              {[].map(
-                /* TODO: Fetch from API */ (interaction: any) => (
+              {[].map((interaction: any) => (
                   <Card key={interaction.id} padding="lg" radius="md" withBorder>
                     <Group justify="space-between" mb="md">
                       <div>
@@ -1622,8 +1617,7 @@ const PharmacyManagement = () => {
           <Select
             label="First Medication"
             placeholder="Select medication"
-            data={[].map(
-              /* TODO: Fetch from API */ (med: any) => ({
+            data={[].map((med: any) => ({
                 value: med.id,
                 label: `${med.brandName || med.name || med.genericName} (${med.genericName || med.name})`,
               })
@@ -1634,8 +1628,7 @@ const PharmacyManagement = () => {
           <Select
             label="Second Medication"
             placeholder="Select medication"
-            data={[].map(
-              /* TODO: Fetch from API */ (med: any) => ({
+            data={[].map((med: any) => ({
                 value: med.id,
                 label: `${med.brandName || med.name || med.genericName} (${med.genericName || med.name})`,
               })

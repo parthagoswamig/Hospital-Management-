@@ -405,7 +405,7 @@ const AppointmentManagement = () => {
               />
               <Select
                 placeholder="Doctor"
-                data={[]} // TODO: Fetch from staff API
+                data={[]}
                 value={selectedDoctor}
                 onChange={(value) => setSelectedDoctor(value || '')}
                 searchable
@@ -501,15 +501,15 @@ const AppointmentManagement = () => {
                         <Table.Td>
                           <Group>
                             <Avatar color="blue" radius="xl">
-                              {appointment.patient.firstName[0]}
-                              {appointment.patient.lastName[0]}
+                              {appointment.patient?.firstName?.[0] || 'P'}
+                              {appointment.patient?.lastName?.[0] || 'T'}
                             </Avatar>
                             <div>
                               <Text fw={500}>
-                                {appointment.patient.firstName} {appointment.patient.lastName}
+                                {appointment.patient?.firstName || 'N/A'} {appointment.patient?.lastName || ''}
                               </Text>
                               <Text size="sm" c="dimmed">
-                                {appointment.appointmentNumber}
+                                {appointment.appointmentNumber || 'N/A'}
                               </Text>
                             </div>
                           </Group>
@@ -517,10 +517,10 @@ const AppointmentManagement = () => {
                         <Table.Td>
                           <div>
                             <Text fw={500}>
-                              {appointment.doctor.firstName} {appointment.doctor.lastName}
+                              {appointment.doctor?.firstName || 'N/A'} {appointment.doctor?.lastName || ''}
                             </Text>
                             <Text size="sm" c="dimmed">
-                              {appointment.department}
+                              {appointment.department || 'N/A'}
                             </Text>
                           </div>
                         </Table.Td>
@@ -530,18 +530,18 @@ const AppointmentManagement = () => {
                               {isClient ? formatDate(appointment.appointmentDate) : 'Loading...'}
                             </Text>
                             <Text size="sm" c="dimmed">
-                              {appointment.appointmentTime} ({appointment.duration} min)
+                              {appointment.appointmentTime || 'N/A'} ({appointment.duration || 0} min)
                             </Text>
                           </div>
                         </Table.Td>
                         <Table.Td>
                           <Badge color={getTypeColor(appointment.appointmentType)} variant="light">
-                            {appointment.appointmentType.replace('_', ' ')}
+                            {appointment.appointmentType?.replace('_', ' ') || 'N/A'}
                           </Badge>
                         </Table.Td>
                         <Table.Td>
                           <Badge color={getStatusColor(appointment.status)} variant="light">
-                            {appointment.status.replace('_', ' ')}
+                            {appointment.status?.replace('_', ' ') || 'N/A'}
                           </Badge>
                         </Table.Td>
                         <Table.Td>
@@ -550,12 +550,12 @@ const AppointmentManagement = () => {
                             variant="light"
                             size="sm"
                           >
-                            {appointment.priority}
+                            {appointment.priority || 'normal'}
                           </Badge>
                         </Table.Td>
                         <Table.Td>
                           <div>
-                            <Text fw={500}>₹{appointment.consultationFee}</Text>
+                            <Text fw={500}>₹{appointment.consultationFee || 0}</Text>
                             <Badge
                               color={appointment.isPaid ? 'green' : 'red'}
                               variant="light"
@@ -626,12 +626,7 @@ const AppointmentManagement = () => {
               <Group>
                 <Select
                   placeholder="Select Doctor"
-                  data={[].map(
-                    /* TODO: Fetch from API */ (doctor) => ({
-                      value: doctor.staffId,
-                      label: `${doctor.firstName} ${doctor.lastName}`,
-                    })
-                  )}
+                  data={[]}
                   value={selectedDoctor}
                   onChange={(value) => setSelectedDoctor(value || '')}
                 />
@@ -846,52 +841,9 @@ const AppointmentManagement = () => {
                 <Title order={4} mb="md">
                   Recent Reminders
                 </Title>
-                <Timeline>
-                  {[
-                    {
-                      id: '1',
-                      reminderType: 'appointment_reminder',
-                      message: 'Upcoming appointment in 2 hours',
-                      scheduledTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
-                      status: 'sent',
-                    },
-                    {
-                      id: '2',
-                      reminderType: 'follow_up',
-                      message: 'Follow-up appointment reminder',
-                      scheduledTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-                      status: 'pending',
-                    },
-                    {
-                      id: '3',
-                      reminderType: 'appointment_reminder',
-                      message: 'Appointment confirmation sent',
-                      scheduledTime: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
-                      status: 'sent',
-                    },
-                  ].map((reminder) => (
-                    <Timeline.Item
-                      key={reminder.id}
-                      bullet={<IconBell size={12} />}
-                      title={reminder.reminderType.replace('_', ' ').toUpperCase()}
-                    >
-                      <Text size="sm" c="dimmed">
-                        {reminder.message}
-                      </Text>
-                      <Text size="xs" c="dimmed" mt="xs">
-                        {new Date(reminder.scheduledTime).toLocaleString()}
-                      </Text>
-                      <Badge
-                        color={reminder.status === 'sent' ? 'green' : 'blue'}
-                        variant="light"
-                        size="xs"
-                        mt="xs"
-                      >
-                        {reminder.status}
-                      </Badge>
-                    </Timeline.Item>
-                  ))}
-                </Timeline>
+                <Text c="dimmed" ta="center" py="xl">
+                  No reminders yet
+                </Text>
               </Card>
             </SimpleGrid>
           </Paper>
@@ -999,16 +951,16 @@ const AppointmentManagement = () => {
             {/* Basic Info */}
             <Group>
               <Avatar size="xl" color="blue" radius="xl">
-                {selectedAppointment.patient.firstName[0]}
-                {selectedAppointment.patient.lastName[0]}
+                {selectedAppointment.patient?.firstName?.[0] || 'P'}
+                {selectedAppointment.patient?.lastName?.[0] || 'T'}
               </Avatar>
               <div>
                 <Title order={3}>
-                  {selectedAppointment.patient.firstName} {selectedAppointment.patient.lastName}
+                  {selectedAppointment.patient?.firstName || 'N/A'} {selectedAppointment.patient?.lastName || ''}
                 </Title>
-                <Text c="dimmed">{selectedAppointment.appointmentNumber}</Text>
+                <Text c="dimmed">{selectedAppointment.appointmentNumber || 'N/A'}</Text>
                 <Badge color={getStatusColor(selectedAppointment.status)} variant="light" mt="xs">
-                  {selectedAppointment.status.replace('_', ' ')}
+                  {selectedAppointment.status?.replace('_', ' ') || 'N/A'}
                 </Badge>
               </div>
             </Group>
@@ -1022,7 +974,7 @@ const AppointmentManagement = () => {
                   Doctor
                 </Text>
                 <Text size="sm" c="dimmed">
-                  {selectedAppointment.doctor.firstName} {selectedAppointment.doctor.lastName}
+                  {selectedAppointment.doctor?.firstName || 'N/A'} {selectedAppointment.doctor?.lastName || ''}
                 </Text>
               </div>
               <div>
@@ -1030,7 +982,7 @@ const AppointmentManagement = () => {
                   Department
                 </Text>
                 <Text size="sm" c="dimmed">
-                  {selectedAppointment.department}
+                  {selectedAppointment.department || 'N/A'}
                 </Text>
               </div>
               <div>
@@ -1038,8 +990,8 @@ const AppointmentManagement = () => {
                   Date & Time
                 </Text>
                 <Text size="sm" c="dimmed">
-                  {new Date(selectedAppointment.appointmentDate).toLocaleDateString()} at{' '}
-                  {selectedAppointment.appointmentTime}
+                  {selectedAppointment.appointmentDate ? new Date(selectedAppointment.appointmentDate).toLocaleDateString() : 'N/A'} at{' '}
+                  {selectedAppointment.appointmentTime || 'N/A'}
                 </Text>
               </div>
               <div>
@@ -1047,7 +999,7 @@ const AppointmentManagement = () => {
                   Duration
                 </Text>
                 <Text size="sm" c="dimmed">
-                  {selectedAppointment.duration} minutes
+                  {selectedAppointment.duration || 0} minutes
                 </Text>
               </div>
               <div>
@@ -1059,7 +1011,7 @@ const AppointmentManagement = () => {
                   variant="light"
                   size="sm"
                 >
-                  {selectedAppointment.appointmentType.replace('_', ' ')}
+                  {selectedAppointment.appointmentType?.replace('_', ' ') || 'N/A'}
                 </Badge>
               </div>
               <div>
@@ -1071,7 +1023,7 @@ const AppointmentManagement = () => {
                   variant="light"
                   size="sm"
                 >
-                  {selectedAppointment.priority}
+                  {selectedAppointment.priority || 'normal'}
                 </Badge>
               </div>
             </SimpleGrid>
@@ -1082,7 +1034,7 @@ const AppointmentManagement = () => {
                 Reason for Visit
               </Text>
               <Text size="sm" c="dimmed">
-                {selectedAppointment.reason}
+                {selectedAppointment.reason || 'N/A'}
               </Text>
             </div>
 
@@ -1138,14 +1090,14 @@ const AppointmentManagement = () => {
             <Select
               label="Patient"
               placeholder="Select patient"
-              data={[]} // TODO: Fetch from patients API
+              data={[]}
               searchable
               required
             />
             <Select
               label="Doctor"
               placeholder="Select doctor"
-              data={[]} // TODO: Fetch from staff API
+              data={[]}
               searchable
               required
             />

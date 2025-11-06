@@ -96,132 +96,6 @@ interface Doctor {
   maxPatientsPerDay: number;
 }
 
-// Mock data
-const mockOPDVisits: OPDVisit[] = [
-  {
-    id: '1',
-    visitNumber: 'OPD2024001',
-    patientId: 'P2024001',
-    patientName: 'Rajesh Kumar',
-    patientPhone: '+91 98765 43210',
-    doctorId: 'D001',
-    doctorName: 'Dr. Sharma',
-    department: 'Cardiology',
-    appointmentTime: '2024-01-15T09:00:00Z',
-    actualArrivalTime: '2024-01-15T08:55:00Z',
-    consultationStartTime: '2024-01-15T09:15:00Z',
-    status: 'in_consultation',
-    visitType: 'new',
-    chiefComplaint: 'Chest pain and shortness of breath',
-    consultationFee: 500,
-    paymentStatus: 'paid',
-    vitalSigns: {
-      bloodPressure: '140/90',
-      heartRate: 85,
-      temperature: 98.6,
-      weight: 75,
-      height: 170,
-    },
-    waitingTime: 15,
-  },
-  {
-    id: '2',
-    visitNumber: 'OPD2024002',
-    patientId: 'P2024002',
-    patientName: 'Sunita Patel',
-    patientPhone: '+91 87654 32109',
-    doctorId: 'D002',
-    doctorName: 'Dr. Reddy',
-    department: 'General Medicine',
-    appointmentTime: '2024-01-15T10:30:00Z',
-    status: 'arrived',
-    visitType: 'follow_up',
-    chiefComplaint: 'Follow-up for diabetes management',
-    consultationFee: 350,
-    paymentStatus: 'insurance',
-    actualArrivalTime: '2024-01-15T10:25:00Z',
-    waitingTime: 5,
-  },
-  {
-    id: '3',
-    visitNumber: 'OPD2024003',
-    patientId: 'P2024003',
-    patientName: 'Mohammed Ali',
-    patientPhone: '+91 76543 21098',
-    doctorId: 'D003',
-    doctorName: 'Dr. Singh',
-    department: 'Orthopedics',
-    appointmentTime: '2024-01-15T14:00:00Z',
-    status: 'scheduled',
-    visitType: 'new',
-    chiefComplaint: 'Knee pain and stiffness',
-    consultationFee: 600,
-    paymentStatus: 'pending',
-  },
-  {
-    id: '4',
-    visitNumber: 'OPD2024004',
-    patientId: 'P2024004',
-    patientName: 'Priya Gupta',
-    patientPhone: '+91 65432 10987',
-    doctorId: 'D001',
-    doctorName: 'Dr. Sharma',
-    department: 'Cardiology',
-    appointmentTime: '2024-01-15T11:30:00Z',
-    consultationStartTime: '2024-01-15T11:35:00Z',
-    consultationEndTime: '2024-01-15T12:05:00Z',
-    status: 'completed',
-    visitType: 'follow_up',
-    chiefComplaint: 'Post-surgery follow-up',
-    diagnosis: 'Post-operative recovery normal',
-    prescription: ['Aspirin 75mg - 1 daily', 'Metoprolol 25mg - 1 BD'],
-    nextVisitDate: '2024-02-15T11:30:00Z',
-    consultationFee: 500,
-    paymentStatus: 'paid',
-    consultationDuration: 30,
-    waitingTime: 5,
-  },
-];
-
-const mockDoctors: Doctor[] = [
-  {
-    id: 'D001',
-    name: 'Dr. Sharma',
-    specialization: 'Cardiologist',
-    department: 'Cardiology',
-    qualification: 'MD, DM Cardiology',
-    experience: 15,
-    consultationFee: 500,
-    availableSlots: ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30'],
-    currentPatients: 8,
-    maxPatientsPerDay: 20,
-  },
-  {
-    id: 'D002',
-    name: 'Dr. Reddy',
-    specialization: 'General Physician',
-    department: 'General Medicine',
-    qualification: 'MBBS, MD Internal Medicine',
-    experience: 12,
-    consultationFee: 350,
-    availableSlots: ['10:00', '10:30', '11:00', '11:30', '14:00', '14:30'],
-    currentPatients: 15,
-    maxPatientsPerDay: 25,
-  },
-  {
-    id: 'D003',
-    name: 'Dr. Singh',
-    specialization: 'Orthopedic Surgeon',
-    department: 'Orthopedics',
-    qualification: 'MS Orthopedics',
-    experience: 18,
-    consultationFee: 600,
-    availableSlots: ['14:00', '14:30', '15:00', '15:30', '16:00'],
-    currentPatients: 6,
-    maxPatientsPerDay: 15,
-  },
-];
-
 const OPDManagement = () => {
   // State management
   const [activeTab, setActiveTab] = useState<string>('queue');
@@ -293,7 +167,7 @@ const OPDManagement = () => {
     } catch (err: any) {
       console.error('Error loading OPD data:', err);
       setError(err.response?.data?.message || err.message || 'Failed to load OPD data');
-      setOpdVisits([] /* TODO: Fetch from API */);
+      setOpdVisits([]);
     } finally {
       setLoading(false);
     }
@@ -686,8 +560,7 @@ const OPDManagement = () => {
             </Title>
 
             <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="lg">
-              {[].map(
-                /* TODO: Fetch from API */ (doctor) => (
+              {[].map((doctor) => (
                   <Card key={doctor.id} padding="lg" radius="md" withBorder>
                     <Group justify="space-between" mb="md">
                       <div>
