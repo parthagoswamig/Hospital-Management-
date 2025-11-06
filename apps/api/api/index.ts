@@ -2,21 +2,21 @@ import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from '../src/app.module';
 import { ValidationPipe } from '@nestjs/common';
-import express from 'express';
+import express, { Request, Response } from 'express';
 
 const server = express();
-let app: any;
+let isInitialized = false;
 
 async function bootstrap() {
-  if (!app) {
+  if (!isInitialized) {
     try {
-      console.log('Starting NestJS initialization...');
+      console.log('Initializing NestJS...');
       
-      app = await NestFactory.create(
+      const app = await NestFactory.create(
         AppModule,
         new ExpressAdapter(server),
         {
-          logger: console,
+          logger: ['error', 'warn', 'log'],
         }
       );
 
@@ -33,15 +33,16 @@ async function bootstrap() {
       );
 
       await app.init();
-      console.log('NestJS initialized successfully');
+      isInitialized = true;
+      console.log('NestJS initialized');
     } catch (error) {
-      console.error('Bootstrap error:', error);
+      console.error('Bootstrap failed:', error);
       throw error;
     }
   }
 }
 
-// Initialize on cold start
-bootstrap().catch(console.error);
-
-export default server;
+export default async (req: Request, res: Response) => {
+  await bootstrap();
+  server(req, res);
+};
