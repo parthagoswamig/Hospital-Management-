@@ -34,14 +34,7 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ onSuccess, onCancel }) => {
     firstName: '',
     lastName: '',
     role: 'DOCTOR',
-    designation: '',
-    specialization: '',
-    departmentId: '',
-    licenseNumber: '',
-    qualification: '',
-    experience: '',
-    joiningDate: new Date().toISOString().split('T')[0],
-    employeeId: '',
+    // Don't initialize optional fields - they'll be undefined
   });
 
   // Fetch departments on mount
@@ -297,7 +290,7 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ onSuccess, onCancel }) => {
           <TextInput
             label="Designation"
             placeholder="e.g., Senior Doctor"
-            value={formData.designation}
+            value={formData.designation || ''}
             onChange={(e) => handleChange('designation', e.target.value)}
           />
         </SimpleGrid>
@@ -307,8 +300,8 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ onSuccess, onCancel }) => {
           <Select
             label="Department"
             placeholder="Select department (optional)"
-            value={formData.departmentId}
-            onChange={(value) => handleChange('departmentId', value || '')}
+            value={formData.departmentId || ''}
+            onChange={(value) => handleChange('departmentId', value || undefined)}
             data={departments.map(dept => ({
               value: dept.id,
               label: dept.name,
@@ -333,13 +326,13 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ onSuccess, onCancel }) => {
           <TextInput
             label="Specialization"
             placeholder="e.g., Cardiology"
-            value={formData.specialization}
+            value={formData.specialization || ''}
             onChange={(e) => handleChange('specialization', e.target.value)}
           />
           <TextInput
             label="License Number"
             placeholder="Enter license number"
-            value={formData.licenseNumber}
+            value={formData.licenseNumber || ''}
             onChange={(e) => handleChange('licenseNumber', e.target.value)}
           />
         </SimpleGrid>
@@ -349,13 +342,13 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ onSuccess, onCancel }) => {
           <TextInput
             label="Qualification"
             placeholder="e.g., MBBS, MD"
-            value={formData.qualification}
+            value={formData.qualification || ''}
             onChange={(e) => handleChange('qualification', e.target.value)}
           />
           <TextInput
             label="Experience"
             placeholder="e.g., 5 years in Cardiology"
-            value={formData.experience}
+            value={formData.experience || ''}
             onChange={(e) => handleChange('experience', e.target.value)}
           />
         </SimpleGrid>
@@ -365,13 +358,13 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ onSuccess, onCancel }) => {
           <TextInput
             label="Employee ID (Optional)"
             placeholder="Auto-generated if empty"
-            value={formData.employeeId}
+            value={formData.employeeId || ''}
             onChange={(e) => handleChange('employeeId', e.target.value)}
           />
           <TextInput
             label="Joining Date"
             type="date"
-            value={formData.joiningDate}
+            value={formData.joiningDate || ''}
             onChange={(e) => handleChange('joiningDate', e.target.value)}
           />
         </SimpleGrid>
