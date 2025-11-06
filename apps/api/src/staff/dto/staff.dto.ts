@@ -26,7 +26,7 @@ export enum StaffRole {
 export class CreateStaffDto {
   @ApiPropertyOptional({ example: 'user-uuid-123' })
   @IsOptional()
-  @ValidateIf((o) => o.userId !== '' && o.userId !== null)
+  @ValidateIf((o) => o.userId && o.userId.trim() !== '')
   @IsUUID()
   userId?: string;
 
@@ -44,7 +44,7 @@ export class CreateStaffDto {
 
   @ApiPropertyOptional({ example: 'dept-uuid-123' })
   @IsOptional()
-  @ValidateIf((o) => o.departmentId !== '' && o.departmentId !== null)
+  @ValidateIf((o) => o.departmentId && o.departmentId.trim() !== '')
   @IsUUID()
   departmentId?: string;
 
@@ -124,7 +124,7 @@ export class UpdateStaffDto {
 
   @ApiPropertyOptional({ example: 'dept-uuid-123' })
   @IsOptional()
-  @ValidateIf((o) => o.departmentId !== '' && o.departmentId !== null)
+  @ValidateIf((o) => o.departmentId && o.departmentId.trim() !== '')
   @IsUUID()
   departmentId?: string;
 
