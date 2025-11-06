@@ -6,8 +6,18 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  getRoot() {
+    return {
+      name: 'HMS SaaS API',
+      version: '1.0.0',
+      status: 'running',
+      endpoints: {
+        health: '/health',
+        docs: '/docs',
+        api: '/api',
+      },
+      message: 'Hospital Management System SaaS API - Visit /docs for API documentation',
+    };
   }
 
   @Get('health')
