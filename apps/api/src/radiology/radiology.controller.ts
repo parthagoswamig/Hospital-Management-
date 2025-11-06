@@ -58,7 +58,10 @@ export class RadiologyController {
     status: HttpStatus.OK,
     description: 'Radiology studies retrieved successfully',
   })
-  findAllStudies(@TenantId() tenantId: string, @Query() query: RadiologyFilterDto) {
+  findAllStudies(
+    @TenantId() tenantId: string,
+    @Query() query: RadiologyFilterDto,
+  ) {
     return this.radiologyService.findAllStudies(tenantId, query);
   }
 
@@ -122,7 +125,10 @@ export class RadiologyController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid request data',
   })
-  createReport(@Body() createDto: CreateReportDto, @TenantId() tenantId: string) {
+  createReport(
+    @Body() createDto: CreateReportDto,
+    @TenantId() tenantId: string,
+  ) {
     return this.radiologyService.createReport(createDto, tenantId);
   }
 
@@ -132,7 +138,10 @@ export class RadiologyController {
     status: HttpStatus.OK,
     description: 'Radiology reports retrieved successfully',
   })
-  findAllReports(@TenantId() tenantId: string, @Query() query: RadiologyFilterDto) {
+  findAllReports(
+    @TenantId() tenantId: string,
+    @Query() query: RadiologyFilterDto,
+  ) {
     return this.radiologyService.findAllReports(tenantId, query);
   }
 
@@ -181,7 +190,10 @@ export class RadiologyController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid request data',
   })
-  createOrder(@Body() createDto: CreateRadiologyOrderDto, @TenantId() tenantId: string) {
+  createOrder(
+    @Body() createDto: CreateRadiologyOrderDto,
+    @TenantId() tenantId: string,
+  ) {
     return this.radiologyService.createOrder(createDto, tenantId);
   }
 
@@ -191,7 +203,10 @@ export class RadiologyController {
     status: HttpStatus.OK,
     description: 'Radiology orders retrieved successfully',
   })
-  findAllOrders(@TenantId() tenantId: string, @Query() query: RadiologyFilterDto) {
+  findAllOrders(
+    @TenantId() tenantId: string,
+    @Query() query: RadiologyFilterDto,
+  ) {
     return this.radiologyService.findAllOrders(tenantId, query);
   }
 

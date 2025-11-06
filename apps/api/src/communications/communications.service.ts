@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  Logger,
+} from '@nestjs/common';
 import { CustomPrismaService } from '../prisma/custom-prisma.service';
 import {
   CreateMessageDto,
@@ -18,7 +23,11 @@ export class CommunicationsService {
   /**
    * Send a message
    */
-  async sendMessage(createDto: CreateMessageDto, tenantId: string, senderId: string) {
+  async sendMessage(
+    createDto: CreateMessageDto,
+    tenantId: string,
+    senderId: string,
+  ) {
     try {
       // Verify recipient exists
       const recipient = await this.prisma.user.findFirst({
@@ -41,10 +50,19 @@ export class CommunicationsService {
         },
       });
 
-      this.logger.log(`Message sent from ${senderId} to ${createDto.recipientId}`);
-      return { success: true, message: 'Message sent successfully', data: message };
+      this.logger.log(
+        `Message sent from ${senderId} to ${createDto.recipientId}`,
+      );
+      return {
+        success: true,
+        message: 'Message sent successfully',
+        data: message,
+      };
     } catch (error) {
-      this.logger.error(`Failed to send message: ${error.message}`, error.stack);
+      this.logger.error(
+        `Failed to send message: ${error.message}`,
+        error.stack,
+      );
       throw error;
     }
   }
@@ -98,7 +116,10 @@ export class CommunicationsService {
         },
       };
     } catch (error) {
-      this.logger.error(`Failed to get messages: ${error.message}`, error.stack);
+      this.logger.error(
+        `Failed to get messages: ${error.message}`,
+        error.stack,
+      );
       throw new BadRequestException('Failed to fetch messages');
     }
   }
@@ -122,9 +143,16 @@ export class CommunicationsService {
       });
 
       this.logger.log(`Message ${id} marked as read by ${userId}`);
-      return { success: true, message: 'Message marked as read', data: updated };
+      return {
+        success: true,
+        message: 'Message marked as read',
+        data: updated,
+      };
     } catch (error) {
-      this.logger.error(`Failed to mark message as read: ${error.message}`, error.stack);
+      this.logger.error(
+        `Failed to mark message as read: ${error.message}`,
+        error.stack,
+      );
       throw error;
     }
   }
@@ -151,7 +179,10 @@ export class CommunicationsService {
       this.logger.log(`Message ${id} deleted by ${userId}`);
       return { success: true, message: 'Message deleted successfully' };
     } catch (error) {
-      this.logger.error(`Failed to delete message: ${error.message}`, error.stack);
+      this.logger.error(
+        `Failed to delete message: ${error.message}`,
+        error.stack,
+      );
       throw error;
     }
   }
@@ -189,7 +220,10 @@ export class CommunicationsService {
         data: notification,
       };
     } catch (error) {
-      this.logger.error(`Failed to create notification: ${error.message}`, error.stack);
+      this.logger.error(
+        `Failed to create notification: ${error.message}`,
+        error.stack,
+      );
       throw error;
     }
   }
@@ -197,7 +231,11 @@ export class CommunicationsService {
   /**
    * Get notifications for a user
    */
-  async getNotifications(tenantId: string, userId: string, query: NotificationQueryDto) {
+  async getNotifications(
+    tenantId: string,
+    userId: string,
+    query: NotificationQueryDto,
+  ) {
     try {
       const { page = 1, limit = 10, read, type } = query;
       const skip = (page - 1) * limit;
@@ -233,7 +271,10 @@ export class CommunicationsService {
         },
       };
     } catch (error) {
-      this.logger.error(`Failed to get notifications: ${error.message}`, error.stack);
+      this.logger.error(
+        `Failed to get notifications: ${error.message}`,
+        error.stack,
+      );
       throw new BadRequestException('Failed to fetch notifications');
     }
   }
@@ -263,7 +304,10 @@ export class CommunicationsService {
         data: updated,
       };
     } catch (error) {
-      this.logger.error(`Failed to mark notification as read: ${error.message}`, error.stack);
+      this.logger.error(
+        `Failed to mark notification as read: ${error.message}`,
+        error.stack,
+      );
       throw error;
     }
   }
@@ -278,14 +322,19 @@ export class CommunicationsService {
         data: { read: true },
       });
 
-      this.logger.log(`${result.count} notifications marked as read for user ${userId}`);
+      this.logger.log(
+        `${result.count} notifications marked as read for user ${userId}`,
+      );
       return {
         success: true,
         message: `${result.count} notifications marked as read`,
         data: { count: result.count },
       };
     } catch (error) {
-      this.logger.error(`Failed to mark all notifications as read: ${error.message}`, error.stack);
+      this.logger.error(
+        `Failed to mark all notifications as read: ${error.message}`,
+        error.stack,
+      );
       throw error;
     }
   }
@@ -308,7 +357,10 @@ export class CommunicationsService {
       this.logger.log(`Notification ${id} deleted by ${userId}`);
       return { success: true, message: 'Notification deleted successfully' };
     } catch (error) {
-      this.logger.error(`Failed to delete notification: ${error.message}`, error.stack);
+      this.logger.error(
+        `Failed to delete notification: ${error.message}`,
+        error.stack,
+      );
       throw error;
     }
   }

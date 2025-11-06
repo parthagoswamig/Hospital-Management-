@@ -28,9 +28,12 @@ export class PharmacyService {
   /**
    * Build where clause for medication queries
    */
-  private buildMedicationWhereClause(tenantId: string, query: MedicationQueryDto): Prisma.MedicationWhereInput {
+  private buildMedicationWhereClause(
+    tenantId: string,
+    query: MedicationQueryDto,
+  ): Prisma.MedicationWhereInput {
     const { search, dosageForm, isActive = true } = query;
-    
+
     const where: Prisma.MedicationWhereInput = {
       tenantId,
       isActive,
@@ -54,9 +57,12 @@ export class PharmacyService {
   /**
    * Build where clause for pharmacy order queries
    */
-  private buildPharmacyOrderWhereClause(tenantId: string, query: PharmacyOrderQueryDto): Prisma.PharmacyOrderWhereInput {
+  private buildPharmacyOrderWhereClause(
+    tenantId: string,
+    query: PharmacyOrderQueryDto,
+  ): Prisma.PharmacyOrderWhereInput {
     const { search, status, startDate, endDate, patientId, doctorId } = query;
-    
+
     const where: Prisma.PharmacyOrderWhereInput = {
       tenantId,
     };
@@ -133,10 +139,16 @@ export class PharmacyService {
   /**
    * Validate pagination parameters
    */
-  private validatePaginationParams(page: any, limit: any): { page: number; limit: number } {
+  private validatePaginationParams(
+    page: any,
+    limit: any,
+  ): { page: number; limit: number } {
     const validatedPage = Math.max(1, parseInt(page?.toString() || '1', 10));
-    const validatedLimit = Math.min(100, Math.max(1, parseInt(limit?.toString() || '10', 10)));
-    
+    const validatedLimit = Math.min(
+      100,
+      Math.max(1, parseInt(limit?.toString() || '10', 10)),
+    );
+
     return { page: validatedPage, limit: validatedLimit };
   }
 
@@ -148,7 +160,7 @@ export class PharmacyService {
   ) {
     try {
       this.logger.log(`Creating medication for tenant: ${tenantId}`);
-      
+
       const medication = await this.prisma.medication.create({
         data: {
           ...createMedicationDto,
@@ -156,14 +168,20 @@ export class PharmacyService {
         },
       });
 
-      this.logger.log(`Successfully created medication with ID: ${medication.id}`);
+      this.logger.log(
+        `Successfully created medication with ID: ${medication.id}`,
+      );
       return {
         success: true,
         message: 'Medication added successfully',
         data: medication,
       };
     } catch (error) {
-      this.logger.error('Error creating medication:', error.message, error.stack);
+      this.logger.error(
+        'Error creating medication:',
+        error.message,
+        error.stack,
+      );
       throw new BadRequestException(
         error.message || 'Failed to add medication',
       );
@@ -172,8 +190,11 @@ export class PharmacyService {
 
   async findAllMedications(tenantId: string, query: MedicationQueryDto = {}) {
     try {
-      this.logger.log(`Finding medications for tenant: ${tenantId} with query:`, query);
-      
+      this.logger.log(
+        `Finding medications for tenant: ${tenantId} with query:`,
+        query,
+      );
+
       const { page: rawPage, limit: rawLimit } = query;
       const { page, limit } = this.validatePaginationParams(rawPage, rawLimit);
       const skip = (page - 1) * limit;
@@ -190,7 +211,9 @@ export class PharmacyService {
         this.prisma.medication.count({ where }),
       ]);
 
-      this.logger.log(`Found ${medications.length} medications out of ${total} total`);
+      this.logger.log(
+        `Found ${medications.length} medications out of ${total} total`,
+      );
       return {
         success: true,
         data: {
@@ -204,21 +227,29 @@ export class PharmacyService {
         },
       };
     } catch (error) {
-      this.logger.error('Error finding medications:', error.message, error.stack);
+      this.logger.error(
+        'Error finding medications:',
+        error.message,
+        error.stack,
+      );
       throw new BadRequestException('Failed to fetch medications');
     }
   }
 
   async findOneMedication(id: string, tenantId: string) {
     try {
-      this.logger.log(`Finding medication with ID: ${id} for tenant: ${tenantId}`);
-      
+      this.logger.log(
+        `Finding medication with ID: ${id} for tenant: ${tenantId}`,
+      );
+
       const medication = await this.prisma.medication.findFirst({
         where: { id, tenantId },
       });
 
       if (!medication) {
-        this.logger.warn(`Medication not found with ID: ${id} for tenant: ${tenantId}`);
+        this.logger.warn(
+          `Medication not found with ID: ${id} for tenant: ${tenantId}`,
+        );
         throw new NotFoundException('Medication not found');
       }
 
@@ -231,7 +262,11 @@ export class PharmacyService {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      this.logger.error('Error finding medication:', error.message, error.stack);
+      this.logger.error(
+        'Error finding medication:',
+        error.message,
+        error.stack,
+      );
       throw new BadRequestException('Failed to fetch medication');
     }
   }
@@ -242,8 +277,10 @@ export class PharmacyService {
     tenantId: string,
   ) {
     try {
-      this.logger.log(`Updating medication with ID: ${id} for tenant: ${tenantId}`);
-      
+      this.logger.log(
+        `Updating medication with ID: ${id} for tenant: ${tenantId}`,
+      );
+
       const medication = await this.prisma.medication.update({
         where: { id, tenantId },
         data: updateMedicationDto,
@@ -256,7 +293,11 @@ export class PharmacyService {
         data: medication,
       };
     } catch (error) {
-      this.logger.error('Error updating medication:', error.message, error.stack);
+      this.logger.error(
+        'Error updating medication:',
+        error.message,
+        error.stack,
+      );
       if (error.code === 'P2025') {
         throw new NotFoundException('Medication not found');
       }
@@ -266,8 +307,10 @@ export class PharmacyService {
 
   async removeMedication(id: string, tenantId: string) {
     try {
-      this.logger.log(`Deactivating medication with ID: ${id} for tenant: ${tenantId}`);
-      
+      this.logger.log(
+        `Deactivating medication with ID: ${id} for tenant: ${tenantId}`,
+      );
+
       await this.prisma.medication.update({
         where: { id, tenantId },
         data: { isActive: false },
@@ -279,7 +322,11 @@ export class PharmacyService {
         message: 'Medication deactivated successfully',
       };
     } catch (error) {
-      this.logger.error('Error removing medication:', error.message, error.stack);
+      this.logger.error(
+        'Error removing medication:',
+        error.message,
+        error.stack,
+      );
       if (error.code === 'P2025') {
         throw new NotFoundException('Medication not found');
       }
@@ -294,8 +341,10 @@ export class PharmacyService {
     tenantId: string,
   ) {
     try {
-      this.logger.log(`Creating pharmacy order for tenant: ${tenantId}, patient: ${createPharmacyOrderDto.patientId}`);
-      
+      this.logger.log(
+        `Creating pharmacy order for tenant: ${tenantId}, patient: ${createPharmacyOrderDto.patientId}`,
+      );
+
       // Generate order number
       const orderNumber = await this.generateOrderNumber(tenantId);
       this.logger.log(`Generated order number: ${orderNumber}`);
@@ -325,14 +374,20 @@ export class PharmacyService {
         include: this.getPharmacyOrderIncludes(),
       });
 
-      this.logger.log(`Successfully created pharmacy order with ID: ${pharmacyOrder.id}, order number: ${orderNumber}`);
+      this.logger.log(
+        `Successfully created pharmacy order with ID: ${pharmacyOrder.id}, order number: ${orderNumber}`,
+      );
       return {
         success: true,
         message: 'Pharmacy order created successfully',
         data: pharmacyOrder,
       };
     } catch (error) {
-      this.logger.error('Error creating pharmacy order:', error.message, error.stack);
+      this.logger.error(
+        'Error creating pharmacy order:',
+        error.message,
+        error.stack,
+      );
       throw new BadRequestException(
         error.message || 'Failed to create pharmacy order',
       );
@@ -344,8 +399,11 @@ export class PharmacyService {
     query: PharmacyOrderQueryDto = {},
   ) {
     try {
-      this.logger.log(`Finding pharmacy orders for tenant: ${tenantId} with query:`, query);
-      
+      this.logger.log(
+        `Finding pharmacy orders for tenant: ${tenantId} with query:`,
+        query,
+      );
+
       const { page: rawPage, limit: rawLimit } = query;
       const { page, limit } = this.validatePaginationParams(rawPage, rawLimit);
       const skip = (page - 1) * limit;
@@ -375,7 +433,9 @@ export class PharmacyService {
         this.prisma.pharmacyOrder.count({ where }),
       ]);
 
-      this.logger.log(`Found ${orders.length} pharmacy orders out of ${total} total`);
+      this.logger.log(
+        `Found ${orders.length} pharmacy orders out of ${total} total`,
+      );
       return {
         success: true,
         data: {
@@ -389,15 +449,21 @@ export class PharmacyService {
         },
       };
     } catch (error) {
-      this.logger.error('Error finding pharmacy orders:', error.message, error.stack);
+      this.logger.error(
+        'Error finding pharmacy orders:',
+        error.message,
+        error.stack,
+      );
       throw new BadRequestException('Failed to fetch pharmacy orders');
     }
   }
 
   async findOnePharmacyOrder(id: string, tenantId: string) {
     try {
-      this.logger.log(`Finding pharmacy order with ID: ${id} for tenant: ${tenantId}`);
-      
+      this.logger.log(
+        `Finding pharmacy order with ID: ${id} for tenant: ${tenantId}`,
+      );
+
       const order = await this.prisma.pharmacyOrder.findFirst({
         where: { id, tenantId },
         include: {
@@ -427,11 +493,15 @@ export class PharmacyService {
       });
 
       if (!order) {
-        this.logger.warn(`Pharmacy order not found with ID: ${id} for tenant: ${tenantId}`);
+        this.logger.warn(
+          `Pharmacy order not found with ID: ${id} for tenant: ${tenantId}`,
+        );
         throw new NotFoundException('Pharmacy order not found');
       }
 
-      this.logger.log(`Successfully found pharmacy order: ${order.orderNumber}`);
+      this.logger.log(
+        `Successfully found pharmacy order: ${order.orderNumber}`,
+      );
       return {
         success: true,
         data: order,
@@ -440,7 +510,11 @@ export class PharmacyService {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      this.logger.error('Error finding pharmacy order:', error.message, error.stack);
+      this.logger.error(
+        'Error finding pharmacy order:',
+        error.message,
+        error.stack,
+      );
       throw new BadRequestException('Failed to fetch pharmacy order');
     }
   }
@@ -451,8 +525,10 @@ export class PharmacyService {
     tenantId: string,
   ) {
     try {
-      this.logger.log(`Updating pharmacy order with ID: ${id} for tenant: ${tenantId}`);
-      
+      this.logger.log(
+        `Updating pharmacy order with ID: ${id} for tenant: ${tenantId}`,
+      );
+
       const order = await this.prisma.pharmacyOrder.update({
         where: { id, tenantId },
         data: {
@@ -464,14 +540,20 @@ export class PharmacyService {
         include: this.getPharmacyOrderIncludes(),
       });
 
-      this.logger.log(`Successfully updated pharmacy order: ${order.orderNumber}`);
+      this.logger.log(
+        `Successfully updated pharmacy order: ${order.orderNumber}`,
+      );
       return {
         success: true,
         message: 'Pharmacy order updated successfully',
         data: order,
       };
     } catch (error) {
-      this.logger.error('Error updating pharmacy order:', error.message, error.stack);
+      this.logger.error(
+        'Error updating pharmacy order:',
+        error.message,
+        error.stack,
+      );
       if (error.code === 'P2025') {
         throw new NotFoundException('Pharmacy order not found');
       }
@@ -486,8 +568,10 @@ export class PharmacyService {
     tenantId: string,
   ) {
     try {
-      this.logger.log(`Updating pharmacy order item with ID: ${itemId} for order: ${orderId}, tenant: ${tenantId}`);
-      
+      this.logger.log(
+        `Updating pharmacy order item with ID: ${itemId} for order: ${orderId}, tenant: ${tenantId}`,
+      );
+
       // Find the specific pharmacy order item
       const item = await this.prisma.pharmacyOrderItem.findFirst({
         where: {
@@ -498,7 +582,9 @@ export class PharmacyService {
       });
 
       if (!item) {
-        this.logger.warn(`Pharmacy order item not found with ID: ${itemId} for order: ${orderId}`);
+        this.logger.warn(
+          `Pharmacy order item not found with ID: ${itemId} for order: ${orderId}`,
+        );
         throw new NotFoundException('Pharmacy order item not found');
       }
 
@@ -516,8 +602,12 @@ export class PharmacyService {
         where: { orderId, tenantId },
       });
 
-      const allDispensed = allItems.every((i) => i.status === PharmacyOrderStatus.DISPENSED);
-      const someDispensed = allItems.some((i) => i.status === PharmacyOrderStatus.DISPENSED);
+      const allDispensed = allItems.every(
+        (i) => i.status === PharmacyOrderStatus.DISPENSED,
+      );
+      const someDispensed = allItems.some(
+        (i) => i.status === PharmacyOrderStatus.DISPENSED,
+      );
 
       // Update order status accordingly
       if (allDispensed) {
@@ -528,13 +618,17 @@ export class PharmacyService {
             dispensedDate: new Date(),
           },
         });
-        this.logger.log(`Updated order ${orderId} status to DISPENSED - all items dispensed`);
+        this.logger.log(
+          `Updated order ${orderId} status to DISPENSED - all items dispensed`,
+        );
       } else if (someDispensed) {
         await this.prisma.pharmacyOrder.update({
           where: { id: orderId },
           data: { status: PharmacyOrderStatus.PARTIALLY_DISPENSED },
         });
-        this.logger.log(`Updated order ${orderId} status to PARTIALLY_DISPENSED`);
+        this.logger.log(
+          `Updated order ${orderId} status to PARTIALLY_DISPENSED`,
+        );
       }
 
       this.logger.log(`Successfully updated pharmacy order item: ${itemId}`);
@@ -547,7 +641,11 @@ export class PharmacyService {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      this.logger.error('Error updating pharmacy order item:', error.message, error.stack);
+      this.logger.error(
+        'Error updating pharmacy order item:',
+        error.message,
+        error.stack,
+      );
       throw new BadRequestException(
         error.message || 'Failed to update pharmacy order item',
       );
@@ -556,8 +654,10 @@ export class PharmacyService {
 
   async cancelPharmacyOrder(id: string, tenantId: string) {
     try {
-      this.logger.log(`Cancelling pharmacy order with ID: ${id} for tenant: ${tenantId}`);
-      
+      this.logger.log(
+        `Cancelling pharmacy order with ID: ${id} for tenant: ${tenantId}`,
+      );
+
       await this.prisma.pharmacyOrder.update({
         where: { id, tenantId },
         data: { status: PharmacyOrderStatus.CANCELLED },
@@ -569,7 +669,11 @@ export class PharmacyService {
         message: 'Pharmacy order cancelled successfully',
       };
     } catch (error) {
-      this.logger.error('Error cancelling pharmacy order:', error.message, error.stack);
+      this.logger.error(
+        'Error cancelling pharmacy order:',
+        error.message,
+        error.stack,
+      );
       if (error.code === 'P2025') {
         throw new NotFoundException('Pharmacy order not found');
       }
@@ -580,7 +684,7 @@ export class PharmacyService {
   async getPharmacyStats(tenantId: string) {
     try {
       this.logger.log(`Getting pharmacy stats for tenant: ${tenantId}`);
-      
+
       const [
         totalOrders,
         pendingOrders,
@@ -616,7 +720,9 @@ export class PharmacyService {
         }),
       ]);
 
-      this.logger.log(`Successfully retrieved pharmacy stats for tenant: ${tenantId}`);
+      this.logger.log(
+        `Successfully retrieved pharmacy stats for tenant: ${tenantId}`,
+      );
       return {
         success: true,
         data: {
@@ -631,7 +737,11 @@ export class PharmacyService {
         },
       };
     } catch (error) {
-      this.logger.error('Error getting pharmacy stats:', error.message, error.stack);
+      this.logger.error(
+        'Error getting pharmacy stats:',
+        error.message,
+        error.stack,
+      );
       throw new BadRequestException('Failed to fetch pharmacy statistics');
     }
   }
@@ -644,11 +754,17 @@ export class PharmacyService {
       const year = new Date().getFullYear();
       const month = String(new Date().getMonth() + 1).padStart(2, '0');
       const orderNumber = `PH${year}${month}${String(count + 1).padStart(5, '0')}`;
-      
-      this.logger.log(`Generated order number: ${orderNumber} for tenant: ${tenantId}`);
+
+      this.logger.log(
+        `Generated order number: ${orderNumber} for tenant: ${tenantId}`,
+      );
       return orderNumber;
     } catch (error) {
-      this.logger.error('Error generating order number:', error.message, error.stack);
+      this.logger.error(
+        'Error generating order number:',
+        error.message,
+        error.stack,
+      );
       throw new BadRequestException('Failed to generate order number');
     }
   }

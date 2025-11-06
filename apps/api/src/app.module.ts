@@ -1,5 +1,5 @@
 import { Module, ValidationPipe } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import Joi from 'joi';
@@ -53,20 +53,20 @@ import { AppService } from './app.service';
           .valid('development', 'production', 'test')
           .default('development'),
         PORT: Joi.number().default(3001),
-        
+
         // Prisma (existing)
         DATABASE_URL: Joi.string().required(),
-        
+
         // Stripe (optional - only needed if SubscriptionModule is enabled)
         STRIPE_SECRET_KEY: Joi.string().optional(),
         STRIPE_PUBLISHABLE_KEY: Joi.string().optional(),
         STRIPE_WEBHOOK_SECRET: Joi.string().optional(),
-        
+
         // Razorpay (optional - for UPI and Indian payment methods)
         RAZORPAY_KEY_ID: Joi.string().optional(),
         RAZORPAY_KEY_SECRET: Joi.string().optional(),
         RAZORPAY_WEBHOOK_SECRET: Joi.string().optional(),
-        
+
         // Optional
         CORS_ORIGIN: Joi.string().default('http://localhost:3000'),
       }),
@@ -132,7 +132,7 @@ import { AppService } from './app.service';
   controllers: [AppController],
   providers: [
     AppService,
-    
+
     // Global validation pipe for DTOs
     {
       provide: APP_PIPE,
@@ -145,13 +145,13 @@ import { AppService } from './app.service';
         },
       }),
     },
-    
+
     // Global rate limiting guard
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
     },
-    
+
     // Uncomment to make JWT auth global for ALL routes
     // (requires @Public() decorator on public routes)
     // {

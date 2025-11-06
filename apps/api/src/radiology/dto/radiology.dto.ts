@@ -1,4 +1,10 @@
-import { IsString, IsNotEmpty, IsOptional, IsEnum, IsDateString } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsEnum,
+  IsDateString,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
@@ -47,7 +53,10 @@ export class CreateStudyDto {
   @IsString()
   notes?: string;
 
-  @ApiPropertyOptional({ enum: RadiologyPriority, example: RadiologyPriority.ROUTINE })
+  @ApiPropertyOptional({
+    enum: RadiologyPriority,
+    example: RadiologyPriority.ROUTINE,
+  })
   @IsOptional()
   @IsEnum(RadiologyPriority)
   priority?: RadiologyPriority;
@@ -150,7 +159,10 @@ export class CreateRadiologyOrderDto {
   @IsNotEmpty()
   studyType: string;
 
-  @ApiPropertyOptional({ enum: RadiologyPriority, example: RadiologyPriority.ROUTINE })
+  @ApiPropertyOptional({
+    enum: RadiologyPriority,
+    example: RadiologyPriority.ROUTINE,
+  })
   @IsOptional()
   @IsEnum(RadiologyPriority)
   priority?: RadiologyPriority;

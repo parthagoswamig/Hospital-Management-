@@ -1,40 +1,46 @@
-import { NestFactory, NestApplication } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../src/app.module';
 import { ExpressAdapter } from '@nestjs/platform-express';
-import express from 'express';
+import express, { Request, Response } from 'express';
+import { Logger } from '@nestjs/common';
 
-const server = express();
+const expressApp = express();
+const logger = new Logger('ServerlessHandler');
 
-// Global app cache for serverless
-declare global {
-  // eslint-disable-next-line no-var
-  var cachedApp: NestApplication | undefined;
-}
+let app: any;
 
-async function getApp(): Promise<NestApplication> {
-  if (!globalThis.cachedApp) {
-    const app = await NestFactory.create(
-      AppModule,
-      new ExpressAdapter(server),
-      { logger: ['error', 'warn', 'log'] }
-    );
+async function bootstrap() {
+  if (!app) {
+    logger.log('Initializing NestJS application for serverless...');
+    
+    const adapter = new ExpressAdapter(expressApp);
+    app = await NestFactory.create(AppModule, adapter, {
+      logger: ['error', 'warn', 'log'],
+    });
 
-    // Enable CORS for serverless
+    // Enable CORS
     app.enableCors({
       origin: true,
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     });
 
     await app.init();
-    globalThis.cachedApp = app;
+    logger.log('NestJS application initialized successfully');
   }
-
-  return globalThis.cachedApp;
+  return app;
 }
 
-export default async (req: express.Request, res: express.Response) => {
-  await getApp();
-  return server(req, res);
+export default async (req: Request, res: Response) => {
+  try {
+    await bootstrap();
+    expressApp(req, res);
+  } catch (error) {
+    logger.error('Serverless function error:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
 };

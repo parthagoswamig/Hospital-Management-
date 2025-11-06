@@ -27,7 +27,7 @@ export class PatientsService {
           : undefined,
       };
 
-      const patientRaw = await this.prisma.patient.create({ 
+      const patientRaw = await this.prisma.patient.create({
         data,
         include: {
           _count: {
@@ -38,12 +38,15 @@ export class PatientsService {
         },
       });
 
-      this.logger.log(`Patient created: ${patientRaw.id} for tenant: ${tenantId}`);
+      this.logger.log(
+        `Patient created: ${patientRaw.id} for tenant: ${tenantId}`,
+      );
 
       // Transform to match frontend expected structure
       const age = patientRaw.dateOfBirth
         ? Math.floor(
-            (new Date().getTime() - new Date(patientRaw.dateOfBirth).getTime()) /
+            (new Date().getTime() -
+              new Date(patientRaw.dateOfBirth).getTime()) /
               (365.25 * 24 * 60 * 60 * 1000),
           )
         : 0;
@@ -115,7 +118,10 @@ export class PatientsService {
         data: patient,
       };
     } catch (error) {
-      this.logger.error(`Error creating patient: ${error.message}`, error.stack);
+      this.logger.error(
+        `Error creating patient: ${error.message}`,
+        error.stack,
+      );
       throw new BadRequestException('Failed to create patient');
     }
   }
@@ -393,7 +399,8 @@ export class PatientsService {
       // Transform to match frontend expected structure
       const age = patientRaw.dateOfBirth
         ? Math.floor(
-            (new Date().getTime() - new Date(patientRaw.dateOfBirth).getTime()) /
+            (new Date().getTime() -
+              new Date(patientRaw.dateOfBirth).getTime()) /
               (365.25 * 24 * 60 * 60 * 1000),
           )
         : 0;
@@ -468,7 +475,10 @@ export class PatientsService {
         data: patient,
       };
     } catch (error) {
-      this.logger.error(`Error updating patient: ${error.message}`, error.stack);
+      this.logger.error(
+        `Error updating patient: ${error.message}`,
+        error.stack,
+      );
       throw new BadRequestException('Failed to update patient');
     }
   }
@@ -490,7 +500,10 @@ export class PatientsService {
         message: 'Patient deleted successfully',
       };
     } catch (error) {
-      this.logger.error(`Error deleting patient: ${error.message}`, error.stack);
+      this.logger.error(
+        `Error deleting patient: ${error.message}`,
+        error.stack,
+      );
       throw new BadRequestException('Failed to delete patient');
     }
   }

@@ -1,4 +1,8 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CustomPrismaService } from '../prisma/custom-prisma.service';
 import { TenantType } from '@prisma/client';
 
@@ -26,9 +30,10 @@ export class TenantsService {
     }
 
     // Convert type to uppercase to match Prisma enum
-    const tenantType = typeof createDto.type === 'string' 
-      ? (createDto.type.toUpperCase() as TenantType)
-      : createDto.type;
+    const tenantType =
+      typeof createDto.type === 'string'
+        ? (createDto.type.toUpperCase() as TenantType)
+        : createDto.type;
 
     const tenant = await this.prisma.tenant.create({
       data: {

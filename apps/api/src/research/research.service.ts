@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateResearchProjectDto } from './dto/research.dto';
 
 @Injectable()
 export class ResearchService {
   private projects: any[] = [];
 
-  async create(createDto: any, tenantId: string) {
+  async create(createDto: CreateResearchProjectDto, tenantId: string) {
     const project = {
       id: Date.now().toString(),
       ...createDto,

@@ -43,21 +43,22 @@ export class IpdController {
    */
   @Post('wards')
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Create a new ward',
-    description: 'Creates a new inpatient ward with specified capacity and type'
+    description:
+      'Creates a new inpatient ward with specified capacity and type',
   })
-  @ApiResponse({ 
-    status: 201, 
-    description: 'Ward created successfully'
+  @ApiResponse({
+    status: 201,
+    description: 'Ward created successfully',
   })
-  @ApiResponse({ 
-    status: 400, 
-    description: 'Bad request - Invalid data provided'
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - Invalid data provided',
   })
   createWard(
-    @Body() createWardDto: CreateWardDto, 
-    @TenantId() tenantId: string
+    @Body() createWardDto: CreateWardDto,
+    @TenantId() tenantId: string,
   ) {
     return this.service.createWard(createWardDto, tenantId);
   }
@@ -66,18 +67,15 @@ export class IpdController {
    * Get all wards with filters
    */
   @Get('wards')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get all wards',
-    description: 'Retrieves paginated list of wards with optional filters'
+    description: 'Retrieves paginated list of wards with optional filters',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Wards retrieved successfully'
+  @ApiResponse({
+    status: 200,
+    description: 'Wards retrieved successfully',
   })
-  findAllWards(
-    @Query() filters: WardFilterDto,
-    @TenantId() tenantId: string
-  ) {
+  findAllWards(@Query() filters: WardFilterDto, @TenantId() tenantId: string) {
     return this.service.findAllWards(tenantId, filters);
   }
 
@@ -85,27 +83,25 @@ export class IpdController {
    * Get ward by ID
    */
   @Get('wards/:id')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get ward by ID',
-    description: 'Retrieves a specific ward with all its details including beds'
+    description:
+      'Retrieves a specific ward with all its details including beds',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Ward retrieved successfully'
+  @ApiResponse({
+    status: 200,
+    description: 'Ward retrieved successfully',
   })
-  @ApiResponse({ 
-    status: 404, 
-    description: 'Ward not found'
+  @ApiResponse({
+    status: 404,
+    description: 'Ward not found',
   })
-  @ApiParam({ 
-    name: 'id', 
+  @ApiParam({
+    name: 'id',
     description: 'Ward ID',
-    example: 'ward-uuid-123'
+    example: 'ward-uuid-123',
   })
-  findOneWard(
-    @Param('id') id: string, 
-    @TenantId() tenantId: string
-  ) {
+  findOneWard(@Param('id') id: string, @TenantId() tenantId: string) {
     return this.service.findOneWard(id, tenantId);
   }
 
@@ -113,27 +109,27 @@ export class IpdController {
    * Update ward
    */
   @Patch('wards/:id')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Update ward',
-    description: 'Updates an existing ward'
+    description: 'Updates an existing ward',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Ward updated successfully'
+  @ApiResponse({
+    status: 200,
+    description: 'Ward updated successfully',
   })
-  @ApiResponse({ 
-    status: 404, 
-    description: 'Ward not found'
+  @ApiResponse({
+    status: 404,
+    description: 'Ward not found',
   })
-  @ApiParam({ 
-    name: 'id', 
+  @ApiParam({
+    name: 'id',
     description: 'Ward ID',
-    example: 'ward-uuid-123'
+    example: 'ward-uuid-123',
   })
   updateWard(
-    @Param('id') id: string, 
-    @Body() updateWardDto: UpdateWardDto, 
-    @TenantId() tenantId: string
+    @Param('id') id: string,
+    @Body() updateWardDto: UpdateWardDto,
+    @TenantId() tenantId: string,
   ) {
     return this.service.updateWard(id, updateWardDto, tenantId);
   }
@@ -145,26 +141,23 @@ export class IpdController {
    */
   @Post('beds')
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Create a new bed',
-    description: 'Creates a new bed within a specified ward'
+    description: 'Creates a new bed within a specified ward',
   })
-  @ApiResponse({ 
-    status: 201, 
-    description: 'Bed created successfully'
+  @ApiResponse({
+    status: 201,
+    description: 'Bed created successfully',
   })
-  @ApiResponse({ 
-    status: 400, 
-    description: 'Bad request - Invalid data provided'
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - Invalid data provided',
   })
-  @ApiResponse({ 
-    status: 404, 
-    description: 'Ward not found'
+  @ApiResponse({
+    status: 404,
+    description: 'Ward not found',
   })
-  createBed(
-    @Body() createBedDto: CreateBedDto, 
-    @TenantId() tenantId: string
-  ) {
+  createBed(@Body() createBedDto: CreateBedDto, @TenantId() tenantId: string) {
     return this.service.createBed(createBedDto, tenantId);
   }
 
@@ -172,18 +165,15 @@ export class IpdController {
    * Get all beds with filters
    */
   @Get('beds')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get all beds',
-    description: 'Retrieves paginated list of beds with optional filters'
+    description: 'Retrieves paginated list of beds with optional filters',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Beds retrieved successfully'
+  @ApiResponse({
+    status: 200,
+    description: 'Beds retrieved successfully',
   })
-  findAllBeds(
-    @Query() filters: BedFilterDto,
-    @TenantId() tenantId: string
-  ) {
+  findAllBeds(@Query() filters: BedFilterDto, @TenantId() tenantId: string) {
     return this.service.findAllBeds(tenantId, filters);
   }
 
@@ -191,13 +181,13 @@ export class IpdController {
    * Get available beds
    */
   @Get('beds/available')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get available beds',
-    description: 'Retrieves all available beds for new admissions'
+    description: 'Retrieves all available beds for new admissions',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Available beds retrieved successfully'
+  @ApiResponse({
+    status: 200,
+    description: 'Available beds retrieved successfully',
   })
   findAvailableBeds(@TenantId() tenantId: string) {
     return this.service.findAvailableBeds(tenantId);
@@ -207,46 +197,44 @@ export class IpdController {
    * Update bed status
    */
   @Patch('beds/:id/status')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Update bed status',
-    description: 'Updates the status of a specific bed (available, occupied, maintenance, etc.)'
+    description:
+      'Updates the status of a specific bed (available, occupied, maintenance, etc.)',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Bed status updated successfully'
+  @ApiResponse({
+    status: 200,
+    description: 'Bed status updated successfully',
   })
-  @ApiResponse({ 
-    status: 404, 
-    description: 'Bed not found'
+  @ApiResponse({
+    status: 404,
+    description: 'Bed not found',
   })
-  @ApiParam({ 
-    name: 'id', 
+  @ApiParam({
+    name: 'id',
     description: 'Bed ID',
-    example: 'bed-uuid-123'
+    example: 'bed-uuid-123',
   })
   updateBedStatus(
     @Param('id') id: string,
     @Body() updateBedStatusDto: UpdateBedStatusDto,
     @TenantId() tenantId: string,
   ) {
-    return this.service.updateBedStatus(
-      id,
-      updateBedStatusDto,
-      tenantId,
-    );
+    return this.service.updateBedStatus(id, updateBedStatusDto, tenantId);
   }
 
   /**
    * Get IPD statistics
    */
   @Get('stats')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get IPD statistics',
-    description: 'Retrieves IPD statistics including ward and bed occupancy rates'
+    description:
+      'Retrieves IPD statistics including ward and bed occupancy rates',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'IPD statistics retrieved successfully'
+  @ApiResponse({
+    status: 200,
+    description: 'IPD statistics retrieved successfully',
   })
   getStats(@TenantId() tenantId: string) {
     return this.service.getStats(tenantId);

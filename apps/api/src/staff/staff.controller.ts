@@ -32,7 +32,10 @@ export class StaffController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new staff member' })
-  @ApiResponse({ status: 201, description: 'Staff member created successfully' })
+  @ApiResponse({
+    status: 201,
+    description: 'Staff member created successfully',
+  })
   @ApiResponse({ status: 400, description: 'Bad request' })
   async create(
     @Body() createStaffDto: CreateStaffDto,
@@ -43,45 +46,48 @@ export class StaffController {
 
   @Get()
   @ApiOperation({ summary: 'Get all staff members with pagination' })
-  @ApiResponse({ status: 200, description: 'Staff members retrieved successfully' })
-  async findAll(
-    @TenantId() tenantId: string,
-    @Query() query: StaffQueryDto,
-  ) {
+  @ApiResponse({
+    status: 200,
+    description: 'Staff members retrieved successfully',
+  })
+  async findAll(@TenantId() tenantId: string, @Query() query: StaffQueryDto) {
     return this.staffService.findAll(tenantId, query);
   }
 
   @Get('search')
   @ApiOperation({ summary: 'Search staff members by query' })
   @ApiResponse({ status: 200, description: 'Search results retrieved' })
-  async search(
-    @TenantId() tenantId: string,
-    @Query('q') query: string,
-  ) {
+  async search(@TenantId() tenantId: string, @Query('q') query: string) {
     return this.staffService.search(tenantId, query);
   }
 
   @Get('stats')
   @ApiOperation({ summary: 'Get staff statistics' })
-  @ApiResponse({ status: 200, description: 'Statistics retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Statistics retrieved successfully',
+  })
   async getStats(@TenantId() tenantId: string) {
     return this.staffService.getStats(tenantId);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get staff member by ID' })
-  @ApiResponse({ status: 200, description: 'Staff member retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Staff member retrieved successfully',
+  })
   @ApiResponse({ status: 404, description: 'Staff member not found' })
-  async findOne(
-    @Param('id') id: string,
-    @TenantId() tenantId: string,
-  ) {
+  async findOne(@Param('id') id: string, @TenantId() tenantId: string) {
     return this.staffService.findOne(id, tenantId);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update staff member by ID' })
-  @ApiResponse({ status: 200, description: 'Staff member updated successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Staff member updated successfully',
+  })
   @ApiResponse({ status: 404, description: 'Staff member not found' })
   async update(
     @Param('id') id: string,
@@ -94,12 +100,12 @@ export class StaffController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Soft delete staff member by ID' })
-  @ApiResponse({ status: 204, description: 'Staff member deleted successfully' })
+  @ApiResponse({
+    status: 204,
+    description: 'Staff member deleted successfully',
+  })
   @ApiResponse({ status: 404, description: 'Staff member not found' })
-  async remove(
-    @Param('id') id: string,
-    @TenantId() tenantId: string,
-  ) {
+  async remove(@Param('id') id: string, @TenantId() tenantId: string) {
     return this.staffService.remove(id, tenantId);
   }
 }

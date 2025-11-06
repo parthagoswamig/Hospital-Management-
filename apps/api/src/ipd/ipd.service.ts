@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  Logger,
+} from '@nestjs/common';
 import { CustomPrismaService } from '../prisma/custom-prisma.service';
 import { Prisma } from '@prisma/client';
 import {
@@ -55,9 +60,12 @@ export class IpdService {
   /**
    * Build where clause for ward queries
    */
-  private buildWardWhereClause(tenantId: string, filters: WardFilterDto): Prisma.WardWhereInput {
-    const { type, search, isActive = true } = filters;
-    
+  private buildWardWhereClause(
+    tenantId: string,
+    filters: WardFilterDto,
+  ): Prisma.WardWhereInput {
+    const { search, isActive = true } = filters;
+
     const where: Prisma.WardWhereInput = {
       tenantId,
       isActive,
@@ -81,9 +89,12 @@ export class IpdService {
   /**
    * Build where clause for bed queries
    */
-  private buildBedWhereClause(tenantId: string, filters: BedFilterDto): Prisma.BedWhereInput {
+  private buildBedWhereClause(
+    tenantId: string,
+    filters: BedFilterDto,
+  ): Prisma.BedWhereInput {
     const { wardId, status, search, isActive = true } = filters;
-    
+
     const where: Prisma.BedWhereInput = {
       tenantId,
       isActive,
@@ -98,9 +109,7 @@ export class IpdService {
     }
 
     if (search) {
-      where.OR = [
-        { bedNumber: { contains: search } },
-      ];
+      where.OR = [{ bedNumber: { contains: search } }];
     }
 
     return where;
@@ -109,10 +118,16 @@ export class IpdService {
   /**
    * Validate pagination parameters
    */
-  private validatePaginationParams(page: any, limit: any): { page: number; limit: number } {
+  private validatePaginationParams(
+    page: any,
+    limit: any,
+  ): { page: number; limit: number } {
     const validatedPage = Math.max(1, parseInt(page?.toString() || '1', 10));
-    const validatedLimit = Math.min(100, Math.max(1, parseInt(limit?.toString() || '10', 10)));
-    
+    const validatedLimit = Math.min(
+      100,
+      Math.max(1, parseInt(limit?.toString() || '10', 10)),
+    );
+
     return { page: validatedPage, limit: validatedLimit };
   }
 
@@ -123,8 +138,10 @@ export class IpdService {
    */
   async createWard(createWardDto: CreateWardDto, tenantId: string) {
     try {
-      this.logger.log(`Creating ward: ${createWardDto.name} for tenant: ${tenantId}`);
-      
+      this.logger.log(
+        `Creating ward: ${createWardDto.name} for tenant: ${tenantId}`,
+      );
+
       const ward = await this.prisma.ward.create({
         data: {
           ...createWardDto,
@@ -134,16 +151,14 @@ export class IpdService {
       });
 
       this.logger.log(`Successfully created ward with ID: ${ward.id}`);
-      return { 
-        success: true, 
-        message: 'Ward created successfully', 
-        data: ward 
+      return {
+        success: true,
+        message: 'Ward created successfully',
+        data: ward,
       };
     } catch (error) {
       this.logger.error('Error creating ward:', error.message, error.stack);
-      throw new BadRequestException(
-        error.message || 'Failed to create ward',
-      );
+      throw new BadRequestException(error.message || 'Failed to create ward');
     }
   }
 
@@ -152,8 +167,11 @@ export class IpdService {
    */
   async findAllWards(tenantId: string, filters: WardFilterDto = {}) {
     try {
-      this.logger.log(`Finding wards for tenant: ${tenantId} with filters:`, filters);
-      
+      this.logger.log(
+        `Finding wards for tenant: ${tenantId} with filters:`,
+        filters,
+      );
+
       const { page: rawPage, limit: rawLimit } = filters;
       const { page, limit } = this.validatePaginationParams(rawPage, rawLimit);
       const skip = (page - 1) * limit;
@@ -196,14 +214,16 @@ export class IpdService {
   async findOneWard(id: string, tenantId: string) {
     try {
       this.logger.log(`Finding ward with ID: ${id} for tenant: ${tenantId}`);
-      
+
       const ward = await this.prisma.ward.findFirst({
         where: { id, tenantId, isActive: true },
         include: this.getWardIncludes(),
       });
 
       if (!ward) {
-        this.logger.warn(`Ward not found with ID: ${id} for tenant: ${tenantId}`);
+        this.logger.warn(
+          `Ward not found with ID: ${id} for tenant: ${tenantId}`,
+        );
         throw new NotFoundException('Ward not found');
       }
 
@@ -224,13 +244,15 @@ export class IpdService {
   async updateWard(id: string, updateWardDto: UpdateWardDto, tenantId: string) {
     try {
       this.logger.log(`Updating ward with ID: ${id} for tenant: ${tenantId}`);
-      
+
       const ward = await this.prisma.ward.findFirst({
         where: { id, tenantId, isActive: true },
       });
 
       if (!ward) {
-        this.logger.warn(`Ward not found with ID: ${id} for tenant: ${tenantId}`);
+        this.logger.warn(
+          `Ward not found with ID: ${id} for tenant: ${tenantId}`,
+        );
         throw new NotFoundException('Ward not found');
       }
 
@@ -265,8 +287,10 @@ export class IpdService {
    */
   async createBed(createBedDto: CreateBedDto, tenantId: string) {
     try {
-      this.logger.log(`Creating bed: ${createBedDto.bedNumber} in ward: ${createBedDto.wardId} for tenant: ${tenantId}`);
-      
+      this.logger.log(
+        `Creating bed: ${createBedDto.bedNumber} in ward: ${createBedDto.wardId} for tenant: ${tenantId}`,
+      );
+
       // Verify ward exists
       const ward = await this.prisma.ward.findFirst({
         where: { id: createBedDto.wardId, tenantId, isActive: true },
@@ -285,19 +309,17 @@ export class IpdService {
       });
 
       this.logger.log(`Successfully created bed with ID: ${bed.id}`);
-      return { 
-        success: true, 
-        message: 'Bed created successfully', 
-        data: bed 
+      return {
+        success: true,
+        message: 'Bed created successfully',
+        data: bed,
       };
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
       }
       this.logger.error('Error creating bed:', error.message, error.stack);
-      throw new BadRequestException(
-        error.message || 'Failed to create bed',
-      );
+      throw new BadRequestException(error.message || 'Failed to create bed');
     }
   }
 
@@ -306,8 +328,11 @@ export class IpdService {
    */
   async findAllBeds(tenantId: string, filters: BedFilterDto = {}) {
     try {
-      this.logger.log(`Finding beds for tenant: ${tenantId} with filters:`, filters);
-      
+      this.logger.log(
+        `Finding beds for tenant: ${tenantId} with filters:`,
+        filters,
+      );
+
       const { page: rawPage, limit: rawLimit } = filters;
       const { page, limit } = this.validatePaginationParams(rawPage, rawLimit);
       const skip = (page - 1) * limit;
@@ -350,12 +375,12 @@ export class IpdService {
   async findAvailableBeds(tenantId: string) {
     try {
       this.logger.log(`Finding available beds for tenant: ${tenantId}`);
-      
+
       const beds = await this.prisma.bed.findMany({
-        where: { 
-          tenantId, 
-          isActive: true, 
-          status: BedStatus.AVAILABLE 
+        where: {
+          tenantId,
+          isActive: true,
+          status: BedStatus.AVAILABLE,
         },
         include: this.getBedIncludes(),
         orderBy: { bedNumber: 'asc' },
@@ -364,7 +389,11 @@ export class IpdService {
       this.logger.log(`Found ${beds.length} available beds`);
       return { success: true, data: beds };
     } catch (error) {
-      this.logger.error('Error finding available beds:', error.message, error.stack);
+      this.logger.error(
+        'Error finding available beds:',
+        error.message,
+        error.stack,
+      );
       throw new BadRequestException('Failed to fetch available beds');
     }
   }
@@ -372,16 +401,24 @@ export class IpdService {
   /**
    * Update bed status
    */
-  async updateBedStatus(id: string, updateBedStatusDto: UpdateBedStatusDto, tenantId: string) {
+  async updateBedStatus(
+    id: string,
+    updateBedStatusDto: UpdateBedStatusDto,
+    tenantId: string,
+  ) {
     try {
-      this.logger.log(`Updating bed status for ID: ${id} to ${updateBedStatusDto.status} for tenant: ${tenantId}`);
-      
-      const bed = await this.prisma.bed.findFirst({ 
-        where: { id, tenantId, isActive: true } 
+      this.logger.log(
+        `Updating bed status for ID: ${id} to ${updateBedStatusDto.status} for tenant: ${tenantId}`,
+      );
+
+      const bed = await this.prisma.bed.findFirst({
+        where: { id, tenantId, isActive: true },
       });
-      
+
       if (!bed) {
-        this.logger.warn(`Bed not found with ID: ${id} for tenant: ${tenantId}`);
+        this.logger.warn(
+          `Bed not found with ID: ${id} for tenant: ${tenantId}`,
+        );
         throw new NotFoundException('Bed not found');
       }
 
@@ -389,22 +426,30 @@ export class IpdService {
         where: { id },
         data: {
           status: updateBedStatusDto.status,
-          ...(updateBedStatusDto.notes && { description: updateBedStatusDto.notes }),
+          ...(updateBedStatusDto.notes && {
+            description: updateBedStatusDto.notes,
+          }),
         },
         include: this.getBedIncludes(),
       });
 
-      this.logger.log(`Successfully updated bed ${bed.bedNumber} status to ${updateBedStatusDto.status}`);
-      return { 
-        success: true, 
-        message: 'Bed status updated successfully', 
-        data: updated 
+      this.logger.log(
+        `Successfully updated bed ${bed.bedNumber} status to ${updateBedStatusDto.status}`,
+      );
+      return {
+        success: true,
+        message: 'Bed status updated successfully',
+        data: updated,
       };
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      this.logger.error('Error updating bed status:', error.message, error.stack);
+      this.logger.error(
+        'Error updating bed status:',
+        error.message,
+        error.stack,
+      );
       if (error.code === 'P2025') {
         throw new NotFoundException('Bed not found');
       }
@@ -418,28 +463,37 @@ export class IpdService {
   async getStats(tenantId: string) {
     try {
       this.logger.log(`Getting IPD stats for tenant: ${tenantId}`);
-      
-      const [totalWards, totalBeds, availableBeds, occupiedBeds, maintenanceBeds, reservedBeds] =
-        await Promise.all([
-          this.prisma.ward.count({ where: { tenantId, isActive: true } }),
-          this.prisma.bed.count({ where: { tenantId, isActive: true } }),
-          this.prisma.bed.count({
-            where: { tenantId, isActive: true, status: BedStatus.AVAILABLE },
-          }),
-          this.prisma.bed.count({
-            where: { tenantId, isActive: true, status: BedStatus.OCCUPIED },
-          }),
-          this.prisma.bed.count({
-            where: { tenantId, isActive: true, status: BedStatus.MAINTENANCE },
-          }),
-          this.prisma.bed.count({
-            where: { tenantId, isActive: true, status: BedStatus.RESERVED },
-          }),
-        ]);
 
-      const occupancyRate = totalBeds > 0 ? ((occupiedBeds / totalBeds) * 100).toFixed(2) : 0;
-      
-      this.logger.log(`Successfully retrieved IPD stats for tenant: ${tenantId}`);
+      const [
+        totalWards,
+        totalBeds,
+        availableBeds,
+        occupiedBeds,
+        maintenanceBeds,
+        reservedBeds,
+      ] = await Promise.all([
+        this.prisma.ward.count({ where: { tenantId, isActive: true } }),
+        this.prisma.bed.count({ where: { tenantId, isActive: true } }),
+        this.prisma.bed.count({
+          where: { tenantId, isActive: true, status: BedStatus.AVAILABLE },
+        }),
+        this.prisma.bed.count({
+          where: { tenantId, isActive: true, status: BedStatus.OCCUPIED },
+        }),
+        this.prisma.bed.count({
+          where: { tenantId, isActive: true, status: BedStatus.MAINTENANCE },
+        }),
+        this.prisma.bed.count({
+          where: { tenantId, isActive: true, status: BedStatus.RESERVED },
+        }),
+      ]);
+
+      const occupancyRate =
+        totalBeds > 0 ? ((occupiedBeds / totalBeds) * 100).toFixed(2) : 0;
+
+      this.logger.log(
+        `Successfully retrieved IPD stats for tenant: ${tenantId}`,
+      );
       return {
         success: true,
         data: {

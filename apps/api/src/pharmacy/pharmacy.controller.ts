@@ -53,7 +53,10 @@ export class PharmacyController {
 
   @Get('medications')
   @ApiOperation({ summary: 'Get all medications with pagination' })
-  @ApiResponse({ status: 200, description: 'Medications retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Medications retrieved successfully',
+  })
   async findAllMedications(
     @TenantId() tenantId: string,
     @Query() query: MedicationQueryDto,
@@ -63,7 +66,10 @@ export class PharmacyController {
 
   @Get('medications/:id')
   @ApiOperation({ summary: 'Get medication by ID' })
-  @ApiResponse({ status: 200, description: 'Medication retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Medication retrieved successfully',
+  })
   @ApiResponse({ status: 404, description: 'Medication not found' })
   async findOneMedication(
     @Param('id') id: string,
@@ -81,7 +87,11 @@ export class PharmacyController {
     @Body() updateMedicationDto: UpdateMedicationDto,
     @TenantId() tenantId: string,
   ) {
-    return this.pharmacyService.updateMedication(id, updateMedicationDto, tenantId);
+    return this.pharmacyService.updateMedication(
+      id,
+      updateMedicationDto,
+      tenantId,
+    );
   }
 
   @Delete('medications/:id')
@@ -101,18 +111,27 @@ export class PharmacyController {
   @Post('orders')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new pharmacy order' })
-  @ApiResponse({ status: 201, description: 'Pharmacy order created successfully' })
+  @ApiResponse({
+    status: 201,
+    description: 'Pharmacy order created successfully',
+  })
   @ApiResponse({ status: 400, description: 'Bad request' })
   async createPharmacyOrder(
     @Body() createPharmacyOrderDto: CreatePharmacyOrderDto,
     @TenantId() tenantId: string,
   ) {
-    return this.pharmacyService.createPharmacyOrder(createPharmacyOrderDto, tenantId);
+    return this.pharmacyService.createPharmacyOrder(
+      createPharmacyOrderDto,
+      tenantId,
+    );
   }
 
   @Get('orders')
   @ApiOperation({ summary: 'Get all pharmacy orders with pagination' })
-  @ApiResponse({ status: 200, description: 'Pharmacy orders retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Pharmacy orders retrieved successfully',
+  })
   async findAllPharmacyOrders(
     @TenantId() tenantId: string,
     @Query() query: PharmacyOrderQueryDto,
@@ -122,14 +141,20 @@ export class PharmacyController {
 
   @Get('orders/stats')
   @ApiOperation({ summary: 'Get pharmacy statistics' })
-  @ApiResponse({ status: 200, description: 'Statistics retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Statistics retrieved successfully',
+  })
   async getPharmacyStats(@TenantId() tenantId: string) {
     return this.pharmacyService.getPharmacyStats(tenantId);
   }
 
   @Get('orders/:id')
   @ApiOperation({ summary: 'Get pharmacy order by ID' })
-  @ApiResponse({ status: 200, description: 'Pharmacy order retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Pharmacy order retrieved successfully',
+  })
   @ApiResponse({ status: 404, description: 'Pharmacy order not found' })
   async findOnePharmacyOrder(
     @Param('id') id: string,
@@ -140,7 +165,10 @@ export class PharmacyController {
 
   @Patch('orders/:id')
   @ApiOperation({ summary: 'Update pharmacy order by ID' })
-  @ApiResponse({ status: 200, description: 'Pharmacy order updated successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Pharmacy order updated successfully',
+  })
   @ApiResponse({ status: 404, description: 'Pharmacy order not found' })
   async updatePharmacyOrder(
     @Param('id') id: string,
@@ -175,7 +203,10 @@ export class PharmacyController {
   @Delete('orders/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Cancel pharmacy order by ID' })
-  @ApiResponse({ status: 204, description: 'Pharmacy order cancelled successfully' })
+  @ApiResponse({
+    status: 204,
+    description: 'Pharmacy order cancelled successfully',
+  })
   @ApiResponse({ status: 404, description: 'Pharmacy order not found' })
   async cancelPharmacyOrder(
     @Param('id') id: string,

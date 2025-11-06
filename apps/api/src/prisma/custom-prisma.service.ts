@@ -58,7 +58,9 @@ export class CustomPrismaService
             '❌ Failed to connect to database after all retries',
           );
           // Don't throw error, just log it and continue
-          this.logger.warn('⚠️ Continuing without database connection - some features may not work');
+          this.logger.warn(
+            '⚠️ Continuing without database connection - some features may not work',
+          );
           return;
         }
       }

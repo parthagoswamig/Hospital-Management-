@@ -58,7 +58,12 @@ async function bootstrap() {
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Accept',
+      'X-Requested-With',
+    ],
     exposedHeaders: ['Content-Range', 'X-Content-Range'],
     maxAge: 3600,
   });
@@ -92,7 +97,9 @@ async function bootstrap() {
 
   // Skip database operations if environment variable is set
   if (process.env.SKIP_DB_OPERATIONS === 'true') {
-    logger.log('🚀 Starting in FAST DEPLOYMENT MODE - Skipping database operations');
+    logger.log(
+      '🚀 Starting in FAST DEPLOYMENT MODE - Skipping database operations',
+    );
   } else {
     logger.log('🚀 Starting with database operations enabled');
   }
@@ -102,7 +109,9 @@ async function bootstrap() {
   logger.log(`🚀 HMS SaaS API is running on: http://${host}:${port}`);
   logger.log(`❤️ Health Check: http://${host}:${port}/health`);
   logger.log(`🏥 Environment: ${process.env.NODE_ENV || 'development'}`);
-  logger.log(`📊 Database Mode: ${process.env.SKIP_DB_OPERATIONS === 'true' ? 'SKIPPED' : 'ENABLED'}`);
+  logger.log(
+    `📊 Database Mode: ${process.env.SKIP_DB_OPERATIONS === 'true' ? 'SKIPPED' : 'ENABLED'}`,
+  );
 }
 
 bootstrap().catch((error) => {

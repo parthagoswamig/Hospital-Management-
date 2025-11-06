@@ -197,7 +197,11 @@ export class AuditInterceptor implements NestInterceptor {
 
       const sanitized: any = {};
       for (const [key, value] of Object.entries(obj)) {
-        if (sensitiveFields.some((field) => key.toLowerCase().includes(field.toLowerCase()))) {
+        if (
+          sensitiveFields.some((field) =>
+            key.toLowerCase().includes(field.toLowerCase()),
+          )
+        ) {
           sanitized[key] = '***REDACTED***';
         } else if (typeof value === 'object' && value !== null) {
           sanitized[key] = sanitize(value);

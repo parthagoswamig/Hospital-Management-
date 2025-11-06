@@ -20,9 +20,6 @@ export enum BedStatus {
   RESERVED = 'RESERVED',
 }
 
-/**
- * Enum for ward types
- */
 export enum WardType {
   GENERAL = 'GENERAL',
   ICU = 'ICU',
@@ -37,51 +34,51 @@ export enum WardType {
  * DTO for creating wards
  */
 export class CreateWardDto {
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'General Ward A',
-    description: 'Name of the ward'
+    description: 'Name of the ward',
   })
   @IsString()
   @IsNotEmpty()
   name: string;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     example: 'General medical and surgical cases',
-    description: 'Description of the ward'
+    description: 'Description of the ward',
   })
   @IsOptional()
   @IsString()
   description?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     enum: WardType,
     example: WardType.GENERAL,
-    description: 'Type of the ward'
+    description: 'Type of the ward',
   })
   @IsEnum(WardType)
   @IsNotEmpty()
   type: WardType;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 30,
     minimum: 1,
-    description: 'Total capacity of beds in the ward'
+    description: 'Total capacity of beds in the ward',
   })
   @IsNumber()
   @Min(1)
   capacity: number;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     example: 'First Floor, East Wing',
-    description: 'Location of the ward'
+    description: 'Location of the ward',
   })
   @IsOptional()
   @IsString()
   location?: string;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     example: 'Dr. Smith',
-    description: 'Head nurse or responsible person'
+    description: 'Head nurse or responsible person',
   })
   @IsOptional()
   @IsString()
@@ -92,60 +89,60 @@ export class CreateWardDto {
  * DTO for updating wards
  */
 export class UpdateWardDto {
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     example: 'Updated General Ward A',
-    description: 'Updated name of the ward'
+    description: 'Updated name of the ward',
   })
   @IsOptional()
   @IsString()
   name?: string;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     example: 'Updated description',
-    description: 'Updated description of the ward'
+    description: 'Updated description of the ward',
   })
   @IsOptional()
   @IsString()
   description?: string;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     enum: WardType,
     example: WardType.ICU,
-    description: 'Updated type of the ward'
+    description: 'Updated type of the ward',
   })
   @IsOptional()
   @IsEnum(WardType)
   type?: WardType;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     example: 35,
     minimum: 1,
-    description: 'Updated capacity of the ward'
+    description: 'Updated capacity of the ward',
   })
   @IsOptional()
   @IsNumber()
   @Min(1)
   capacity?: number;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     example: 'Second Floor, West Wing',
-    description: 'Updated location of the ward'
+    description: 'Updated location of the ward',
   })
   @IsOptional()
   @IsString()
   location?: string;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     example: 'Dr. Johnson',
-    description: 'Updated head nurse'
+    description: 'Updated head nurse',
   })
   @IsOptional()
   @IsString()
   headNurse?: string;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     example: true,
-    description: 'Whether the ward is active'
+    description: 'Whether the ward is active',
   })
   @IsOptional()
   @IsBoolean()
@@ -156,35 +153,35 @@ export class UpdateWardDto {
  * DTO for creating beds
  */
 export class CreateBedDto {
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'ward-uuid-123',
-    description: 'ID of the ward this bed belongs to'
+    description: 'ID of the ward this bed belongs to',
   })
   @IsString()
   @IsNotEmpty()
   wardId: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'A001',
-    description: 'Unique bed number within the ward'
+    description: 'Unique bed number within the ward',
   })
   @IsString()
   @IsNotEmpty()
   bedNumber: string;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     enum: BedStatus,
     example: BedStatus.AVAILABLE,
     default: BedStatus.AVAILABLE,
-    description: 'Current status of the bed'
+    description: 'Current status of the bed',
   })
   @IsOptional()
   @IsEnum(BedStatus)
   status?: BedStatus;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     example: 'Standard hospital bed with adjustable height',
-    description: 'Description or notes about the bed'
+    description: 'Description or notes about the bed',
   })
   @IsOptional()
   @IsString()
@@ -195,18 +192,18 @@ export class CreateBedDto {
  * DTO for updating bed status
  */
 export class UpdateBedStatusDto {
-  @ApiProperty({ 
+  @ApiProperty({
     enum: BedStatus,
     example: BedStatus.OCCUPIED,
-    description: 'New status of the bed'
+    description: 'New status of the bed',
   })
   @IsEnum(BedStatus)
   @IsNotEmpty()
   status: BedStatus;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     example: 'Patient admitted for surgery',
-    description: 'Reason for status change'
+    description: 'Reason for status change',
   })
   @IsOptional()
   @IsString()
@@ -217,47 +214,47 @@ export class UpdateBedStatusDto {
  * DTO for filtering wards
  */
 export class WardFilterDto {
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     example: 1,
     minimum: 1,
     default: 1,
-    description: 'Page number for pagination'
+    description: 'Page number for pagination',
   })
   @IsOptional()
   @Type(() => Number)
   page?: number = 1;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     example: 10,
     minimum: 1,
     maximum: 100,
     default: 10,
-    description: 'Number of items per page'
+    description: 'Number of items per page',
   })
   @IsOptional()
   @Type(() => Number)
   limit?: number = 10;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     enum: WardType,
     example: WardType.GENERAL,
-    description: 'Filter by ward type'
+    description: 'Filter by ward type',
   })
   @IsOptional()
   @IsEnum(WardType)
   type?: WardType;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     example: 'General',
-    description: 'Search in ward name or description'
+    description: 'Search in ward name or description',
   })
   @IsOptional()
   @IsString()
   search?: string;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     example: true,
-    description: 'Filter by active status'
+    description: 'Filter by active status',
   })
   @IsOptional()
   @IsBoolean()
@@ -269,55 +266,55 @@ export class WardFilterDto {
  * DTO for filtering beds
  */
 export class BedFilterDto {
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     example: 1,
     minimum: 1,
     default: 1,
-    description: 'Page number for pagination'
+    description: 'Page number for pagination',
   })
   @IsOptional()
   @Type(() => Number)
   page?: number = 1;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     example: 10,
     minimum: 1,
     maximum: 100,
     default: 10,
-    description: 'Number of items per page'
+    description: 'Number of items per page',
   })
   @IsOptional()
   @Type(() => Number)
   limit?: number = 10;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     example: 'ward-uuid-123',
-    description: 'Filter by ward ID'
+    description: 'Filter by ward ID',
   })
   @IsOptional()
   @IsString()
   wardId?: string;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     enum: BedStatus,
     example: BedStatus.AVAILABLE,
-    description: 'Filter by bed status'
+    description: 'Filter by bed status',
   })
   @IsOptional()
   @IsEnum(BedStatus)
   status?: BedStatus;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     example: 'A001',
-    description: 'Search by bed number'
+    description: 'Search by bed number',
   })
   @IsOptional()
   @IsString()
   search?: string;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     example: true,
-    description: 'Filter by active status'
+    description: 'Filter by active status',
   })
   @IsOptional()
   @IsBoolean()

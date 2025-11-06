@@ -1,5 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { AppointmentStatus } from '@prisma/client';
+import { UpdatePortalAccessDto } from './dto/portal-access.dto';
+import { BookAppointmentDto } from './dto/book-appointment.dto';
+import { QueryDto } from '../shared/dto/query.dto';
 
 @Injectable()
 export class PatientPortalService {
@@ -13,7 +17,11 @@ export class PatientPortalService {
     return { success: true, data: patient };
   }
 
-  async updateProfile(userId: string, updateDto: any, tenantId: string) {
+  async updateProfile(
+    userId: string,
+    updateDto: UpdatePortalAccessDto,
+    tenantId: string,
+  ) {
     const patient = await this.prisma.patient.findFirst({
       where: { createdBy: userId, tenantId },
     });
@@ -26,7 +34,7 @@ export class PatientPortalService {
     return { success: true, message: 'Profile updated', data: updated };
   }
 
-  async getMyAppointments(userId: string, tenantId: string, query: any) {
+  async getMyAppointments(userId: string, tenantId: string, query: QueryDto) {
     const patient = await this.prisma.patient.findFirst({
       where: { createdBy: userId, tenantId },
     });
@@ -41,7 +49,11 @@ export class PatientPortalService {
     return { success: true, data: appointments };
   }
 
-  async bookAppointment(userId: string, createDto: any, tenantId: string) {
+  async bookAppointment(
+    userId: string,
+    createDto: BookAppointmentDto,
+    tenantId: string,
+  ) {
     const patient = await this.prisma.patient.findFirst({
       where: { createdBy: userId, tenantId },
     });
@@ -49,9 +61,17 @@ export class PatientPortalService {
 
     const appointment = await this.prisma.appointment.create({
       data: {
-        ...createDto,
-        patientId: patient.id,
-        tenantId,
+        startTime: new Date(createDto.startTime),
+        endTime: new Date(createDto.endTime),
+        status: createDto.status || AppointmentStatus.SCHEDULED,
+        reason: createDto.reason,
+        notes: createDto.notes,
+        doctor: { connect: { id: createDto.doctorId } },
+        department: createDto.departmentId
+          ? { connect: { id: createDto.departmentId } }
+          : undefined,
+        patient: { connect: { id: patient.id } },
+        tenant: { connect: { id: tenantId } },
       },
       include: { doctor: true },
     });
@@ -59,7 +79,7 @@ export class PatientPortalService {
     return { success: true, message: 'Appointment booked', data: appointment };
   }
 
-  async getMyRecords(userId: string, tenantId: string, query: any) {
+  async getMyRecords(userId: string, tenantId: string, query: QueryDto) {
     const patient = await this.prisma.patient.findFirst({
       where: { createdBy: userId, tenantId },
     });

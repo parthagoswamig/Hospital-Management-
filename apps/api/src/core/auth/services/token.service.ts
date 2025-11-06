@@ -68,7 +68,7 @@ export class TokenService {
       return await this.jwtService.verifyAsync<JwtPayload>(token, {
         secret: this.configService.get<string>('JWT_ACCESS_TOKEN_SECRET'),
       });
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException('Invalid or expired access token');
     }
   }
@@ -76,12 +76,14 @@ export class TokenService {
   /**
    * Verify and decode refresh token
    */
-  async verifyRefreshToken(token: string): Promise<{ sub: string; sessionId?: string }> {
+  async verifyRefreshToken(
+    token: string,
+  ): Promise<{ sub: string; sessionId?: string }> {
     try {
       return await this.jwtService.verifyAsync(token, {
         secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET'),
       });
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
   }

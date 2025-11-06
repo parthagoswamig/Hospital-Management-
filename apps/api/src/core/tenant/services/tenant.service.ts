@@ -2,7 +2,6 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
-  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -73,7 +72,9 @@ export class TenantService {
     // Set trial period if free plan
     const trialEndsAt =
       createDto.subscriptionPlan === SubscriptionPlan.FREE
-        ? new Date(Date.now() + (createDto.trialDays || 14) * 24 * 60 * 60 * 1000)
+        ? new Date(
+            Date.now() + (createDto.trialDays || 14) * 24 * 60 * 60 * 1000,
+          )
         : null;
 
     const tenant = this.tenantRepository.create({
@@ -91,6 +92,7 @@ export class TenantService {
    * Find tenant by ID
    */
   async findOne(id: string): Promise<Tenant> {
+    // const subdomain = host.split('.')[0]; // Unused variable
     const tenant = await this.tenantRepository.findOne({ where: { id } });
 
     if (!tenant) {

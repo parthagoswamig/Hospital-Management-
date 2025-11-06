@@ -218,7 +218,10 @@ export class CreatePharmacyOrderDto {
 }
 
 export class UpdatePharmacyOrderDto {
-  @ApiPropertyOptional({ enum: PharmacyOrderStatus, example: PharmacyOrderStatus.DISPENSED })
+  @ApiPropertyOptional({
+    enum: PharmacyOrderStatus,
+    example: PharmacyOrderStatus.DISPENSED,
+  })
   @IsOptional()
   @IsEnum(PharmacyOrderStatus)
   status?: PharmacyOrderStatus;
@@ -236,7 +239,10 @@ export class UpdatePharmacyOrderDto {
 }
 
 export class UpdatePharmacyOrderItemDto {
-  @ApiPropertyOptional({ enum: PharmacyOrderItemStatus, example: PharmacyOrderItemStatus.DISPENSED })
+  @ApiPropertyOptional({
+    enum: PharmacyOrderItemStatus,
+    example: PharmacyOrderItemStatus.DISPENSED,
+  })
   @IsOptional()
   @IsEnum(PharmacyOrderItemStatus)
   status?: PharmacyOrderItemStatus;
@@ -254,12 +260,18 @@ export class PharmacyOrderQueryDto {
   @Type(() => Number)
   limit?: number;
 
-  @ApiPropertyOptional({ example: 'patient name or order number', description: 'Search query' })
+  @ApiPropertyOptional({
+    example: 'patient name or order number',
+    description: 'Search query',
+  })
   @IsOptional()
   @IsString()
   search?: string;
 
-  @ApiPropertyOptional({ enum: PharmacyOrderStatus, example: PharmacyOrderStatus.PENDING })
+  @ApiPropertyOptional({
+    enum: PharmacyOrderStatus,
+    example: PharmacyOrderStatus.PENDING,
+  })
   @IsOptional()
   @IsEnum(PharmacyOrderStatus)
   status?: PharmacyOrderStatus;
@@ -274,12 +286,18 @@ export class PharmacyOrderQueryDto {
   @IsUUID()
   doctorId?: string;
 
-  @ApiPropertyOptional({ example: '2024-01-01', description: 'Start date (YYYY-MM-DD)' })
+  @ApiPropertyOptional({
+    example: '2024-01-01',
+    description: 'Start date (YYYY-MM-DD)',
+  })
   @IsOptional()
   @IsDateString()
   startDate?: string;
 
-  @ApiPropertyOptional({ example: '2024-01-31', description: 'End date (YYYY-MM-DD)' })
+  @ApiPropertyOptional({
+    example: '2024-01-31',
+    description: 'End date (YYYY-MM-DD)',
+  })
   @IsOptional()
   @IsDateString()
   endDate?: string;

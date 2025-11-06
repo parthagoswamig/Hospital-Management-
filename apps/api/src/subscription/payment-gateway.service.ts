@@ -25,7 +25,7 @@ export class PaymentGatewayService {
    */
   getAvailableGateways(): PaymentGateway[] {
     const gateways: PaymentGateway[] = [];
-    
+
     // Check Stripe
     try {
       if (this.stripeService) {
@@ -55,12 +55,14 @@ export class PaymentGatewayService {
     switch (gateway) {
       case 'stripe':
         return await this.createStripePayment(amount, currency, metadata);
-      
+
       case 'razorpay':
         return await this.createRazorpayPayment(amount, currency, metadata);
-      
+
       default:
-        throw new BadRequestException(`Unsupported payment gateway: ${gateway}`);
+        throw new BadRequestException(
+          `Unsupported payment gateway: ${gateway}`,
+        );
     }
   }
 
@@ -83,7 +85,7 @@ export class PaymentGatewayService {
       orderId: paymentIntent.id,
       amount,
       currency,
-      clientSecret: paymentIntent.client_secret!,
+      clientSecret: paymentIntent.client_secret,
     };
   }
 
@@ -122,14 +124,20 @@ export class PaymentGatewayService {
   ): Promise<boolean> {
     switch (gateway) {
       case 'razorpay':
-        return this.razorpayService.verifyPaymentSignature(orderId, paymentId, signature);
-      
+        return this.razorpayService.verifyPaymentSignature(
+          orderId,
+          paymentId,
+          signature,
+        );
+
       case 'stripe':
         // Stripe verification is done via webhooks
         return true;
-      
+
       default:
-        throw new BadRequestException(`Unsupported payment gateway: ${gateway}`);
+        throw new BadRequestException(
+          `Unsupported payment gateway: ${gateway}`,
+        );
     }
   }
 
@@ -140,13 +148,15 @@ export class PaymentGatewayService {
     switch (gateway) {
       case 'razorpay':
         return await this.razorpayService.fetchPayment(paymentId);
-      
+
       case 'stripe':
         // Implement Stripe payment fetch if needed
         throw new BadRequestException('Stripe payment fetch not implemented');
-      
+
       default:
-        throw new BadRequestException(`Unsupported payment gateway: ${gateway}`);
+        throw new BadRequestException(
+          `Unsupported payment gateway: ${gateway}`,
+        );
     }
   }
 
@@ -161,13 +171,15 @@ export class PaymentGatewayService {
     switch (gateway) {
       case 'razorpay':
         return await this.razorpayService.createRefund(paymentId, amount);
-      
+
       case 'stripe':
         // Implement Stripe refund if needed
         throw new BadRequestException('Stripe refund not implemented');
-      
+
       default:
-        throw new BadRequestException(`Unsupported payment gateway: ${gateway}`);
+        throw new BadRequestException(
+          `Unsupported payment gateway: ${gateway}`,
+        );
     }
   }
 }

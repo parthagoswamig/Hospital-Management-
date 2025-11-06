@@ -1,6 +1,11 @@
 import { AppDataSource } from '../../data-source';
 import { User } from '../../core/auth/entities/user.entity';
-import { Tenant, TenantType, TenantStatus, SubscriptionPlan } from '../../core/tenant/entities/tenant.entity';
+import {
+  Tenant,
+  TenantType,
+  TenantStatus,
+  SubscriptionPlan,
+} from '../../core/tenant/entities/tenant.entity';
 import { UserRole } from '../../core/rbac/enums/roles.enum';
 import * as bcrypt from 'bcrypt';
 
@@ -244,27 +249,27 @@ async function seed() {
     console.log(`   Email: admin@hms.com`);
     console.log(`   Password: Admin@123!`);
     console.log(`   Role: SUPER_ADMIN\n`);
-    
+
     console.log('🏥 Demo Hospital Admin:');
     console.log(`   Email: admin@demo-hospital.com`);
     console.log(`   Password: Demo@123!`);
     console.log(`   Role: TENANT_ADMIN\n`);
-    
+
     console.log('👨‍⚕️ Demo Doctor:');
     console.log(`   Email: doctor@demo-hospital.com`);
     console.log(`   Password: Doctor@123!`);
     console.log(`   Role: DOCTOR\n`);
-    
+
     console.log('👩‍⚕️ Demo Nurse:');
     console.log(`   Email: nurse@demo-hospital.com`);
     console.log(`   Password: Nurse@123!`);
     console.log(`   Role: NURSE\n`);
-    
+
     console.log('🤒 Demo Patient:');
     console.log(`   Email: patient@demo-hospital.com`);
     console.log(`   Password: Patient@123!`);
     console.log(`   Role: PATIENT\n`);
-    
+
     console.log('='.repeat(60));
   } catch (error) {
     console.error('❌ Seed failed:', error);

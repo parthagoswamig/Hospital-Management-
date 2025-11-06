@@ -17,7 +17,6 @@ import {
   ApiResponse,
   ApiBearerAuth,
   ApiParam,
-  ApiQuery,
 } from '@nestjs/swagger';
 import { OpdService } from './opd.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -41,21 +40,21 @@ export class OpdController {
    */
   @Post('visits')
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Create a new OPD visit',
-    description: 'Creates a new outpatient department visit for a patient'
+    description: 'Creates a new outpatient department visit for a patient',
   })
-  @ApiResponse({ 
-    status: 201, 
-    description: 'OPD visit created successfully'
+  @ApiResponse({
+    status: 201,
+    description: 'OPD visit created successfully',
   })
-  @ApiResponse({ 
-    status: 400, 
-    description: 'Bad request - Invalid data provided'
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - Invalid data provided',
   })
-  @ApiResponse({ 
-    status: 404, 
-    description: 'Patient or doctor not found'
+  @ApiResponse({
+    status: 404,
+    description: 'Patient or doctor not found',
   })
   async createVisit(
     @Body() createOpdVisitDto: CreateOpdVisitDto,
@@ -68,13 +67,13 @@ export class OpdController {
    * Get all OPD visits with filters
    */
   @Get('visits')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get all OPD visits',
-    description: 'Retrieves paginated list of OPD visits with optional filters'
+    description: 'Retrieves paginated list of OPD visits with optional filters',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'OPD visits retrieved successfully'
+  @ApiResponse({
+    status: 200,
+    description: 'OPD visits retrieved successfully',
   })
   async findAllVisits(
     @Query() filters: OpdVisitFilterDto,
@@ -87,27 +86,24 @@ export class OpdController {
    * Get OPD visit by ID
    */
   @Get('visits/:id')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get OPD visit by ID',
-    description: 'Retrieves a specific OPD visit with all details'
+    description: 'Retrieves a specific OPD visit with all details',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'OPD visit retrieved successfully'
+  @ApiResponse({
+    status: 200,
+    description: 'OPD visit retrieved successfully',
   })
-  @ApiResponse({ 
-    status: 404, 
-    description: 'OPD visit not found'
+  @ApiResponse({
+    status: 404,
+    description: 'OPD visit not found',
   })
-  @ApiParam({ 
-    name: 'id', 
+  @ApiParam({
+    name: 'id',
     description: 'OPD visit ID',
-    example: 'visit-uuid-123'
+    example: 'visit-uuid-123',
   })
-  async findOneVisit(
-    @Param('id') id: string, 
-    @TenantId() tenantId: string,
-  ) {
+  async findOneVisit(@Param('id') id: string, @TenantId() tenantId: string) {
     return this.opdService.findOneVisit(id, tenantId);
   }
 
@@ -115,60 +111,53 @@ export class OpdController {
    * Update OPD visit
    */
   @Patch('visits/:id')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Update OPD visit',
-    description: 'Updates an existing OPD visit'
+    description: 'Updates an existing OPD visit',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'OPD visit updated successfully'
+  @ApiResponse({
+    status: 200,
+    description: 'OPD visit updated successfully',
   })
-  @ApiResponse({ 
-    status: 404, 
-    description: 'OPD visit not found'
+  @ApiResponse({
+    status: 404,
+    description: 'OPD visit not found',
   })
-  @ApiParam({ 
-    name: 'id', 
+  @ApiParam({
+    name: 'id',
     description: 'OPD visit ID',
-    example: 'visit-uuid-123'
+    example: 'visit-uuid-123',
   })
   async updateVisit(
     @Param('id') id: string,
     @Body() updateOpdVisitDto: UpdateOpdVisitDto,
     @TenantId() tenantId: string,
   ) {
-    return this.opdService.updateVisit(
-      id,
-      updateOpdVisitDto,
-      tenantId,
-    );
+    return this.opdService.updateVisit(id, updateOpdVisitDto, tenantId);
   }
 
   /**
    * Cancel OPD visit
    */
   @Delete('visits/:id')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Cancel OPD visit',
-    description: 'Cancels an existing OPD visit'
+    description: 'Cancels an existing OPD visit',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'OPD visit cancelled successfully'
+  @ApiResponse({
+    status: 200,
+    description: 'OPD visit cancelled successfully',
   })
-  @ApiResponse({ 
-    status: 404, 
-    description: 'OPD visit not found'
+  @ApiResponse({
+    status: 404,
+    description: 'OPD visit not found',
   })
-  @ApiParam({ 
-    name: 'id', 
+  @ApiParam({
+    name: 'id',
     description: 'OPD visit ID',
-    example: 'visit-uuid-123'
+    example: 'visit-uuid-123',
   })
-  async removeVisit(
-    @Param('id') id: string, 
-    @TenantId() tenantId: string,
-  ) {
+  async removeVisit(@Param('id') id: string, @TenantId() tenantId: string) {
     return this.opdService.removeVisit(id, tenantId);
   }
 
@@ -176,13 +165,13 @@ export class OpdController {
    * Get OPD queue
    */
   @Get('queue')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get OPD queue',
-    description: 'Retrieves the current OPD queue with waiting patients'
+    description: 'Retrieves the current OPD queue with waiting patients',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'OPD queue retrieved successfully'
+  @ApiResponse({
+    status: 200,
+    description: 'OPD queue retrieved successfully',
   })
   async getQueue(
     @Query() filters: OpdQueueFilterDto,
@@ -195,13 +184,14 @@ export class OpdController {
    * Get OPD statistics
    */
   @Get('stats')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get OPD statistics',
-    description: 'Retrieves OPD statistics for today including patient counts and status distribution'
+    description:
+      'Retrieves OPD statistics for today including patient counts and status distribution',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'OPD statistics retrieved successfully'
+  @ApiResponse({
+    status: 200,
+    description: 'OPD statistics retrieved successfully',
   })
   async getStats(@TenantId() tenantId: string) {
     return this.opdService.getStats(tenantId);

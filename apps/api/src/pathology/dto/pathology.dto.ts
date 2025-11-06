@@ -1,4 +1,11 @@
-import { IsString, IsNotEmpty, IsOptional, IsArray, IsNumber, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsArray,
+  IsNumber,
+  IsEnum,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
@@ -51,7 +58,7 @@ export class CreateLabTestDto {
   @IsNotEmpty()
   category: TestCategory;
 
-  @ApiPropertyOptional({ example: 25.00 })
+  @ApiPropertyOptional({ example: 25.0 })
   @IsOptional()
   @IsNumber()
   price?: number;
@@ -83,7 +90,7 @@ export class UpdateLabTestDto {
   @IsEnum(TestCategory)
   category?: TestCategory;
 
-  @ApiPropertyOptional({ example: 30.00 })
+  @ApiPropertyOptional({ example: 30.0 })
   @IsOptional()
   @IsNumber()
   price?: number;
@@ -110,9 +117,9 @@ export class CreateLabOrderDto {
   @IsString()
   doctorId?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: ['test-uuid-1', 'test-uuid-2'],
-    description: 'Array of test IDs to be ordered'
+    description: 'Array of test IDs to be ordered',
   })
   @IsArray()
   @IsString({ each: true })

@@ -6,7 +6,7 @@ export const ROLES_KEY = 'roles';
 /**
  * Roles Decorator
  * Use this decorator to restrict access to routes based on user roles
- * 
+ *
  * @example
  * ```typescript
  * @Roles(UserRole.DOCTOR, UserRole.NURSE)

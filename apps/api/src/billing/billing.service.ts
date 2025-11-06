@@ -132,10 +132,16 @@ export class BillingService {
   /**
    * Validate pagination parameters
    */
-  private validatePaginationParams(page: any, limit: any): { page: number; limit: number } {
+  private validatePaginationParams(
+    page: any,
+    limit: any,
+  ): { page: number; limit: number } {
     const validatedPage = Math.max(1, parseInt(page?.toString() || '1', 10));
-    const validatedLimit = Math.min(100, Math.max(1, parseInt(limit?.toString() || '10', 10)));
-    
+    const validatedLimit = Math.min(
+      100,
+      Math.max(1, parseInt(limit?.toString() || '10', 10)),
+    );
+
     return { page: validatedPage, limit: validatedLimit };
   }
 
@@ -337,8 +343,11 @@ export class BillingService {
    */
   async getInvoices(filters: InvoiceFilterDto, tenantId: string) {
     try {
-      this.logger.log(`Finding invoices for tenant: ${tenantId} with filters:`, filters);
-      
+      this.logger.log(
+        `Finding invoices for tenant: ${tenantId} with filters:`,
+        filters,
+      );
+
       const { page: rawPage, limit: rawLimit } = filters;
       const { page, limit } = this.validatePaginationParams(rawPage, rawLimit);
       const skip = (page - 1) * limit;
@@ -358,7 +367,9 @@ export class BillingService {
         this.prisma.invoice.count({ where }),
       ]);
 
-      this.logger.log(`Found ${invoices.length} invoices out of ${total} total`);
+      this.logger.log(
+        `Found ${invoices.length} invoices out of ${total} total`,
+      );
       return {
         data: invoices,
         meta: {
@@ -380,14 +391,16 @@ export class BillingService {
   async getInvoiceById(id: string, tenantId: string) {
     try {
       this.logger.log(`Finding invoice with ID: ${id} for tenant: ${tenantId}`);
-      
+
       const invoice = await this.prisma.invoice.findFirst({
         where: { id, tenantId },
         include: this.getInvoiceIncludes(),
       });
 
       if (!invoice) {
-        this.logger.warn(`Invoice not found with ID: ${id} for tenant: ${tenantId}`);
+        this.logger.warn(
+          `Invoice not found with ID: ${id} for tenant: ${tenantId}`,
+        );
         throw new NotFoundException('Invoice not found');
       }
 
@@ -563,8 +576,11 @@ export class BillingService {
    */
   async getPayments(filters: PaymentFilterDto, tenantId: string) {
     try {
-      this.logger.log(`Finding payments for tenant: ${tenantId} with filters:`, filters);
-      
+      this.logger.log(
+        `Finding payments for tenant: ${tenantId} with filters:`,
+        filters,
+      );
+
       const { page: rawPage, limit: rawLimit } = filters;
       const { page, limit } = this.validatePaginationParams(rawPage, rawLimit);
       const skip = (page - 1) * limit;
@@ -584,7 +600,9 @@ export class BillingService {
         this.prisma.payment.count({ where }),
       ]);
 
-      this.logger.log(`Found ${payments.length} payments out of ${total} total`);
+      this.logger.log(
+        `Found ${payments.length} payments out of ${total} total`,
+      );
       return {
         data: payments,
         meta: {
@@ -606,14 +624,16 @@ export class BillingService {
   async getPaymentById(id: string, tenantId: string) {
     try {
       this.logger.log(`Finding payment with ID: ${id} for tenant: ${tenantId}`);
-      
+
       const payment = await this.prisma.payment.findFirst({
         where: { id, tenantId },
         include: this.getPaymentIncludes(),
       });
 
       if (!payment) {
-        this.logger.warn(`Payment not found with ID: ${id} for tenant: ${tenantId}`);
+        this.logger.warn(
+          `Payment not found with ID: ${id} for tenant: ${tenantId}`,
+        );
         throw new NotFoundException('Payment not found');
       }
 
@@ -667,7 +687,7 @@ export class BillingService {
     today.setHours(0, 0, 0, 0);
 
     const thisMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+    // const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
 
     const [
       totalInvoices,

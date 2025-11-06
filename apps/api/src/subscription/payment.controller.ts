@@ -1,6 +1,17 @@
-import { Controller, Get, Post, Body, UseGuards, Request, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  UseGuards,
+  Request,
+  BadRequestException,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { PaymentGatewayService, PaymentGateway } from './payment-gateway.service';
+import {
+  PaymentGatewayService,
+  PaymentGateway,
+} from './payment-gateway.service';
 
 class CreatePaymentOrderDto {
   gateway!: PaymentGateway;
@@ -28,7 +39,7 @@ export class PaymentController {
   @Get('gateways')
   getAvailableGateways() {
     const gateways = this.paymentGatewayService.getAvailableGateways();
-    
+
     return {
       success: true,
       data: {
@@ -93,7 +104,9 @@ export class PaymentController {
     const { gateway, orderId, paymentId, signature } = dto;
 
     if (!gateway || !orderId || !paymentId) {
-      throw new BadRequestException('Gateway, orderId, and paymentId are required');
+      throw new BadRequestException(
+        'Gateway, orderId, and paymentId are required',
+      );
     }
 
     const isValid = await this.paymentGatewayService.verifyPayment(

@@ -7,7 +7,6 @@ import {
   IsNumber,
   IsBoolean,
   IsDateString,
-  Min,
   MaxLength,
   IsPositive,
 } from 'class-validator';
@@ -71,7 +70,7 @@ export class CreateLabTestDto {
   @IsEnum(LabTestCategory)
   category: LabTestCategory;
 
-  @ApiPropertyOptional({ example: 500.00 })
+  @ApiPropertyOptional({ example: 500.0 })
   @IsOptional()
   @IsNumber({ maxDecimalPlaces: 2 })
   @IsPositive()
@@ -102,12 +101,15 @@ export class UpdateLabTestDto {
   @MaxLength(1000)
   description?: string;
 
-  @ApiPropertyOptional({ enum: LabTestCategory, example: LabTestCategory.BLOOD })
+  @ApiPropertyOptional({
+    enum: LabTestCategory,
+    example: LabTestCategory.BLOOD,
+  })
   @IsOptional()
   @IsEnum(LabTestCategory)
   category?: LabTestCategory;
 
-  @ApiPropertyOptional({ example: 500.00 })
+  @ApiPropertyOptional({ example: 500.0 })
   @IsOptional()
   @IsNumber({ maxDecimalPlaces: 2 })
   @IsPositive()
@@ -130,10 +132,10 @@ export class CreateLabOrderDto {
   @IsUUID()
   doctorId?: string;
 
-  @ApiProperty({ 
-    example: ['test-uuid-1', 'test-uuid-2'], 
+  @ApiProperty({
+    example: ['test-uuid-1', 'test-uuid-2'],
     description: 'Array of lab test IDs',
-    type: [String]
+    type: [String],
   })
   @IsArray()
   @IsUUID(4, { each: true })
@@ -145,14 +147,20 @@ export class CreateLabOrderDto {
   @MaxLength(1000)
   notes?: string;
 
-  @ApiPropertyOptional({ enum: LabOrderPriority, example: LabOrderPriority.ROUTINE })
+  @ApiPropertyOptional({
+    enum: LabOrderPriority,
+    example: LabOrderPriority.ROUTINE,
+  })
   @IsOptional()
   @IsEnum(LabOrderPriority)
   priority?: LabOrderPriority;
 }
 
 export class UpdateLabOrderDto {
-  @ApiPropertyOptional({ enum: LabOrderStatus, example: LabOrderStatus.IN_PROGRESS })
+  @ApiPropertyOptional({
+    enum: LabOrderStatus,
+    example: LabOrderStatus.IN_PROGRESS,
+  })
   @IsOptional()
   @IsEnum(LabOrderStatus)
   status?: LabOrderStatus;
@@ -198,7 +206,10 @@ export class UpdateLabTestResultDto {
   @MaxLength(1000)
   notes?: string;
 
-  @ApiPropertyOptional({ enum: LabTestResultStatus, example: LabTestResultStatus.COMPLETED })
+  @ApiPropertyOptional({
+    enum: LabTestResultStatus,
+    example: LabTestResultStatus.COMPLETED,
+  })
   @IsOptional()
   @IsEnum(LabTestResultStatus)
   status?: LabTestResultStatus;
@@ -216,12 +227,18 @@ export class LabOrderQueryDto {
   @Type(() => Number)
   limit?: number;
 
-  @ApiPropertyOptional({ example: 'patient name or order number', description: 'Search query' })
+  @ApiPropertyOptional({
+    example: 'patient name or order number',
+    description: 'Search query',
+  })
   @IsOptional()
   @IsString()
   search?: string;
 
-  @ApiPropertyOptional({ enum: LabOrderStatus, example: LabOrderStatus.PENDING })
+  @ApiPropertyOptional({
+    enum: LabOrderStatus,
+    example: LabOrderStatus.PENDING,
+  })
   @IsOptional()
   @IsEnum(LabOrderStatus)
   status?: LabOrderStatus;
@@ -236,12 +253,18 @@ export class LabOrderQueryDto {
   @IsUUID()
   doctorId?: string;
 
-  @ApiPropertyOptional({ example: '2024-01-01', description: 'Start date (YYYY-MM-DD)' })
+  @ApiPropertyOptional({
+    example: '2024-01-01',
+    description: 'Start date (YYYY-MM-DD)',
+  })
   @IsOptional()
   @IsDateString()
   startDate?: string;
 
-  @ApiPropertyOptional({ example: '2024-01-31', description: 'End date (YYYY-MM-DD)' })
+  @ApiPropertyOptional({
+    example: '2024-01-31',
+    description: 'End date (YYYY-MM-DD)',
+  })
   @IsOptional()
   @IsDateString()
   endDate?: string;
@@ -263,7 +286,10 @@ export class LabTestQueryDto {
   @IsString()
   search?: string;
 
-  @ApiPropertyOptional({ enum: LabTestCategory, example: LabTestCategory.BLOOD })
+  @ApiPropertyOptional({
+    enum: LabTestCategory,
+    example: LabTestCategory.BLOOD,
+  })
   @IsOptional()
   @IsEnum(LabTestCategory)
   category?: LabTestCategory;

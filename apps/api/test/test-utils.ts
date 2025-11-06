@@ -16,7 +16,7 @@ const TEST_USER = {
   email: 'test@example.com',
   tenantId: TEST_TENANT_ID,
   role: 'ADMIN',
-  permissions: ['patients:read', 'patients:write', 'patients:delete']
+  permissions: ['patients:read', 'patients:write', 'patients:delete'],
 };
 
 const logger = new Logger('TestApp');
@@ -30,38 +30,42 @@ export class TestApp {
   async init() {
     try {
       logger.log('Initializing test application...');
-      
+
       // Test database connection first
       await this.testDatabaseConnection();
-      
+
       // Initialize the testing module
       this.moduleFixture = await Test.createTestingModule({
         imports: [AppModule],
-    }).compile();
+      }).compile();
 
       this.app = this.moduleFixture.createNestApplication();
-      
+
       // Disable rate limiting for tests
       const reflector = this.app.get(Reflector);
       const storageService = this.app.get(ThrottlerStorage);
       const configService = this.app.get(ConfigService);
-      this.app.useGlobalGuards(new ThrottlerGuard({ throttlers: [] }, storageService, reflector));
-      
+      this.app.useGlobalGuards(
+        new ThrottlerGuard({ throttlers: [] }, storageService, reflector),
+      );
+
       // Enable validation pipe
-      this.app.useGlobalPipes(new ValidationPipe({
-        whitelist: true,
-        transform: true,
-        forbidNonWhitelisted: true,
-      }));
-      
+      this.app.useGlobalPipes(
+        new ValidationPipe({
+          whitelist: true,
+          transform: true,
+          forbidNonWhitelisted: true,
+        }),
+      );
+
       // Generate auth token
       const jwtService = this.app.get(JwtService);
       this.authToken = jwtService.sign(TEST_USER);
       this.tenantId = TEST_TENANT_ID;
-      
+
       await this.app.init();
       logger.log('Test application initialized successfully');
-      
+
       return this;
     } catch (error) {
       logger.error('Failed to initialize test application', error);
@@ -88,19 +92,21 @@ export class TestApp {
     try {
       await prisma.$connect();
       logger.log('✅ Database connection successful');
-      
+
       // Test a simple query
       await prisma.$queryRaw`SELECT 1`;
     } catch (error) {
       logger.error('❌ Database connection failed:', error);
-      throw new Error('Failed to connect to test database. Please check your DATABASE_URL in .env.test');
+      throw new Error(
+        'Failed to connect to test database. Please check your DATABASE_URL in .env.test',
+      );
     }
   }
 
   async cleanupDatabase() {
     try {
       logger.log('🧹 Cleaning up test database...');
-      
+
       // Get all tables except migrations and enums
       const tables = await prisma.$queryRaw<Array<{ tablename: string }>>`
         SELECT tablename 
@@ -111,7 +117,9 @@ export class TestApp {
       `;
 
       if (tables.length === 0) {
-        logger.warn('No tables found in the database. Is the connection configured correctly?');
+        logger.warn(
+          'No tables found in the database. Is the connection configured correctly?',
+        );
         return;
       }
 
@@ -122,7 +130,7 @@ export class TestApp {
       for (const { tablename } of tables as any[]) {
         try {
           await prisma.$executeRawUnsafe(
-            `TRUNCATE TABLE "${tablename}" CASCADE;`
+            `TRUNCATE TABLE "${tablename}" CASCADE;`,
           );
           logger.debug(`✅ Truncated table: ${tablename}`);
         } catch (error) {
@@ -133,7 +141,7 @@ export class TestApp {
 
       // Re-enable foreign key constraints
       await prisma.$executeRaw`SET session_replication_role = 'origin'`;
-      
+
       logger.log('✨ Test database cleanup completed');
     } catch (error) {
       logger.error('❌ Error during database cleanup:', error);

@@ -47,7 +47,10 @@ export class PathologyController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid request data',
   })
-  createTest(@Body() createDto: CreateLabTestDto, @TenantId() tenantId: string) {
+  createTest(
+    @Body() createDto: CreateLabTestDto,
+    @TenantId() tenantId: string,
+  ) {
     return this.pathologyService.createTest(createDto, tenantId);
   }
 
@@ -57,7 +60,10 @@ export class PathologyController {
     status: HttpStatus.OK,
     description: 'Laboratory tests retrieved successfully',
   })
-  findAllTests(@TenantId() tenantId: string, @Query() query: PathologyFilterDto) {
+  findAllTests(
+    @TenantId() tenantId: string,
+    @Query() query: PathologyFilterDto,
+  ) {
     return this.pathologyService.findAllTests(tenantId, query);
   }
 
@@ -121,7 +127,10 @@ export class PathologyController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid request data',
   })
-  createOrder(@Body() createDto: CreateLabOrderDto, @TenantId() tenantId: string) {
+  createOrder(
+    @Body() createDto: CreateLabOrderDto,
+    @TenantId() tenantId: string,
+  ) {
     return this.pathologyService.createOrder(createDto, tenantId);
   }
 
@@ -131,7 +140,10 @@ export class PathologyController {
     status: HttpStatus.OK,
     description: 'Laboratory orders retrieved successfully',
   })
-  findAllOrders(@TenantId() tenantId: string, @Query() query: PathologyFilterDto) {
+  findAllOrders(
+    @TenantId() tenantId: string,
+    @Query() query: PathologyFilterDto,
+  ) {
     return this.pathologyService.findAllOrders(tenantId, query);
   }
 

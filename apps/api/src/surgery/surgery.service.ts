@@ -1,11 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateSurgeryDto, QuerySurgeryDto } from './dto/surgery.dto';
 
 @Injectable()
 export class SurgeryService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createDto: any, tenantId: string) {
+  async create(createDto: CreateSurgeryDto, tenantId: string) {
     const surgery = await this.prisma.surgery.create({
       data: { ...createDto, tenantId },
       include: { patient: true, operationTheater: true },
@@ -13,7 +14,7 @@ export class SurgeryService {
     return { success: true, message: 'Surgery scheduled', data: surgery };
   }
 
-  async findAll(tenantId: string, query: any) {
+  async findAll(tenantId: string, query: QuerySurgeryDto) {
     const { page = 1, limit = 10, status } = query;
     const where: any = { tenantId, isActive: true };
     if (status) where.status = status;

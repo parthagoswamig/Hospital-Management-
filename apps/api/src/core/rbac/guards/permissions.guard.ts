@@ -1,8 +1,17 @@
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PERMISSIONS_KEY } from '../decorators/permissions.decorator';
 import { Permission } from '../enums/permissions.enum';
-import { getPermissionsForRole, roleHasAnyPermission, roleHasAllPermissions } from '../role-permission.mapping';
+import {
+  getPermissionsForRole,
+  roleHasAnyPermission,
+  roleHasAllPermissions,
+} from '../role-permission.mapping';
 
 /**
  * Permissions Guard
@@ -17,20 +26,20 @@ export class PermissionsGuard implements CanActivate {
     // Check for regular permissions
     const requiredPermissions = this.reflector.getAllAndOverride<Permission[]>(
       PERMISSIONS_KEY,
-      [context.getHandler(), context.getClass()]
+      [context.getHandler(), context.getClass()],
     );
 
     // Check for require all permissions
-    const requireAll = this.reflector.get<{ permissions: Permission[]; requireAll: boolean }>(
-      'require_all_permissions',
-      context.getHandler()
-    );
+    const requireAll = this.reflector.get<{
+      permissions: Permission[];
+      requireAll: boolean;
+    }>('require_all_permissions', context.getHandler());
 
     // Check for require any permission
-    const requireAny = this.reflector.get<{ permissions: Permission[]; requireAll: boolean }>(
-      'require_any_permission',
-      context.getHandler()
-    );
+    const requireAny = this.reflector.get<{
+      permissions: Permission[];
+      requireAll: boolean;
+    }>('require_any_permission', context.getHandler());
 
     // If no permissions required, allow access
     if (!requiredPermissions && !requireAll && !requireAny) {
@@ -53,10 +62,13 @@ export class PermissionsGuard implements CanActivate {
 
     // Handle require all permissions
     if (requireAll) {
-      const hasAllPermissions = roleHasAllPermissions(user.role, requireAll.permissions);
+      const hasAllPermissions = roleHasAllPermissions(
+        user.role,
+        requireAll.permissions,
+      );
       if (!hasAllPermissions) {
         throw new ForbiddenException(
-          `Access denied. You must have ALL of these permissions: ${requireAll.permissions.join(', ')}`
+          `Access denied. You must have ALL of these permissions: ${requireAll.permissions.join(', ')}`,
         );
       }
       return true;
@@ -64,10 +76,13 @@ export class PermissionsGuard implements CanActivate {
 
     // Handle require any permission
     if (requireAny) {
-      const hasAnyPermission = roleHasAnyPermission(user.role, requireAny.permissions);
+      const hasAnyPermission = roleHasAnyPermission(
+        user.role,
+        requireAny.permissions,
+      );
       if (!hasAnyPermission) {
         throw new ForbiddenException(
-          `Access denied. You must have at least ONE of these permissions: ${requireAny.permissions.join(', ')}`
+          `Access denied. You must have at least ONE of these permissions: ${requireAny.permissions.join(', ')}`,
         );
       }
       return true;
@@ -75,13 +90,13 @@ export class PermissionsGuard implements CanActivate {
 
     // Handle regular permissions (any permission is sufficient)
     if (requiredPermissions) {
-      const hasPermission = requiredPermissions.some(permission =>
-        userPermissions.includes(permission)
+      const hasPermission = requiredPermissions.some((permission) =>
+        userPermissions.includes(permission),
       );
 
       if (!hasPermission) {
         throw new ForbiddenException(
-          `Access denied. Required permissions: ${requiredPermissions.join(', ')}`
+          `Access denied. Required permissions: ${requiredPermissions.join(', ')}`,
         );
       }
     }
@@ -100,7 +115,7 @@ export class UserPermissionsGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const requiredPermissions = this.reflector.getAllAndOverride<Permission[]>(
       PERMISSIONS_KEY,
-      [context.getHandler(), context.getClass()]
+      [context.getHandler(), context.getClass()],
     );
 
     if (!requiredPermissions || requiredPermissions.length === 0) {
@@ -115,15 +130,16 @@ export class UserPermissionsGuard implements CanActivate {
     }
 
     // Check if user has custom permissions assigned (overrides role permissions)
-    const userPermissions = user.permissions || getPermissionsForRole(user.role);
+    const userPermissions =
+      user.permissions || getPermissionsForRole(user.role);
 
-    const hasPermission = requiredPermissions.some(permission =>
-      userPermissions.includes(permission)
+    const hasPermission = requiredPermissions.some((permission) =>
+      userPermissions.includes(permission),
     );
 
     if (!hasPermission) {
       throw new ForbiddenException(
-        `Access denied. Required permissions: ${requiredPermissions.join(', ')}`
+        `Access denied. Required permissions: ${requiredPermissions.join(', ')}`,
       );
     }
 

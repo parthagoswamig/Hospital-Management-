@@ -50,7 +50,10 @@ export class AppointmentsController {
 
   @Get()
   @ApiOperation({ summary: 'Get all appointments with pagination and filters' })
-  @ApiResponse({ status: 200, description: 'Appointments retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Appointments retrieved successfully',
+  })
   async findAll(
     @TenantId() tenantId: string,
     @Query() query: AppointmentQueryDto,
@@ -60,7 +63,10 @@ export class AppointmentsController {
 
   @Get('calendar')
   @ApiOperation({ summary: 'Get appointments in calendar view' })
-  @ApiResponse({ status: 200, description: 'Calendar data retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Calendar data retrieved successfully',
+  })
   async getCalendar(
     @TenantId() tenantId: string,
     @Query() query: CalendarQueryDto,
@@ -80,14 +86,20 @@ export class AppointmentsController {
 
   @Get('stats')
   @ApiOperation({ summary: 'Get appointment statistics' })
-  @ApiResponse({ status: 200, description: 'Statistics retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Statistics retrieved successfully',
+  })
   async getStats(@TenantId() tenantId: string) {
     return this.appointmentsService.getStats(tenantId);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get appointment by ID' })
-  @ApiResponse({ status: 200, description: 'Appointment retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Appointment retrieved successfully',
+  })
   @ApiResponse({ status: 404, description: 'Appointment not found' })
   async findOne(@Param('id') id: string, @TenantId() tenantId: string) {
     return this.appointmentsService.findOne(tenantId, id);

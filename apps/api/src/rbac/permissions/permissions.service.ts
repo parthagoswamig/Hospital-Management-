@@ -77,7 +77,10 @@ export class PermissionsService {
   /**
    * Check if a user has a specific permission
    */
-  async userHasPermission(userId: string, permissionName: string): Promise<boolean> {
+  async userHasPermission(
+    userId: string,
+    permissionName: string,
+  ): Promise<boolean> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       include: {
@@ -98,7 +101,7 @@ export class PermissionsService {
     }
 
     return user.tenantRole.rolePermissions.some(
-      (rp) => rp.permission.name === permissionName && rp.permission.isActive
+      (rp) => rp.permission.name === permissionName && rp.permission.isActive,
     );
   }
 

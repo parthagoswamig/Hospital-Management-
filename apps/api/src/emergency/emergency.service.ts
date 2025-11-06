@@ -1,6 +1,10 @@
-import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  Logger,
+} from '@nestjs/common';
 import { CustomPrismaService } from '../prisma/custom-prisma.service';
-import { Prisma } from '@prisma/client';
 import {
   CreateEmergencyCaseDto,
   UpdateEmergencyCaseDto,
@@ -40,21 +44,27 @@ export class EmergencyService {
     };
   }
 
-  private buildEmergencyWhereClause(tenantId: string, filters: EmergencyFilterDto) {
+  private buildEmergencyWhereClause(
+    tenantId: string,
+    filters: EmergencyFilterDto,
+  ) {
     const { status, triageLevel, search } = filters;
     const where: any = { tenantId, isActive: true };
-    
+
     if (status) where.status = status;
     if (triageLevel) where.triageLevel = triageLevel;
     if (search) {
       where.OR = [
         { chiefComplaint: { contains: search, mode: 'insensitive' } },
         { treatmentNotes: { contains: search, mode: 'insensitive' } },
-        { patient: {
+        {
+          patient: {
             OR: [
               { firstName: { contains: search, mode: 'insensitive' } },
               { lastName: { contains: search, mode: 'insensitive' } },
-              { medicalRecordNumber: { contains: search, mode: 'insensitive' } },
+              {
+                medicalRecordNumber: { contains: search, mode: 'insensitive' },
+              },
             ],
           },
         },
@@ -65,8 +75,10 @@ export class EmergencyService {
 
   async create(createDto: CreateEmergencyCaseDto, tenantId: string) {
     try {
-      this.logger.log(`Creating emergency case for patient: ${createDto.patientId}, tenant: ${tenantId}`);
-      
+      this.logger.log(
+        `Creating emergency case for patient: ${createDto.patientId}, tenant: ${tenantId}`,
+      );
+
       const patient = await this.prisma.patient.findFirst({
         where: { id: createDto.patientId, tenantId },
       });
@@ -79,7 +91,9 @@ export class EmergencyService {
           patientId: createDto.patientId,
           chiefComplaint: createDto.chiefComplaint,
           triageLevel: createDto.triageLevel as any,
-          vitalSigns: createDto.vitalSigns ? JSON.stringify(createDto.vitalSigns) : null,
+          vitalSigns: createDto.vitalSigns
+            ? JSON.stringify(createDto.vitalSigns)
+            : null,
           status: 'WAITING' as any,
           arrivalTime: new Date(),
           tenantId,
@@ -87,7 +101,9 @@ export class EmergencyService {
         include: this.getEmergencyCaseIncludes(),
       });
 
-      this.logger.log(`Successfully created emergency case with ID: ${emergencyCase.id}`);
+      this.logger.log(
+        `Successfully created emergency case with ID: ${emergencyCase.id}`,
+      );
       return {
         success: true,
         message: 'Emergency case created successfully',
@@ -95,7 +111,11 @@ export class EmergencyService {
       };
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      this.logger.error('Error creating emergency case:', error.message, error.stack);
+      this.logger.error(
+        'Error creating emergency case:',
+        error.message,
+        error.stack,
+      );
       throw new BadRequestException('Failed to create emergency case');
     }
   }
@@ -118,7 +138,9 @@ export class EmergencyService {
         this.prisma.emergencyCase.count({ where }),
       ]);
 
-      this.logger.log(`Found ${cases.length} emergency cases out of ${total} total`);
+      this.logger.log(
+        `Found ${cases.length} emergency cases out of ${total} total`,
+      );
       return {
         success: true,
         data: {
@@ -132,74 +154,94 @@ export class EmergencyService {
         },
       };
     } catch (error) {
-      this.logger.error('Error finding emergency cases:', error.message, error.stack);
+      this.logger.error(
+        'Error finding emergency cases:',
+        error.message,
+        error.stack,
+      );
       throw new BadRequestException('Failed to fetch emergency cases');
     }
   }
 
   async findOne(id: string, tenantId: string) {
     try {
-      this.logger.log(`Finding emergency case with ID: ${id} for tenant: ${tenantId}`);
-      
+      this.logger.log(
+        `Finding emergency case with ID: ${id} for tenant: ${tenantId}`,
+      );
+
       const emergencyCase = await this.prisma.emergencyCase.findFirst({
         where: { id, tenantId, isActive: true },
         include: this.getEmergencyCaseIncludes(),
       });
-      
+
       if (!emergencyCase) {
         this.logger.warn(`Emergency case not found with ID: ${id}`);
         throw new NotFoundException('Emergency case not found');
       }
-      
+
       return { success: true, data: emergencyCase };
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      this.logger.error('Error finding emergency case:', error.message, error.stack);
+      this.logger.error(
+        'Error finding emergency case:',
+        error.message,
+        error.stack,
+      );
       throw new BadRequestException('Failed to fetch emergency case');
     }
   }
 
-  async update(id: string, updateDto: UpdateEmergencyCaseDto, tenantId: string) {
+  async update(
+    id: string,
+    updateDto: UpdateEmergencyCaseDto,
+    tenantId: string,
+  ) {
     try {
       this.logger.log(`Updating emergency case with ID: ${id}`);
-      
+
       const emergencyCase = await this.prisma.emergencyCase.findFirst({
         where: { id, tenantId },
       });
       if (!emergencyCase) {
         throw new NotFoundException('Emergency case not found');
       }
-      
+
       const updated = await this.prisma.emergencyCase.update({
         where: { id },
         data: updateDto,
         include: this.getEmergencyCaseIncludes(),
       });
-      
+
       this.logger.log(`Successfully updated emergency case: ${updated.id}`);
-      return { 
-        success: true, 
-        message: 'Emergency case updated successfully', 
-        data: updated 
+      return {
+        success: true,
+        message: 'Emergency case updated successfully',
+        data: updated,
       };
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      this.logger.error('Error updating emergency case:', error.message, error.stack);
+      this.logger.error(
+        'Error updating emergency case:',
+        error.message,
+        error.stack,
+      );
       throw new BadRequestException('Failed to update emergency case');
     }
   }
 
   async updateTriage(id: string, triageDto: UpdateTriageDto, tenantId: string) {
     try {
-      this.logger.log(`Updating triage for emergency case: ${id} to ${triageDto.triageLevel}`);
-      
+      this.logger.log(
+        `Updating triage for emergency case: ${id} to ${triageDto.triageLevel}`,
+      );
+
       const emergencyCase = await this.prisma.emergencyCase.findFirst({
         where: { id, tenantId },
       });
       if (!emergencyCase) {
         throw new NotFoundException('Emergency case not found');
       }
-      
+
       const updated = await this.prisma.emergencyCase.update({
         where: { id },
         data: {
@@ -207,12 +249,14 @@ export class EmergencyService {
         },
         include: this.getEmergencyCaseIncludes(),
       });
-      
-      this.logger.log(`Successfully updated triage level to: ${triageDto.triageLevel}`);
-      return { 
-        success: true, 
-        message: 'Triage level updated successfully', 
-        data: updated 
+
+      this.logger.log(
+        `Successfully updated triage level to: ${triageDto.triageLevel}`,
+      );
+      return {
+        success: true,
+        message: 'Triage level updated successfully',
+        data: updated,
       };
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
@@ -224,20 +268,26 @@ export class EmergencyService {
   async getQueue(tenantId: string) {
     try {
       this.logger.log(`Getting emergency queue for tenant: ${tenantId}`);
-      
+
       const queue = await this.prisma.emergencyCase.findMany({
-        where: { 
-          tenantId, 
-          status: { in: [EmergencyStatus.WAITING, EmergencyStatus.IN_TREATMENT] } 
+        where: {
+          tenantId,
+          status: {
+            in: [EmergencyStatus.WAITING, EmergencyStatus.IN_TREATMENT],
+          },
         },
         include: this.getEmergencyCaseIncludes(),
         orderBy: [{ triageLevel: 'asc' }, { arrivalTime: 'asc' }],
       });
-      
+
       this.logger.log(`Found ${queue.length} cases in emergency queue`);
       return { success: true, data: queue };
     } catch (error) {
-      this.logger.error('Error getting emergency queue:', error.message, error.stack);
+      this.logger.error(
+        'Error getting emergency queue:',
+        error.message,
+        error.stack,
+      );
       throw new BadRequestException('Failed to fetch emergency queue');
     }
   }
@@ -245,30 +295,49 @@ export class EmergencyService {
   async getStats(tenantId: string) {
     try {
       this.logger.log(`Getting emergency stats for tenant: ${tenantId}`);
-      
-      const [total, waiting, inTreatment, discharged, admitted, criticalCases] = await Promise.all([
-        this.prisma.emergencyCase.count({ where: { tenantId, isActive: true } }),
-        this.prisma.emergencyCase.count({ where: { tenantId, status: EmergencyStatus.WAITING } }),
-        this.prisma.emergencyCase.count({ where: { tenantId, status: EmergencyStatus.IN_TREATMENT } }),
-        this.prisma.emergencyCase.count({ where: { tenantId, status: EmergencyStatus.DISCHARGED } }),
-        this.prisma.emergencyCase.count({ where: { tenantId, status: EmergencyStatus.ADMITTED } }),
-        this.prisma.emergencyCase.count({ where: { tenantId, triageLevel: TriageLevel.CRITICAL } }),
-      ]);
-      
-      this.logger.log(`Successfully retrieved emergency stats for tenant: ${tenantId}`);
+
+      const [total, waiting, inTreatment, discharged, admitted, criticalCases] =
+        await Promise.all([
+          this.prisma.emergencyCase.count({
+            where: { tenantId, isActive: true },
+          }),
+          this.prisma.emergencyCase.count({
+            where: { tenantId, status: EmergencyStatus.WAITING },
+          }),
+          this.prisma.emergencyCase.count({
+            where: { tenantId, status: EmergencyStatus.IN_TREATMENT },
+          }),
+          this.prisma.emergencyCase.count({
+            where: { tenantId, status: EmergencyStatus.DISCHARGED },
+          }),
+          this.prisma.emergencyCase.count({
+            where: { tenantId, status: EmergencyStatus.ADMITTED },
+          }),
+          this.prisma.emergencyCase.count({
+            where: { tenantId, triageLevel: TriageLevel.CRITICAL },
+          }),
+        ]);
+
+      this.logger.log(
+        `Successfully retrieved emergency stats for tenant: ${tenantId}`,
+      );
       return {
         success: true,
-        data: { 
-          total, 
-          waiting, 
-          inTreatment, 
-          discharged, 
-          admitted, 
-          criticalCases 
+        data: {
+          total,
+          waiting,
+          inTreatment,
+          discharged,
+          admitted,
+          criticalCases,
         },
       };
     } catch (error) {
-      this.logger.error('Error getting emergency stats:', error.message, error.stack);
+      this.logger.error(
+        'Error getting emergency stats:',
+        error.message,
+        error.stack,
+      );
       throw new BadRequestException('Failed to fetch emergency statistics');
     }
   }

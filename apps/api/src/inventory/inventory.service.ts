@@ -1,18 +1,31 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateInventoryItemDto } from './dto/create-item.dto';
+import { UpdateInventoryItemDto } from './dto/update-item.dto';
+import { QueryInventoryDto } from './dto/query-item.dto';
 
 @Injectable()
 export class InventoryService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createDto: any, tenantId: string) {
+  async create(createDto: CreateInventoryItemDto, tenantId: string) {
     const item = await this.prisma.inventoryItem.create({
-      data: { ...createDto, tenantId },
+      data: {
+        name: createDto.name,
+        category: createDto.category || '',
+        description: createDto.code,
+        quantity: createDto.quantity,
+        minQuantity: createDto.minQuantity || 0,
+        unit: createDto.unit,
+        price: createDto.unitPrice,
+        isActive: createDto.isActive ?? true,
+        tenant: { connect: { id: tenantId } },
+      },
     });
     return { success: true, message: 'Item created', data: item };
   }
 
-  async findAll(tenantId: string, query: any) {
+  async findAll(tenantId: string, query: QueryInventoryDto) {
     const { page = 1, limit = 10, category } = query;
     const where: any = { tenantId, isActive: true };
     if (category) where.category = category;
@@ -60,7 +73,11 @@ export class InventoryService {
     return { success: true, data: item };
   }
 
-  async update(id: string, updateDto: any, tenantId: string) {
+  async update(
+    id: string,
+    updateDto: UpdateInventoryItemDto,
+    tenantId: string,
+  ) {
     const item = await this.prisma.inventoryItem.findFirst({
       where: { id, tenantId },
     });

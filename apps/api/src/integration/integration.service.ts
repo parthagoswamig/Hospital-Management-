@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateIntegrationDto } from './dto/integration.dto';
 
 @Injectable()
 export class IntegrationService {
   private integrations: any[] = [];
 
-  async create(createDto: any, tenantId: string) {
+  async create(createDto: CreateIntegrationDto, tenantId: string) {
     const integration = {
       id: Date.now().toString(),
       ...createDto,

@@ -1,4 +1,10 @@
-import { Controller, Post, Body, Headers, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Headers,
+  BadRequestException,
+} from '@nestjs/common';
 import { SubscriptionService } from './subscription.service';
 import { StripeService } from './stripe.service';
 
@@ -28,7 +34,9 @@ export class SubscriptionWebhookController {
         webhookSecret,
       );
     } catch (err) {
-      throw new BadRequestException(`Webhook signature verification failed: ${err.message}`);
+      throw new BadRequestException(
+        `Webhook signature verification failed: ${err.message}`,
+      );
     }
 
     // Handle the event

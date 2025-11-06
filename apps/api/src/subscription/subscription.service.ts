@@ -1,6 +1,13 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { CustomPrismaService } from '../prisma/custom-prisma.service';
-import { CreateSubscriptionDto, UpdateSubscriptionDto } from './dto/subscription.dto';
+import {
+  CreateSubscriptionDto,
+  UpdateSubscriptionDto,
+} from './dto/subscription.dto';
 import { StripeService } from './stripe.service';
 
 @Injectable()
@@ -35,7 +42,9 @@ export class SubscriptionService {
     });
 
     if (!subscription) {
-      throw new NotFoundException('No active subscription found for this tenant');
+      throw new NotFoundException(
+        'No active subscription found for this tenant',
+      );
     }
 
     return subscription;
@@ -93,7 +102,9 @@ export class SubscriptionService {
     });
 
     if (existingSubscription) {
-      throw new BadRequestException('Tenant already has an active subscription');
+      throw new BadRequestException(
+        'Tenant already has an active subscription',
+      );
     }
 
     // Calculate period dates

@@ -29,7 +29,9 @@ export class RolesService {
     });
 
     if (existingRole) {
-      throw new BadRequestException(`Role '${name}' already exists for this tenant`);
+      throw new BadRequestException(
+        `Role '${name}' already exists for this tenant`,
+      );
     }
 
     // Create role
@@ -161,12 +163,14 @@ export class RolesService {
       });
 
       if (existingRole) {
-        throw new BadRequestException(`Role '${name}' already exists for this tenant`);
+        throw new BadRequestException(
+          `Role '${name}' already exists for this tenant`,
+        );
       }
     }
 
     // Update role
-    const updatedRole = await this.prisma.tenantRole.update({
+    await this.prisma.tenantRole.update({
       where: { id: roleId },
       data: {
         name,
@@ -339,7 +343,11 @@ export class RolesService {
   /**
    * Remove role from a user
    */
-  async removeRoleFromUser(tenantId: string, userId: string, removedBy: string) {
+  async removeRoleFromUser(
+    tenantId: string,
+    userId: string,
+    removedBy: string,
+  ) {
     // Verify user belongs to tenant
     const user = await this.prisma.user.findFirst({
       where: {

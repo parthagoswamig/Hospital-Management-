@@ -13,7 +13,9 @@ export class RazorpayService {
     const keySecret = this.configService.get<string>('RAZORPAY_KEY_SECRET');
 
     if (!keyId || !keySecret) {
-      this.logger.warn('Razorpay credentials not configured. Razorpay payments will not be available.');
+      this.logger.warn(
+        'Razorpay credentials not configured. Razorpay payments will not be available.',
+      );
       return;
     }
 
@@ -35,7 +37,12 @@ export class RazorpayService {
   /**
    * Create a Razorpay order for subscription payment
    */
-  async createOrder(amount: number, currency: string = 'INR', receipt?: string, notes?: Record<string, string>) {
+  async createOrder(
+    amount: number,
+    currency: string = 'INR',
+    receipt?: string,
+    notes?: Record<string, string>,
+  ) {
     if (!this.razorpay) {
       throw new Error('Razorpay is not configured');
     }
@@ -126,13 +133,19 @@ export class RazorpayService {
   /**
    * Cancel a subscription
    */
-  async cancelSubscription(subscriptionId: string, cancelAtCycleEnd: boolean = false) {
+  async cancelSubscription(
+    subscriptionId: string,
+    cancelAtCycleEnd: boolean = false,
+  ) {
     if (!this.razorpay) {
       throw new Error('Razorpay is not configured');
     }
 
     try {
-      const subscription = await this.razorpay.subscriptions.cancel(subscriptionId, cancelAtCycleEnd);
+      const subscription = await this.razorpay.subscriptions.cancel(
+        subscriptionId,
+        cancelAtCycleEnd,
+      );
       this.logger.log(`Razorpay subscription cancelled: ${subscriptionId}`);
       return subscription;
     } catch (error) {
@@ -192,9 +205,12 @@ export class RazorpayService {
         };
       }
 
-      const paymentLink = await this.razorpay.paymentLink.create(paymentLinkData);
+      const paymentLink =
+        await this.razorpay.paymentLink.create(paymentLinkData);
 
-      this.logger.log(`Razorpay payment link created: ${(paymentLink as any).id}`);
+      this.logger.log(
+        `Razorpay payment link created: ${(paymentLink as any).id}`,
+      );
       return paymentLink;
     } catch (error) {
       this.logger.error('Failed to create Razorpay payment link', error);
@@ -217,12 +233,12 @@ export class RazorpayService {
     try {
       const keySecret = this.configService.get<string>('RAZORPAY_KEY_SECRET');
       const generatedSignature = crypto
-        .createHmac('sha256', keySecret!)
+        .createHmac('sha256', keySecret)
         .update(`${orderId}|${paymentId}`)
         .digest('hex');
 
       const isValid = generatedSignature === signature;
-      
+
       if (isValid) {
         this.logger.log(`Payment signature verified for order: ${orderId}`);
       } else {
@@ -245,7 +261,9 @@ export class RazorpayService {
     }
 
     try {
-      const webhookSecret = this.configService.get<string>('RAZORPAY_WEBHOOK_SECRET');
+      const webhookSecret = this.configService.get<string>(
+        'RAZORPAY_WEBHOOK_SECRET',
+      );
       if (!webhookSecret) {
         this.logger.warn('Razorpay webhook secret not configured');
         return false;
@@ -327,7 +345,11 @@ export class RazorpayService {
   /**
    * Create a refund
    */
-  async createRefund(paymentId: string, amount?: number, notes?: Record<string, string>) {
+  async createRefund(
+    paymentId: string,
+    amount?: number,
+    notes?: Record<string, string>,
+  ) {
     if (!this.razorpay) {
       throw new Error('Razorpay is not configured');
     }

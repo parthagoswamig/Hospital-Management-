@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+// import { GenerateReportDto } from './dto/report.dto';
 
 @Injectable()
 export class ReportsService {
@@ -59,7 +60,7 @@ export class ReportsService {
   }
 
   async getPatientReport(tenantId: string, query: any) {
-    const { startDate, endDate, groupBy = 'day' } = query;
+    const { startDate, endDate } = query;
 
     const where: any = { tenantId };
     if (startDate || endDate) {
@@ -148,7 +149,7 @@ export class ReportsService {
   }
 
   async getRevenueReport(tenantId: string, query: any) {
-    const { startDate, endDate, groupBy = 'day' } = query;
+    const { startDate, endDate } = query;
 
     const where: any = { tenantId, status: 'COMPLETED' };
     if (startDate || endDate) {

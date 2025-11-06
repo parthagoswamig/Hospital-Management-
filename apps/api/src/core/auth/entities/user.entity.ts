@@ -53,13 +53,23 @@ export class User extends TenantBaseEntity {
   @Column({ type: 'boolean', default: false, name: 'is_2fa_enabled' })
   is2FAEnabled: boolean;
 
-  @Column({ type: 'varchar', length: 255, nullable: true, name: 'two_fa_secret' })
+  @Column({
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+    name: 'two_fa_secret',
+  })
   twoFASecret?: string;
 
   @Column({ type: 'timestamp', nullable: true, name: 'last_login_at' })
   lastLoginAt?: Date;
 
-  @Column({ type: 'varchar', length: 100, nullable: true, name: 'last_login_ip' })
+  @Column({
+    type: 'varchar',
+    length: 100,
+    nullable: true,
+    name: 'last_login_ip',
+  })
   lastLoginIp?: string;
 
   @Column({ type: 'int', default: 0, name: 'failed_login_attempts' })
@@ -68,16 +78,30 @@ export class User extends TenantBaseEntity {
   @Column({ type: 'timestamp', nullable: true, name: 'locked_until' })
   lockedUntil?: Date;
 
-  @Column({ type: 'varchar', length: 255, nullable: true, name: 'reset_password_token' })
+  @Column({
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+    name: 'reset_password_token',
+  })
   resetPasswordToken?: string;
 
   @Column({ type: 'timestamp', nullable: true, name: 'reset_password_expires' })
   resetPasswordExpires?: Date;
 
-  @Column({ type: 'varchar', length: 255, nullable: true, name: 'email_verification_token' })
+  @Column({
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+    name: 'email_verification_token',
+  })
   emailVerificationToken?: string;
 
-  @Column({ type: 'timestamp', nullable: true, name: 'email_verification_expires' })
+  @Column({
+    type: 'timestamp',
+    nullable: true,
+    name: 'email_verification_expires',
+  })
   emailVerificationExpires?: Date;
 
   @Column({ type: 'jsonb', nullable: true })

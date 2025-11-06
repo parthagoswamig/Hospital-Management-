@@ -48,6 +48,8 @@ export class AuthController {
     const user = await this.authService.register(registerDto);
     // Don't return sensitive data
     const { passwordHash, twoFASecret, ...safeUser } = user;
+    void passwordHash;
+    void twoFASecret;
     return {
       message: 'User registered successfully. Please verify your email.',
       user: safeUser,
@@ -130,8 +132,8 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  async logout(@Request() req) {
-    await this.authService.logout(req.user.sub, req.user.sessionId);
+  async logout() {
+    await this.authService.logout();
     return {
       message: 'Logged out successfully.',
     };

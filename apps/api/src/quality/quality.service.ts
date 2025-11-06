@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
+import { CreateIncidentDto } from './dto/quality.dto';
 
 @Injectable()
 export class QualityService {
   private metrics: any[] = [];
   private incidents: any[] = [];
 
-  async createMetric(createDto: any, tenantId: string) {
+  async createMetric(createDto: CreateIncidentDto, tenantId: string) {
     const metric = {
       id: Date.now().toString(),
       ...createDto,
@@ -25,7 +26,7 @@ export class QualityService {
     return { success: true, data };
   }
 
-  async reportIncident(createDto: any, tenantId: string) {
+  async reportIncident(createDto: CreateIncidentDto, tenantId: string) {
     const incident = {
       id: Date.now().toString(),
       ...createDto,

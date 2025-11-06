@@ -52,10 +52,7 @@ export class PatientsController {
   @Get()
   @ApiOperation({ summary: 'Get all patients with pagination' })
   @ApiResponse({ status: 200, description: 'Patients retrieved successfully' })
-  async findAll(
-    @TenantId() tenantId: string,
-    @Query() query: PatientQueryDto,
-  ) {
+  async findAll(@TenantId() tenantId: string, @Query() query: PatientQueryDto) {
     return this.patientsService.findAll(tenantId, query);
   }
 
@@ -68,7 +65,10 @@ export class PatientsController {
 
   @Get('stats')
   @ApiOperation({ summary: 'Get patient statistics' })
-  @ApiResponse({ status: 200, description: 'Statistics retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Statistics retrieved successfully',
+  })
   async getStats(@TenantId() tenantId: string) {
     return this.patientsService.getStats(tenantId);
   }

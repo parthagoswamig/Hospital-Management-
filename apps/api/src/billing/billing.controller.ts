@@ -45,25 +45,25 @@ export class BillingController {
    */
   @Post('invoices')
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Create a new invoice',
-    description: 'Creates a new invoice with items for a patient'
+    description: 'Creates a new invoice with items for a patient',
   })
-  @ApiResponse({ 
-    status: 201, 
-    description: 'Invoice created successfully'
+  @ApiResponse({
+    status: 201,
+    description: 'Invoice created successfully',
   })
-  @ApiResponse({ 
-    status: 400, 
-    description: 'Bad request - Invalid data provided'
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - Invalid data provided',
   })
-  @ApiResponse({ 
-    status: 404, 
-    description: 'Patient not found'
+  @ApiResponse({
+    status: 404,
+    description: 'Patient not found',
   })
   async createInvoice(
-    @Body() createInvoiceDto: CreateInvoiceDto, 
-    @TenantId() tenantId: string
+    @Body() createInvoiceDto: CreateInvoiceDto,
+    @TenantId() tenantId: string,
   ) {
     const invoice = await this.billingService.createInvoice(
       createInvoiceDto,
@@ -80,22 +80,19 @@ export class BillingController {
    * Get all invoices with filters
    */
   @Get('invoices')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get all invoices',
-    description: 'Retrieves paginated list of invoices with optional filters'
+    description: 'Retrieves paginated list of invoices with optional filters',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Invoices retrieved successfully'
+  @ApiResponse({
+    status: 200,
+    description: 'Invoices retrieved successfully',
   })
   async getInvoices(
-    @Query() filters: InvoiceFilterDto, 
-    @TenantId() tenantId: string
+    @Query() filters: InvoiceFilterDto,
+    @TenantId() tenantId: string,
   ) {
-    const result = await this.billingService.getInvoices(
-      filters,
-      tenantId,
-    );
+    const result = await this.billingService.getInvoices(filters, tenantId);
     return {
       success: true,
       message: 'Invoices retrieved successfully',
@@ -107,13 +104,14 @@ export class BillingController {
    * Get billing statistics
    */
   @Get('invoices/stats')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get billing statistics',
-    description: 'Retrieves billing statistics including revenue, invoice counts, and payment methods'
+    description:
+      'Retrieves billing statistics including revenue, invoice counts, and payment methods',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Billing statistics retrieved successfully'
+  @ApiResponse({
+    status: 200,
+    description: 'Billing statistics retrieved successfully',
   })
   async getBillingStats(@TenantId() tenantId: string) {
     const stats = await this.billingService.getBillingStats(tenantId);
@@ -128,25 +126,25 @@ export class BillingController {
    * Get revenue report
    */
   @Get('invoices/reports/revenue')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get revenue report',
-    description: 'Generates revenue report for a specific date range'
+    description: 'Generates revenue report for a specific date range',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Revenue report generated successfully'
+  @ApiResponse({
+    status: 200,
+    description: 'Revenue report generated successfully',
   })
-  @ApiQuery({ 
-    name: 'startDate', 
-    required: true, 
+  @ApiQuery({
+    name: 'startDate',
+    required: true,
     description: 'Start date for the report (ISO string)',
-    example: '2024-12-01T00:00:00.000Z'
+    example: '2024-12-01T00:00:00.000Z',
   })
-  @ApiQuery({ 
-    name: 'endDate', 
-    required: true, 
+  @ApiQuery({
+    name: 'endDate',
+    required: true,
     description: 'End date for the report (ISO string)',
-    example: '2024-12-31T23:59:59.999Z'
+    example: '2024-12-31T23:59:59.999Z',
   })
   async getRevenueReport(
     @Query('startDate') startDate: string,
@@ -169,31 +167,25 @@ export class BillingController {
    * Get invoice by ID
    */
   @Get('invoices/:id')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get invoice by ID',
-    description: 'Retrieves a specific invoice with all its details'
+    description: 'Retrieves a specific invoice with all its details',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Invoice retrieved successfully'
+  @ApiResponse({
+    status: 200,
+    description: 'Invoice retrieved successfully',
   })
-  @ApiResponse({ 
-    status: 404, 
-    description: 'Invoice not found'
+  @ApiResponse({
+    status: 404,
+    description: 'Invoice not found',
   })
-  @ApiParam({ 
-    name: 'id', 
+  @ApiParam({
+    name: 'id',
     description: 'Invoice ID',
-    example: 'invoice-uuid-123'
+    example: 'invoice-uuid-123',
   })
-  async getInvoiceById(
-    @Param('id') id: string, 
-    @TenantId() tenantId: string
-  ) {
-    const invoice = await this.billingService.getInvoiceById(
-      id,
-      tenantId,
-    );
+  async getInvoiceById(@Param('id') id: string, @TenantId() tenantId: string) {
+    const invoice = await this.billingService.getInvoiceById(id, tenantId);
     return {
       success: true,
       message: 'Invoice retrieved successfully',
@@ -205,22 +197,22 @@ export class BillingController {
    * Update invoice
    */
   @Patch('invoices/:id')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Update invoice',
-    description: 'Updates an existing invoice'
+    description: 'Updates an existing invoice',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Invoice updated successfully'
+  @ApiResponse({
+    status: 200,
+    description: 'Invoice updated successfully',
   })
-  @ApiResponse({ 
-    status: 404, 
-    description: 'Invoice not found'
+  @ApiResponse({
+    status: 404,
+    description: 'Invoice not found',
   })
-  @ApiParam({ 
-    name: 'id', 
+  @ApiParam({
+    name: 'id',
     description: 'Invoice ID',
-    example: 'invoice-uuid-123'
+    example: 'invoice-uuid-123',
   })
   async updateInvoice(
     @Param('id') id: string,
@@ -243,35 +235,29 @@ export class BillingController {
    * Cancel invoice
    */
   @Delete('invoices/:id')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Cancel invoice',
-    description: 'Cancels an existing invoice (soft delete)'
+    description: 'Cancels an existing invoice (soft delete)',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Invoice cancelled successfully'
+  @ApiResponse({
+    status: 200,
+    description: 'Invoice cancelled successfully',
   })
-  @ApiResponse({ 
-    status: 400, 
-    description: 'Cannot delete a paid invoice or invoice with payments'
+  @ApiResponse({
+    status: 400,
+    description: 'Cannot delete a paid invoice or invoice with payments',
   })
-  @ApiResponse({ 
-    status: 404, 
-    description: 'Invoice not found'
+  @ApiResponse({
+    status: 404,
+    description: 'Invoice not found',
   })
-  @ApiParam({ 
-    name: 'id', 
+  @ApiParam({
+    name: 'id',
     description: 'Invoice ID',
-    example: 'invoice-uuid-123'
+    example: 'invoice-uuid-123',
   })
-  async deleteInvoice(
-    @Param('id') id: string, 
-    @TenantId() tenantId: string
-  ) {
-    const invoice = await this.billingService.deleteInvoice(
-      id,
-      tenantId,
-    );
+  async deleteInvoice(@Param('id') id: string, @TenantId() tenantId: string) {
+    const invoice = await this.billingService.deleteInvoice(id, tenantId);
     return {
       success: true,
       message: 'Invoice cancelled successfully',
@@ -286,25 +272,25 @@ export class BillingController {
    */
   @Post('payments')
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Record a payment',
-    description: 'Records a new payment against an invoice'
+    description: 'Records a new payment against an invoice',
   })
-  @ApiResponse({ 
-    status: 201, 
-    description: 'Payment recorded successfully'
+  @ApiResponse({
+    status: 201,
+    description: 'Payment recorded successfully',
   })
-  @ApiResponse({ 
-    status: 400, 
-    description: 'Payment amount exceeds remaining balance or invalid data'
+  @ApiResponse({
+    status: 400,
+    description: 'Payment amount exceeds remaining balance or invalid data',
   })
-  @ApiResponse({ 
-    status: 404, 
-    description: 'Invoice not found'
+  @ApiResponse({
+    status: 404,
+    description: 'Invoice not found',
   })
   async createPayment(
-    @Body() createPaymentDto: CreatePaymentDto, 
-    @TenantId() tenantId: string
+    @Body() createPaymentDto: CreatePaymentDto,
+    @TenantId() tenantId: string,
   ) {
     const payment = await this.billingService.createPayment(
       createPaymentDto,
@@ -321,22 +307,19 @@ export class BillingController {
    * Get all payments with filters
    */
   @Get('payments')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get all payments',
-    description: 'Retrieves paginated list of payments with optional filters'
+    description: 'Retrieves paginated list of payments with optional filters',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Payments retrieved successfully'
+  @ApiResponse({
+    status: 200,
+    description: 'Payments retrieved successfully',
   })
   async getPayments(
-    @Query() filters: PaymentFilterDto, 
-    @TenantId() tenantId: string
+    @Query() filters: PaymentFilterDto,
+    @TenantId() tenantId: string,
   ) {
-    const result = await this.billingService.getPayments(
-      filters,
-      tenantId,
-    );
+    const result = await this.billingService.getPayments(filters, tenantId);
     return {
       success: true,
       message: 'Payments retrieved successfully',
@@ -348,31 +331,25 @@ export class BillingController {
    * Get payment by ID
    */
   @Get('payments/:id')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get payment by ID',
-    description: 'Retrieves a specific payment with all its details'
+    description: 'Retrieves a specific payment with all its details',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Payment retrieved successfully'
+  @ApiResponse({
+    status: 200,
+    description: 'Payment retrieved successfully',
   })
-  @ApiResponse({ 
-    status: 404, 
-    description: 'Payment not found'
+  @ApiResponse({
+    status: 404,
+    description: 'Payment not found',
   })
-  @ApiParam({ 
-    name: 'id', 
+  @ApiParam({
+    name: 'id',
     description: 'Payment ID',
-    example: 'payment-uuid-123'
+    example: 'payment-uuid-123',
   })
-  async getPaymentById(
-    @Param('id') id: string, 
-    @TenantId() tenantId: string
-  ) {
-    const payment = await this.billingService.getPaymentById(
-      id,
-      tenantId,
-    );
+  async getPaymentById(@Param('id') id: string, @TenantId() tenantId: string) {
+    const payment = await this.billingService.getPaymentById(id, tenantId);
     return {
       success: true,
       message: 'Payment retrieved successfully',
@@ -384,22 +361,22 @@ export class BillingController {
    * Update payment
    */
   @Patch('payments/:id')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Update payment',
-    description: 'Updates an existing payment'
+    description: 'Updates an existing payment',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Payment updated successfully'
+  @ApiResponse({
+    status: 200,
+    description: 'Payment updated successfully',
   })
-  @ApiResponse({ 
-    status: 404, 
-    description: 'Payment not found'
+  @ApiResponse({
+    status: 404,
+    description: 'Payment not found',
   })
-  @ApiParam({ 
-    name: 'id', 
+  @ApiParam({
+    name: 'id',
     description: 'Payment ID',
-    example: 'payment-uuid-123'
+    example: 'payment-uuid-123',
   })
   async updatePayment(
     @Param('id') id: string,

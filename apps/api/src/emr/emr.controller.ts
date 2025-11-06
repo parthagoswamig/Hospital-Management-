@@ -15,7 +15,6 @@ import {
   ApiOperation,
   ApiResponse,
   ApiParam,
-  ApiQuery,
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { EmrService } from './emr.service';
@@ -44,7 +43,10 @@ export class EmrController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid request data',
   })
-  create(@Body() createDto: CreateMedicalRecordDto, @TenantId() tenantId: string) {
+  create(
+    @Body() createDto: CreateMedicalRecordDto,
+    @TenantId() tenantId: string,
+  ) {
     return this.emrService.create(createDto, tenantId);
   }
 
@@ -69,7 +71,10 @@ export class EmrController {
     status: HttpStatus.NOT_FOUND,
     description: 'Patient not found',
   })
-  findByPatient(@Param('patientId') patientId: string, @TenantId() tenantId: string) {
+  findByPatient(
+    @Param('patientId') patientId: string,
+    @TenantId() tenantId: string,
+  ) {
     return this.emrService.findByPatient(patientId, tenantId);
   }
 

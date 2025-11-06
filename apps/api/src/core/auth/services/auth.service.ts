@@ -114,6 +114,8 @@ export class AuthService {
 
     // Return user without sensitive data
     const { passwordHash, twoFASecret, ...userWithoutSensitiveData } = user;
+    void passwordHash;
+    void twoFASecret;
 
     return {
       user: userWithoutSensitiveData,
@@ -137,7 +139,8 @@ export class AuthService {
     }
 
     // Validate password strength
-    const passwordValidation = this.passwordService.validatePasswordStrength(password);
+    const passwordValidation =
+      this.passwordService.validatePasswordStrength(password);
     if (!passwordValidation.valid) {
       throw new BadRequestException(passwordValidation.errors.join(', '));
     }
@@ -206,7 +209,8 @@ export class AuthService {
       return;
     }
 
-    const { token, expires } = this.passwordService.generatePasswordResetToken();
+    const { token, expires } =
+      this.passwordService.generatePasswordResetToken();
 
     user.resetPasswordToken = token;
     user.resetPasswordExpires = expires;
@@ -236,7 +240,8 @@ export class AuthService {
     }
 
     // Validate password strength
-    const passwordValidation = this.passwordService.validatePasswordStrength(newPassword);
+    const passwordValidation =
+      this.passwordService.validatePasswordStrength(newPassword);
     if (!passwordValidation.valid) {
       throw new BadRequestException(passwordValidation.errors.join(', '));
     }
@@ -304,7 +309,8 @@ export class AuthService {
     }
 
     // Validate new password strength
-    const passwordValidation = this.passwordService.validatePasswordStrength(newPassword);
+    const passwordValidation =
+      this.passwordService.validatePasswordStrength(newPassword);
     if (!passwordValidation.valid) {
       throw new BadRequestException(passwordValidation.errors.join(', '));
     }
@@ -318,7 +324,7 @@ export class AuthService {
   /**
    * Logout (invalidate tokens - requires Redis for token blacklisting)
    */
-  async logout(userId: string, sessionId?: string): Promise<void> {
+  async logout(): Promise<void> {
     // TODO: Implement token blacklisting with Redis
     // For now, client-side token removal is sufficient
   }

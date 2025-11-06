@@ -6,7 +6,11 @@ import { Reflector } from '@nestjs/core';
  * Decorator to mark routes as public (skip JWT authentication)
  */
 export const Public = () => {
-  return (target: any, propertyKey?: string, descriptor?: PropertyDescriptor) => {
+  return (
+    target: any,
+    propertyKey?: string,
+    descriptor?: PropertyDescriptor,
+  ) => {
     if (descriptor) {
       Reflect.defineMetadata('isPublic', true, descriptor.value);
       return descriptor;

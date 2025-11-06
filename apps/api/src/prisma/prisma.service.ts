@@ -1,6 +1,5 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { Prisma, PrismaClient } from '@prisma/client';
-import { INestApplication } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class PrismaService
@@ -9,7 +8,7 @@ export class PrismaService
 {
   constructor() {
     super({
-      log: ['query', 'info', 'warn', 'error'],
+      log: ['query', 'info', 'warn', 'error'] as const,
       errorFormat: 'pretty',
       datasources: {
         db: {
@@ -66,10 +65,10 @@ export class PrismaService
           console.log(`Retrying in ${delay / 1000} seconds...`);
           await new Promise((resolve) => setTimeout(resolve, delay));
         } else {
-          console.error(
-            '❌ Failed to connect to database after all retries',
+          console.error('❌ Failed to connect to database after all retries');
+          console.warn(
+            '⚠️ Continuing without database connection - some features may not work',
           );
-          console.warn('⚠️ Continuing without database connection - some features may not work');
           return;
         }
       }

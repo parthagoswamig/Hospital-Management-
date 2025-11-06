@@ -10,7 +10,11 @@ import {
   IsInt,
   Min,
 } from 'class-validator';
-import { TenantType, TenantStatus, SubscriptionPlan } from '../entities/tenant.entity';
+import {
+  TenantType,
+  TenantStatus,
+  SubscriptionPlan,
+} from '../entities/tenant.entity';
 
 export class CreateTenantDto {
   @IsString()

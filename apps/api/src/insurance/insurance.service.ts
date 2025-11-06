@@ -1,19 +1,31 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { ClaimStatus } from '@prisma/client';
+import { CreateClaimDto } from './dto/create-claim.dto';
+import { QueryClaimDto } from './dto/query-claim.dto';
 
 @Injectable()
 export class InsuranceService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createDto: any, tenantId: string) {
+  async create(createDto: CreateClaimDto, tenantId: string) {
     const claim = await this.prisma.insuranceClaim.create({
-      data: { ...createDto, tenantId },
+      data: {
+        policyNumber: createDto.policyNumber,
+        provider: createDto.insuranceProvider,
+        amount: createDto.claimAmount,
+        submittedAt: new Date(createDto.submittedAt),
+        status: (createDto.status as ClaimStatus) || ClaimStatus.SUBMITTED,
+        claimNumber: `CLM-${Date.now()}`,
+        patient: { connect: { id: createDto.patientId } },
+        tenant: { connect: { id: tenantId } },
+      },
       include: { patient: true },
     });
     return { success: true, message: 'Claim created', data: claim };
   }
 
-  async findAll(tenantId: string, query: any) {
+  async findAll(tenantId: string, query: QueryClaimDto) {
     const { page = 1, limit = 10, status } = query;
     const where: any = { tenantId, isActive: true };
     if (status) where.status = status;

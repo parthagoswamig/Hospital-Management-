@@ -164,9 +164,7 @@ export class AppointmentsService {
         include: this.getAppointmentIncludes(),
       });
 
-      this.logger.log(
-        `Appointment updated: ${id} for tenant: ${tenantId}`,
-      );
+      this.logger.log(`Appointment updated: ${id} for tenant: ${tenantId}`);
 
       return {
         success: true,
@@ -191,9 +189,7 @@ export class AppointmentsService {
         where: { id },
       });
 
-      this.logger.log(
-        `Appointment deleted: ${id} for tenant: ${tenantId}`,
-      );
+      this.logger.log(`Appointment deleted: ${id} for tenant: ${tenantId}`);
 
       return {
         success: true,
@@ -316,8 +312,12 @@ export class AppointmentsService {
 
   async getCalendar(tenantId: string, query: CalendarQueryDto) {
     const { startDate, endDate } = query;
-    const appointments = await this.getCalendarView(tenantId, startDate, endDate);
-    
+    const appointments = await this.getCalendarView(
+      tenantId,
+      startDate,
+      endDate,
+    );
+
     return {
       success: true,
       data: appointments,
@@ -327,18 +327,14 @@ export class AppointmentsService {
   async checkAvailability(tenantId: string, query: CheckAvailabilityDto) {
     const { doctorId, date } = query;
     const slots = await this.getAvailableSlots(doctorId, date);
-    
+
     return {
       success: true,
       data: slots,
     };
   }
 
-  async updateStatus(
-    id: string,
-    status: AppointmentStatus,
-    tenantId: string,
-  ) {
+  async updateStatus(id: string, status: AppointmentStatus, tenantId: string) {
     try {
       // Verify appointment exists
       await this.findOne(tenantId, id);
@@ -408,7 +404,9 @@ export class AppointmentsService {
             OR: [
               { firstName: { contains: search, mode: 'insensitive' } },
               { lastName: { contains: search, mode: 'insensitive' } },
-              { medicalRecordNumber: { contains: search, mode: 'insensitive' } },
+              {
+                medicalRecordNumber: { contains: search, mode: 'insensitive' },
+              },
             ],
           },
         },

@@ -13,10 +13,10 @@ describe('PatientsController (e2e)', () => {
   beforeAll(async () => {
     logger.log('Starting PatientsController E2E tests');
     logger.log('Initializing test environment...');
-    
+
     testApp = await new TestApp().init();
     prisma = testApp.moduleFixture.get<PrismaService>(PrismaService);
-    
+
     // Log database connection status
     try {
       await prisma.$connect();
@@ -25,7 +25,7 @@ describe('PatientsController (e2e)', () => {
       logger.error('❌ Failed to connect to database', error);
       throw error;
     }
-    
+
     logger.log('Cleaning up test database...');
     await testApp.cleanupDatabase();
     logger.log('Test environment ready');
@@ -62,7 +62,8 @@ describe('PatientsController (e2e)', () => {
         bloodType: 'A_POSITIVE',
       };
 
-      const response = await testApp.getRequest()
+      const response = await testApp
+        .getRequest()
         .post('/patients')
         .send(patientData)
         .expect(201);
@@ -82,7 +83,8 @@ describe('PatientsController (e2e)', () => {
     });
 
     it('should return 400 for invalid data', async () => {
-      const response = await testApp.getRequest()
+      const response = await testApp
+        .getRequest()
         .post('/patients')
         .send({
           firstName: '', // Invalid: empty first name
@@ -103,16 +105,17 @@ describe('PatientsController (e2e)', () => {
       await Promise.all([
         testApp.createTestPatient({ firstName: 'Alice', lastName: 'Smith' }),
         testApp.createTestPatient({ firstName: 'Bob', lastName: 'Johnson' }),
-        testApp.createTestPatient({ 
-          firstName: 'Charlie', 
+        testApp.createTestPatient({
+          firstName: 'Charlie',
           lastName: 'Brown',
-          deletedAt: new Date() // Soft-deleted
+          deletedAt: new Date(), // Soft-deleted
         }),
       ]);
     });
 
     it('should return paginated list of active patients', async () => {
-      const response = await testApp.getRequest()
+      const response = await testApp
+        .getRequest()
         .get('/patients')
         .query({ page: 1, limit: 10 })
         .expect(200);
@@ -139,7 +142,8 @@ describe('PatientsController (e2e)', () => {
     });
 
     it('should return patient by ID', async () => {
-      const response = await testApp.getRequest()
+      const response = await testApp
+        .getRequest()
         .get(`/patients/${testPatient.id}`)
         .expect(200);
 
@@ -171,7 +175,8 @@ describe('PatientsController (e2e)', () => {
         address: '456 Update St',
       };
 
-      const response = await testApp.getRequest()
+      const response = await testApp
+        .getRequest()
         .patch(`/patients/${testPatient.id}`)
         .send(updateData)
         .expect(200);
@@ -199,22 +204,27 @@ describe('PatientsController (e2e)', () => {
 
     it('should soft delete patient by default', async () => {
       // First delete
-      await testApp.getRequest()
+      await testApp
+        .getRequest()
         .delete(`/patients/${testPatient.id}`)
         .expect(200);
 
       // Should not find in normal query
-      const listResponse = await testApp.getRequest()
+      const listResponse = await testApp
+        .getRequest()
         .get('/patients')
         .expect(200);
-      
-      expect(listResponse.body.data.some((p: any) => p.id === testPatient.id)).toBe(false);
+
+      expect(
+        listResponse.body.data.some((p: any) => p.id === testPatient.id),
+      ).toBe(false);
 
       // Should find with includeDeleted
-      const getResponse = await testApp.getRequest()
+      const getResponse = await testApp
+        .getRequest()
         .get(`/patients/${testPatient.id}?includeDeleted=true`)
         .expect(200);
-      
+
       expect(getResponse.body.id).toBe(testPatient.id);
       expect(getResponse.body.deletedAt).toBeDefined();
     });

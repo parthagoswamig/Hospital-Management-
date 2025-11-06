@@ -56,7 +56,10 @@ export class CreateEmergencyCaseDto {
 }
 
 export class UpdateEmergencyCaseDto {
-  @ApiPropertyOptional({ enum: EmergencyStatus, example: EmergencyStatus.IN_TREATMENT })
+  @ApiPropertyOptional({
+    enum: EmergencyStatus,
+    example: EmergencyStatus.IN_TREATMENT,
+  })
   @IsOptional()
   @IsEnum(EmergencyStatus)
   status?: EmergencyStatus;
@@ -95,7 +98,10 @@ export class EmergencyFilterDto {
   @Type(() => Number)
   limit?: number = 10;
 
-  @ApiPropertyOptional({ enum: EmergencyStatus, example: EmergencyStatus.WAITING })
+  @ApiPropertyOptional({
+    enum: EmergencyStatus,
+    example: EmergencyStatus.WAITING,
+  })
   @IsOptional()
   @IsEnum(EmergencyStatus)
   status?: EmergencyStatus;

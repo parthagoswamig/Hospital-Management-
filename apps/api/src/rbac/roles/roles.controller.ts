@@ -24,7 +24,11 @@ export class RolesController {
   @Post()
   @RequirePermissions('roles.create')
   async create(@Request() req, @Body() createRoleDto: CreateRoleDto) {
-    return this.rolesService.create(req.user.tenantId, createRoleDto, req.user.userId);
+    return this.rolesService.create(
+      req.user.tenantId,
+      createRoleDto,
+      req.user.userId,
+    );
   }
 
   @Get()
@@ -46,7 +50,12 @@ export class RolesController {
     @Param('id') id: string,
     @Body() updateRoleDto: UpdateRoleDto,
   ) {
-    return this.rolesService.update(req.user.tenantId, id, updateRoleDto, req.user.userId);
+    return this.rolesService.update(
+      req.user.tenantId,
+      id,
+      updateRoleDto,
+      req.user.userId,
+    );
   }
 
   @Delete(':id')
@@ -79,6 +88,10 @@ export class RolesController {
   @Delete('remove/:userId')
   @RequirePermissions('roles.manage')
   async removeRoleFromUser(@Request() req, @Param('userId') userId: string) {
-    return this.rolesService.removeRoleFromUser(req.user.tenantId, userId, req.user.userId);
+    return this.rolesService.removeRoleFromUser(
+      req.user.tenantId,
+      userId,
+      req.user.userId,
+    );
   }
 }

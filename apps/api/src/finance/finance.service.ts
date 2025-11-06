@@ -1,11 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { FinanceQueryDto } from './dto/finance-query.dto';
 
 @Injectable()
 export class FinanceService {
   constructor(private prisma: PrismaService) {}
 
-  async findAllInvoices(tenantId: string, query: any) {
+  async findAllInvoices(tenantId: string, query: FinanceQueryDto) {
     const {
       page = 1,
       limit = 10,

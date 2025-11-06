@@ -1,11 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateTelemedicineDto } from './dto/create-telemedicine.dto';
+import { UpdateTelemedicineDto } from './dto/update-telemedicine.dto';
+import { QueryTelemedicineDto } from './dto/query-telemedicine.dto';
 
 @Injectable()
 export class TelemedicineService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createDto: any, tenantId: string) {
+  async create(createDto: CreateTelemedicineDto, tenantId: string) {
     const consultation = await this.prisma.telemedicineConsultation.create({
       data: { ...createDto, tenantId },
       include: { patient: true, doctor: true },
@@ -17,7 +20,7 @@ export class TelemedicineService {
     };
   }
 
-  async findAll(tenantId: string, query: any) {
+  async findAll(tenantId: string, query: QueryTelemedicineDto) {
     const { page = 1, limit = 10 } = query;
     const [consultations, total] = await Promise.all([
       this.prisma.telemedicineConsultation.findMany({
@@ -52,7 +55,7 @@ export class TelemedicineService {
     return { success: true, data: consultation };
   }
 
-  async update(id: string, updateDto: any, tenantId: string) {
+  async update(id: string, updateDto: UpdateTelemedicineDto, tenantId: string) {
     const consultation = await this.prisma.telemedicineConsultation.findFirst({
       where: { id, tenantId },
     });

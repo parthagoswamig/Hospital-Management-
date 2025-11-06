@@ -75,7 +75,9 @@ export class StaffService {
         },
       });
 
-      this.logger.log(`Staff member created: ${staff.id} for tenant: ${tenantId}`);
+      this.logger.log(
+        `Staff member created: ${staff.id} for tenant: ${tenantId}`,
+      );
 
       return {
         success: true,
@@ -219,14 +221,19 @@ export class StaffService {
         },
       });
 
-      this.logger.log(`Staff member deactivated: ${id} for tenant: ${tenantId}`);
+      this.logger.log(
+        `Staff member deactivated: ${id} for tenant: ${tenantId}`,
+      );
 
       return {
         success: true,
         message: 'Staff member deactivated successfully',
       };
     } catch (error) {
-      this.logger.error(`Error deactivating staff: ${error.message}`, error.stack);
+      this.logger.error(
+        `Error deactivating staff: ${error.message}`,
+        error.stack,
+      );
       throw new BadRequestException('Failed to deactivate staff member');
     }
   }
@@ -340,12 +347,7 @@ export class StaffService {
   }
 
   private buildWhereClause(tenantId: string, query: StaffQueryDto) {
-    const {
-      search,
-      role,
-      departmentId,
-      status = 'active',
-    } = query;
+    const { search, role, departmentId, status = 'active' } = query;
 
     const where: any = {
       tenantId,

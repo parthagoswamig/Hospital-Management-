@@ -6,7 +6,7 @@ export const PERMISSIONS_KEY = 'permissions';
 /**
  * Permissions Decorator
  * Use this decorator to restrict access to routes based on user permissions
- * 
+ *
  * @example
  * ```typescript
  * @Permissions(Permission.VIEW_PATIENTS, Permission.UPDATE_PATIENTS)
@@ -16,7 +16,7 @@ export const PERMISSIONS_KEY = 'permissions';
  * }
  * ```
  */
-export const Permissions = (...permissions: Permission[]) => 
+export const Permissions = (...permissions: Permission[]) =>
   SetMetadata(PERMISSIONS_KEY, permissions);
 
 /**

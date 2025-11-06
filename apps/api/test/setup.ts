@@ -8,7 +8,7 @@ console.log(`Loading test environment from: ${envPath}`);
 
 dotenv.config({
   path: envPath,
-  override: true // Override any existing environment variables
+  override: true, // Override any existing environment variables
 });
 
 // Set test environment
@@ -55,6 +55,5 @@ afterAll(async () => {
 });
 
 declare global {
-  // eslint-disable-next-line no-var
   var testApp: TestApp;
 }

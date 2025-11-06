@@ -13,7 +13,11 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../../rbac/guards/permissions.guard';
 import { Permissions } from '../../rbac/decorators/permissions.decorator';
 import { Permission } from '../../rbac/enums/permissions.enum';
-import { QueryAuditLogsDto, GetStatisticsDto, MarkReviewedDto } from '../dto/audit.dto';
+import {
+  QueryAuditLogsDto,
+  GetStatisticsDto,
+  MarkReviewedDto,
+} from '../dto/audit.dto';
 import { AuditEntityType } from '../entities/audit-log.entity';
 
 @Controller('audit')

@@ -1,4 +1,9 @@
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { UserRole } from '../enums/roles.enum';
 
@@ -23,7 +28,7 @@ export class TenantGuard implements CanActivate {
     // Check if tenant check should be skipped
     const skipCheck = this.reflector.getAllAndOverride<boolean>(
       SKIP_TENANT_CHECK,
-      [context.getHandler(), context.getClass()]
+      [context.getHandler(), context.getClass()],
     );
 
     if (skipCheck) {
@@ -54,7 +59,7 @@ export class TenantGuard implements CanActivate {
     if (requestTenantId) {
       if (user.tenantId !== requestTenantId) {
         throw new ForbiddenException(
-          'Access denied. You cannot access data from another tenant'
+          'Access denied. You cannot access data from another tenant',
         );
       }
     }
@@ -111,7 +116,7 @@ export class TenantRLSGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const skipCheck = this.reflector.getAllAndOverride<boolean>(
       SKIP_TENANT_CHECK,
-      [context.getHandler(), context.getClass()]
+      [context.getHandler(), context.getClass()],
     );
 
     if (skipCheck) {

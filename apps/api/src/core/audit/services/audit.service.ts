@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between, In } from 'typeorm';
-import { AuditLog, AuditAction, AuditEntityType } from '../entities/audit-log.entity';
+import {
+  AuditLog,
+  AuditAction,
+  AuditEntityType,
+} from '../entities/audit-log.entity';
 
 export interface CreateAuditLogDto {
   userId: string;
@@ -180,7 +184,9 @@ export class AuditService {
   /**
    * Query audit logs with filters
    */
-  async query(query: AuditLogQuery): Promise<{ data: AuditLog[]; total: number }> {
+  async query(
+    query: AuditLogQuery,
+  ): Promise<{ data: AuditLog[]; total: number }> {
     const {
       tenantId,
       userId,
@@ -212,7 +218,9 @@ export class AuditService {
     }
 
     if (entityType) {
-      where.entityType = Array.isArray(entityType) ? In(entityType) : entityType;
+      where.entityType = Array.isArray(entityType)
+        ? In(entityType)
+        : entityType;
     }
 
     if (startDate && endDate) {

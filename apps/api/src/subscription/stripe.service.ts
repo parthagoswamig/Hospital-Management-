@@ -9,16 +9,18 @@ export class StripeService {
 
   constructor(private configService: ConfigService) {
     const stripeSecretKey = this.configService.get<string>('STRIPE_SECRET_KEY');
-    
+
     if (!stripeSecretKey) {
-      this.logger.warn('Stripe credentials not configured. Stripe payments will not be available.');
+      this.logger.warn(
+        'Stripe credentials not configured. Stripe payments will not be available.',
+      );
       return;
     }
 
     this.stripe = new Stripe(stripeSecretKey, {
       apiVersion: '2025-09-30.clover',
     });
-    
+
     this.logger.log('Stripe service initialized successfully');
   }
 
@@ -29,7 +31,11 @@ export class StripeService {
     return !!this.stripe;
   }
 
-  async createCustomer(email: string, name: string, metadata?: Record<string, string>) {
+  async createCustomer(
+    email: string,
+    name: string,
+    metadata?: Record<string, string>,
+  ) {
     if (!this.stripe) throw new Error('Stripe is not configured');
     return await this.stripe.customers.create({
       email,
@@ -55,7 +61,11 @@ export class StripeService {
     });
   }
 
-  async createPaymentIntent(amount: number, currency: string = 'usd', customerId?: string) {
+  async createPaymentIntent(
+    amount: number,
+    currency: string = 'usd',
+    customerId?: string,
+  ) {
     if (!this.stripe) throw new Error('Stripe is not configured');
     return await this.stripe.paymentIntents.create({
       amount: amount * 100, // Convert to cents
@@ -91,8 +101,16 @@ export class StripeService {
     return session.url;
   }
 
-  async constructEvent(payload: string | Buffer, signature: string, webhookSecret: string) {
+  async constructEvent(
+    payload: string | Buffer,
+    signature: string,
+    webhookSecret: string,
+  ) {
     if (!this.stripe) throw new Error('Stripe is not configured');
-    return await this.stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+    return await this.stripe.webhooks.constructEvent(
+      payload,
+      signature,
+      webhookSecret,
+    );
   }
 }

@@ -40,11 +40,14 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterUserDto) {
-    const { email, password, firstName, lastName, phone, tenantId, role } = registerDto;
+    const { email, password, firstName, lastName, tenantId, role } =
+      registerDto;
 
     // Validate required fields
     if (!email || !password || !firstName || !lastName || !tenantId) {
-      throw new BadRequestException('Missing required fields: email, password, firstName, lastName, tenantId');
+      throw new BadRequestException(
+        'Missing required fields: email, password, firstName, lastName, tenantId',
+      );
     }
 
     // Check if user already exists
@@ -205,14 +208,15 @@ export class AuthService {
     if (!user) {
       return {
         success: true,
-        message: 'If an account with that email exists, a password reset link has been sent.',
+        message:
+          'If an account with that email exists, a password reset link has been sent.',
       };
     }
 
     // Generate reset token (valid for 1 hour)
     const resetToken = this.jwtService.sign(
       { sub: user.id, email: user.email, type: 'password-reset' },
-      { expiresIn: '1h' }
+      { expiresIn: '1h' },
     );
 
     // In production, send email with reset link
@@ -224,7 +228,8 @@ export class AuthService {
 
     return {
       success: true,
-      message: 'If an account with that email exists, a password reset link has been sent.',
+      message:
+        'If an account with that email exists, a password reset link has been sent.',
       // Remove this in production!
       resetToken, // Only for development
     };
@@ -264,11 +269,14 @@ export class AuthService {
 
       return {
         success: true,
-        message: 'Password has been reset successfully. You can now login with your new password.',
+        message:
+          'Password has been reset successfully. You can now login with your new password.',
       };
     } catch (error) {
       if (error.name === 'TokenExpiredError') {
-        throw new BadRequestException('Reset token has expired. Please request a new one.');
+        throw new BadRequestException(
+          'Reset token has expired. Please request a new one.',
+        );
       }
       if (error.name === 'JsonWebTokenError') {
         throw new BadRequestException('Invalid reset token.');

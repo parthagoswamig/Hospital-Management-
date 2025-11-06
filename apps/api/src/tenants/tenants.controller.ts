@@ -11,10 +11,7 @@ export class TenantsController {
   }
 
   @Get()
-  async findAll(
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-  ) {
+  async findAll(@Query('page') page?: string, @Query('limit') limit?: string) {
     return this.tenantsService.findAll(
       page ? parseInt(page) : 1,
       limit ? parseInt(limit) : 10,

@@ -1,4 +1,11 @@
-import { Controller, Post, Body, Headers, Logger, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Headers,
+  Logger,
+  BadRequestException,
+} from '@nestjs/common';
 import { RazorpayService } from './razorpay.service';
 import { CustomPrismaService } from '../prisma/custom-prisma.service';
 
@@ -45,19 +52,27 @@ export class RazorpayWebhookController {
           break;
 
         case 'subscription.activated':
-          await this.handleSubscriptionActivated(eventPayload.subscription.entity);
+          await this.handleSubscriptionActivated(
+            eventPayload.subscription.entity,
+          );
           break;
 
         case 'subscription.charged':
-          await this.handleSubscriptionCharged(eventPayload.subscription.entity);
+          await this.handleSubscriptionCharged(
+            eventPayload.subscription.entity,
+          );
           break;
 
         case 'subscription.cancelled':
-          await this.handleSubscriptionCancelled(eventPayload.subscription.entity);
+          await this.handleSubscriptionCancelled(
+            eventPayload.subscription.entity,
+          );
           break;
 
         case 'subscription.completed':
-          await this.handleSubscriptionCompleted(eventPayload.subscription.entity);
+          await this.handleSubscriptionCompleted(
+            eventPayload.subscription.entity,
+          );
           break;
 
         case 'subscription.paused':
@@ -65,7 +80,9 @@ export class RazorpayWebhookController {
           break;
 
         case 'subscription.resumed':
-          await this.handleSubscriptionResumed(eventPayload.subscription.entity);
+          await this.handleSubscriptionResumed(
+            eventPayload.subscription.entity,
+          );
           break;
 
         case 'order.paid':
@@ -78,21 +95,28 @@ export class RazorpayWebhookController {
 
       return { received: true };
     } catch (error) {
-      this.logger.error(`Error processing webhook: ${error.message}`, error.stack);
+      this.logger.error(
+        `Error processing webhook: ${error.message}`,
+        error.stack,
+      );
       throw error;
     }
   }
 
   private async handlePaymentCaptured(payment: any) {
-    this.logger.log(`Payment captured: ${payment.id}, Amount: ${payment.amount / 100}`);
-    
+    this.logger.log(
+      `Payment captured: ${payment.id}, Amount: ${payment.amount / 100}`,
+    );
+
     // Update subscription or invoice status in database
     // You can add custom logic here based on your needs
   }
 
   private async handlePaymentFailed(payment: any) {
-    this.logger.warn(`Payment failed: ${payment.id}, Reason: ${payment.error_description}`);
-    
+    this.logger.warn(
+      `Payment failed: ${payment.id}, Reason: ${payment.error_description}`,
+    );
+
     // Handle failed payment - maybe send notification to user
   }
 
@@ -101,7 +125,7 @@ export class RazorpayWebhookController {
 
     // Update subscription status in database
     const razorpaySubscriptionId = subscription.id;
-    
+
     await this.prisma.subscription.updateMany({
       where: { stripeSubscriptionId: razorpaySubscriptionId }, // We'll use this field for Razorpay too
       data: { status: 'ACTIVE' },
@@ -110,7 +134,7 @@ export class RazorpayWebhookController {
 
   private async handleSubscriptionCharged(subscription: any) {
     this.logger.log(`Subscription charged: ${subscription.id}`);
-    
+
     // Record the payment in your system
   }
 
@@ -118,10 +142,10 @@ export class RazorpayWebhookController {
     this.logger.log(`Subscription cancelled: ${subscription.id}`);
 
     const razorpaySubscriptionId = subscription.id;
-    
+
     await this.prisma.subscription.updateMany({
       where: { stripeSubscriptionId: razorpaySubscriptionId },
-      data: { 
+      data: {
         status: 'CANCELLED',
         cancelAtPeriodEnd: true,
       },
@@ -132,7 +156,7 @@ export class RazorpayWebhookController {
     this.logger.log(`Subscription completed: ${subscription.id}`);
 
     const razorpaySubscriptionId = subscription.id;
-    
+
     await this.prisma.subscription.updateMany({
       where: { stripeSubscriptionId: razorpaySubscriptionId },
       data: { status: 'CANCELLED' },
@@ -143,7 +167,7 @@ export class RazorpayWebhookController {
     this.logger.log(`Subscription paused: ${subscription.id}`);
 
     const razorpaySubscriptionId = subscription.id;
-    
+
     await this.prisma.subscription.updateMany({
       where: { stripeSubscriptionId: razorpaySubscriptionId },
       data: { status: 'SUSPENDED' },
@@ -154,7 +178,7 @@ export class RazorpayWebhookController {
     this.logger.log(`Subscription resumed: ${subscription.id}`);
 
     const razorpaySubscriptionId = subscription.id;
-    
+
     await this.prisma.subscription.updateMany({
       where: { stripeSubscriptionId: razorpaySubscriptionId },
       data: { status: 'ACTIVE' },
@@ -163,7 +187,7 @@ export class RazorpayWebhookController {
 
   private async handleOrderPaid(order: any) {
     this.logger.log(`Order paid: ${order.id}, Amount: ${order.amount / 100}`);
-    
+
     // Handle one-time order payment
   }
 }

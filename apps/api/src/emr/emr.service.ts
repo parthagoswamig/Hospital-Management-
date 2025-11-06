@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, Logger, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  Logger,
+  BadRequestException,
+} from '@nestjs/common';
 import { CustomPrismaService } from '../prisma/custom-prisma.service';
 import {
   CreateMedicalRecordDto,
@@ -15,7 +20,10 @@ export class EmrService {
   /**
    * Build where clause for medical record queries
    */
-  private buildWhereClause(tenantId: string, filters: Partial<EmrFilterDto> = {}) {
+  private buildWhereClause(
+    tenantId: string,
+    filters: Partial<EmrFilterDto> = {},
+  ) {
     const where: any = {
       tenantId,
       isActive: true,
@@ -71,10 +79,7 @@ export class EmrService {
     }
   }
 
-  async create(
-    createDto: CreateMedicalRecordDto,
-    tenantId: string,
-  ) {
+  async create(createDto: CreateMedicalRecordDto, tenantId: string) {
     this.logger.log(
       `Creating medical record for patient ${createDto.patientId} in tenant ${tenantId}`,
     );
@@ -107,7 +112,7 @@ export class EmrService {
         `Failed to create medical record for patient ${createDto.patientId}`,
         error.stack,
       );
-      
+
       if (error.code === 'P2002') {
         throw new BadRequestException('Duplicate medical record');
       }
@@ -198,9 +203,7 @@ export class EmrService {
   }
 
   async findOne(id: string, tenantId: string) {
-    this.logger.log(
-      `Fetching medical record ${id} for tenant ${tenantId}`,
-    );
+    this.logger.log(`Fetching medical record ${id} for tenant ${tenantId}`);
 
     try {
       const record = await this.prisma.medicalRecord.findFirst({
@@ -209,13 +212,13 @@ export class EmrService {
       });
 
       if (!record) {
-        this.logger.warn(`Medical record ${id} not found in tenant ${tenantId}`);
+        this.logger.warn(
+          `Medical record ${id} not found in tenant ${tenantId}`,
+        );
         throw new NotFoundException('Medical record not found');
       }
 
-      this.logger.log(
-        `Successfully retrieved medical record ${id}`,
-      );
+      this.logger.log(`Successfully retrieved medical record ${id}`);
 
       return {
         success: true,
@@ -225,11 +228,8 @@ export class EmrService {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      
-      this.logger.error(
-        `Failed to fetch medical record ${id}`,
-        error.stack,
-      );
+
+      this.logger.error(`Failed to fetch medical record ${id}`, error.stack);
       throw error;
     }
   }
@@ -239,9 +239,7 @@ export class EmrService {
     updateDto: UpdateMedicalRecordDto,
     tenantId: string,
   ) {
-    this.logger.log(
-      `Updating medical record ${id} for tenant ${tenantId}`,
-    );
+    this.logger.log(`Updating medical record ${id} for tenant ${tenantId}`);
 
     try {
       const record = await this.prisma.medicalRecord.update({
@@ -253,9 +251,7 @@ export class EmrService {
         include: this.getIncludes(),
       });
 
-      this.logger.log(
-        `Successfully updated medical record ${id}`,
-      );
+      this.logger.log(`Successfully updated medical record ${id}`);
 
       return {
         success: true,
@@ -263,11 +259,8 @@ export class EmrService {
         data: record,
       };
     } catch (error) {
-      this.logger.error(
-        `Failed to update medical record ${id}`,
-        error.stack,
-      );
-      
+      this.logger.error(`Failed to update medical record ${id}`, error.stack);
+
       if (error.code === 'P2025') {
         throw new NotFoundException('Medical record not found');
       }
@@ -283,26 +276,21 @@ export class EmrService {
     try {
       await this.prisma.medicalRecord.update({
         where: { id, tenantId },
-        data: { 
+        data: {
           isActive: false,
           updatedAt: new Date(),
         },
       });
 
-      this.logger.log(
-        `Successfully soft deleted medical record ${id}`,
-      );
+      this.logger.log(`Successfully soft deleted medical record ${id}`);
 
       return {
         success: true,
         message: 'Medical record deleted successfully',
       };
     } catch (error) {
-      this.logger.error(
-        `Failed to delete medical record ${id}`,
-        error.stack,
-      );
-      
+      this.logger.error(`Failed to delete medical record ${id}`, error.stack);
+
       if (error.code === 'P2025') {
         throw new NotFoundException('Medical record not found');
       }
@@ -343,7 +331,7 @@ export class EmrService {
         data: {
           total,
           recentRecords,
-          byType: byType.map(item => ({
+          byType: byType.map((item) => ({
             recordType: item.recordType,
             count: item._count,
           })),

@@ -1,6 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { createClient, SupabaseClient, AuthResponse, User, Session } from '@supabase/supabase-js';
+import {
+  createClient,
+  SupabaseClient,
+  AuthResponse,
+  User,
+  Session,
+} from '@supabase/supabase-js';
 
 export interface SignUpData {
   email: string;
@@ -29,7 +35,9 @@ export class SupabaseAuthService {
     const supabaseAnonKey = this.configService.get<string>('SUPABASE_ANON_KEY');
 
     if (!supabaseUrl || !supabaseAnonKey) {
-      this.logger.error('Supabase configuration is missing. Please check your environment variables.');
+      this.logger.error(
+        'Supabase configuration is missing. Please check your environment variables.',
+      );
       throw new Error('Supabase configuration is missing');
     }
 
@@ -40,7 +48,7 @@ export class SupabaseAuthService {
   async signUp(data: SignUpData): Promise<AuthResponse> {
     try {
       this.logger.log(`Attempting to sign up user: ${data.email}`);
-      
+
       const response = await this.supabase.auth.signUp({
         email: data.email,
         password: data.password,
@@ -52,7 +60,9 @@ export class SupabaseAuthService {
         throw new Error(response.error.message);
       }
 
-      this.logger.log(`User signed up successfully: ${response.data?.user?.id}`);
+      this.logger.log(
+        `User signed up successfully: ${response.data?.user?.id}`,
+      );
       return response;
     } catch (error) {
       this.logger.error('Sign up failed:', error);
@@ -63,7 +73,7 @@ export class SupabaseAuthService {
   async signInWithEmail(data: SignInData): Promise<AuthResponse> {
     try {
       this.logger.log(`Attempting to sign in user: ${data.email}`);
-      
+
       const response = await this.supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
@@ -74,7 +84,9 @@ export class SupabaseAuthService {
         throw new Error(response.error.message);
       }
 
-      this.logger.log(`User signed in successfully: ${response.data?.user?.id}`);
+      this.logger.log(
+        `User signed in successfully: ${response.data?.user?.id}`,
+      );
       return response;
     } catch (error) {
       this.logger.error('Sign in failed:', error);
@@ -85,15 +97,15 @@ export class SupabaseAuthService {
   async signOut(): Promise<{ error: any }> {
     try {
       this.logger.log('Signing out user');
-      
+
       const response = await this.supabase.auth.signOut();
-      
+
       if (response.error) {
         this.logger.error('Sign out error:', response.error.message);
       } else {
         this.logger.log('User signed out successfully');
       }
-      
+
       return response;
     } catch (error) {
       this.logger.error('Sign out failed:', error);
@@ -104,7 +116,7 @@ export class SupabaseAuthService {
   async getUser(): Promise<User | null> {
     try {
       const response = await this.supabase.auth.getUser();
-      
+
       if (response.error) {
         this.logger.error('Get user error:', response.error.message);
         return null;
@@ -120,7 +132,7 @@ export class SupabaseAuthService {
   async getSession(): Promise<Session | null> {
     try {
       const response = await this.supabase.auth.getSession();
-      
+
       if (response.error) {
         this.logger.error('Get session error:', response.error.message);
         return null;
@@ -136,7 +148,7 @@ export class SupabaseAuthService {
   async refreshSession(refreshToken: string): Promise<AuthResponse> {
     try {
       this.logger.log('Refreshing session');
-      
+
       const response = await this.supabase.auth.refreshSession({
         refresh_token: refreshToken,
       });
@@ -157,7 +169,7 @@ export class SupabaseAuthService {
   async resetPassword(email: string): Promise<{ error: any }> {
     try {
       this.logger.log(`Resetting password for user: ${email}`);
-      
+
       const response = await this.supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${this.configService.get('APP_URL') || 'http://localhost:3000'}/reset-password`,
       });
@@ -175,10 +187,12 @@ export class SupabaseAuthService {
     }
   }
 
-  async updatePassword(newPassword: string): Promise<{ data: { user: User | null }; error: any }> {
+  async updatePassword(
+    newPassword: string,
+  ): Promise<{ data: { user: User | null }; error: any }> {
     try {
       this.logger.log('Updating password');
-      
+
       const response = await this.supabase.auth.updateUser({
         password: newPassword,
       });

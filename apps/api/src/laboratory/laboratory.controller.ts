@@ -54,21 +54,15 @@ export class LaboratoryController {
   @Get('tests')
   @ApiOperation({ summary: 'Get all lab tests with pagination' })
   @ApiResponse({ status: 200, description: 'Lab tests retrieved successfully' })
-  async findAllLabTests(
-    @TenantId() tenantId: string,
-    @Query() query: LabTestQueryDto,
-  ) {
-    return this.laboratoryService.findAllLabTests(tenantId, query);
+  async getLabTests(@TenantId() tenantId: string) {
+    return this.laboratoryService.findAllLabTests(tenantId);
   }
 
   @Get('tests/:id')
   @ApiOperation({ summary: 'Get lab test by ID' })
   @ApiResponse({ status: 200, description: 'Lab test retrieved successfully' })
   @ApiResponse({ status: 404, description: 'Lab test not found' })
-  async findOneLabTest(
-    @Param('id') id: string,
-    @TenantId() tenantId: string,
-  ) {
+  async findOneLabTest(@Param('id') id: string, @TenantId() tenantId: string) {
     return this.laboratoryService.findOneLabTest(id, tenantId);
   }
 
@@ -89,10 +83,7 @@ export class LaboratoryController {
   @ApiOperation({ summary: 'Soft delete lab test by ID' })
   @ApiResponse({ status: 204, description: 'Lab test deleted successfully' })
   @ApiResponse({ status: 404, description: 'Lab test not found' })
-  async removeLabTest(
-    @Param('id') id: string,
-    @TenantId() tenantId: string,
-  ) {
+  async removeLabTest(@Param('id') id: string, @TenantId() tenantId: string) {
     return this.laboratoryService.removeLabTest(id, tenantId);
   }
 
@@ -112,17 +103,20 @@ export class LaboratoryController {
 
   @Get('orders')
   @ApiOperation({ summary: 'Get all lab orders with pagination' })
-  @ApiResponse({ status: 200, description: 'Lab orders retrieved successfully' })
-  async findAllLabOrders(
-    @TenantId() tenantId: string,
-    @Query() query: LabOrderQueryDto,
-  ) {
-    return this.laboratoryService.findAllLabOrders(tenantId, query);
+  @ApiResponse({
+    status: 200,
+    description: 'Lab orders retrieved successfully',
+  })
+  async getLabOrders(@TenantId() tenantId: string) {
+    return this.laboratoryService.findAllLabOrders(tenantId);
   }
 
   @Get('orders/stats')
   @ApiOperation({ summary: 'Get laboratory statistics' })
-  @ApiResponse({ status: 200, description: 'Statistics retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Statistics retrieved successfully',
+  })
   async getLabStats(@TenantId() tenantId: string) {
     return this.laboratoryService.getLabStats(tenantId);
   }
@@ -131,10 +125,7 @@ export class LaboratoryController {
   @ApiOperation({ summary: 'Get lab order by ID' })
   @ApiResponse({ status: 200, description: 'Lab order retrieved successfully' })
   @ApiResponse({ status: 404, description: 'Lab order not found' })
-  async findOneLabOrder(
-    @Param('id') id: string,
-    @TenantId() tenantId: string,
-  ) {
+  async findOneLabOrder(@Param('id') id: string, @TenantId() tenantId: string) {
     return this.laboratoryService.findOneLabOrder(id, tenantId);
   }
 
@@ -177,10 +168,7 @@ export class LaboratoryController {
   @ApiOperation({ summary: 'Cancel lab order by ID' })
   @ApiResponse({ status: 204, description: 'Lab order cancelled successfully' })
   @ApiResponse({ status: 404, description: 'Lab order not found' })
-  async cancelLabOrder(
-    @Param('id') id: string,
-    @TenantId() tenantId: string,
-  ) {
+  async cancelLabOrder(@Param('id') id: string, @TenantId() tenantId: string) {
     return this.laboratoryService.cancelLabOrder(id, tenantId);
   }
 }

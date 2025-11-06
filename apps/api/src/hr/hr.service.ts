@@ -1,11 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateStaffDto } from './dto/create-staff.dto';
+import { QueryStaffDto } from './dto/query-staff.dto';
 
 @Injectable()
 export class HrService {
   constructor(private prisma: PrismaService) {}
 
-  async createStaff(createDto: any, tenantId: string) {
+  async createStaff(createDto: CreateStaffDto, tenantId: string) {
     const staff = await this.prisma.staff.create({
       data: {
         ...createDto,
@@ -24,14 +26,14 @@ export class HrService {
     };
   }
 
-  async findAllStaff(tenantId: string, query: any) {
+  async findAllStaff(tenantId: string, query: QueryStaffDto) {
     const { page = 1, limit = 10, departmentId, designation, isActive } = query;
     const skip = (page - 1) * limit;
 
     const where: any = { tenantId };
     if (departmentId) where.departmentId = departmentId;
     if (designation) where.designation = designation;
-    if (isActive !== undefined) where.isActive = isActive === 'true';
+    if (isActive !== undefined) where.isActive = isActive;
 
     const [staff, total] = await Promise.all([
       this.prisma.staff.findMany({

@@ -1,4 +1,12 @@
-import { IsString, IsNotEmpty, IsOptional, IsEnum, IsBoolean, IsNumber, Min } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsEnum,
+  IsBoolean,
+  IsNumber,
+  Min,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export enum MessagePriority {
@@ -32,7 +40,10 @@ export class CreateMessageDto {
   @IsNotEmpty()
   content: string;
 
-  @ApiPropertyOptional({ enum: MessagePriority, default: MessagePriority.NORMAL })
+  @ApiPropertyOptional({
+    enum: MessagePriority,
+    default: MessagePriority.NORMAL,
+  })
   @IsEnum(MessagePriority)
   @IsOptional()
   priority?: MessagePriority;
@@ -64,7 +75,10 @@ export class CreateNotificationDto {
   @IsNotEmpty()
   message: string;
 
-  @ApiPropertyOptional({ enum: NotificationType, default: NotificationType.INFO })
+  @ApiPropertyOptional({
+    enum: NotificationType,
+    default: NotificationType.INFO,
+  })
   @IsEnum(NotificationType)
   @IsOptional()
   type?: NotificationType;
@@ -103,7 +117,10 @@ export class MessageQueryDto {
   @IsBoolean()
   read?: boolean;
 
-  @ApiPropertyOptional({ description: 'Filter by priority', enum: MessagePriority })
+  @ApiPropertyOptional({
+    description: 'Filter by priority',
+    enum: MessagePriority,
+  })
   @IsOptional()
   @IsEnum(MessagePriority)
   priority?: MessagePriority;
@@ -132,7 +149,10 @@ export class NotificationQueryDto {
   @IsBoolean()
   read?: boolean;
 
-  @ApiPropertyOptional({ description: 'Filter by type', enum: NotificationType })
+  @ApiPropertyOptional({
+    description: 'Filter by type',
+    enum: NotificationType,
+  })
   @IsOptional()
   @IsEnum(NotificationType)
   type?: NotificationType;

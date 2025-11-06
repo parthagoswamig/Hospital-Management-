@@ -1,14 +1,11 @@
-import { Injectable, NotFoundException, Logger, BadRequestException } from '@nestjs/common';
-import { CustomPrismaService } from '../prisma/custom-prisma.service';
 import {
-  CreateStudyDto,
-  UpdateStudyDto,
-  CreateReportDto,
-  UpdateReportDto,
-  CreateRadiologyOrderDto,
-  UpdateRadiologyOrderDto,
-  RadiologyFilterDto,
-} from './dto';
+  Injectable,
+  NotFoundException,
+  Logger,
+  BadRequestException,
+} from '@nestjs/common';
+import { CustomPrismaService } from '../prisma/custom-prisma.service';
+import { RadiologyFilterDto } from './dto';
 
 @Injectable()
 export class RadiologyService {
@@ -19,7 +16,10 @@ export class RadiologyService {
   /**
    * Build where clause for radiology queries
    */
-  private buildWhereClause(tenantId: string, filters: Partial<RadiologyFilterDto> = {}) {
+  private buildWhereClause(
+    tenantId: string,
+    filters: Partial<RadiologyFilterDto> = {},
+  ) {
     const where: any = {
       tenantId,
       isActive: true,

@@ -57,7 +57,11 @@ export class Tenant extends BaseEntity {
   })
   subscriptionPlan: SubscriptionPlan;
 
-  @Column({ type: 'timestamp', nullable: true, name: 'subscription_start_date' })
+  @Column({
+    type: 'timestamp',
+    nullable: true,
+    name: 'subscription_start_date',
+  })
   subscriptionStartDate?: Date;
 
   @Column({ type: 'timestamp', nullable: true, name: 'subscription_end_date' })
@@ -96,10 +100,20 @@ export class Tenant extends BaseEntity {
   country?: string;
 
   // Licensing & Registration
-  @Column({ type: 'varchar', length: 255, nullable: true, name: 'license_number' })
+  @Column({
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+    name: 'license_number',
+  })
   licenseNumber?: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true, name: 'registration_number' })
+  @Column({
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+    name: 'registration_number',
+  })
   registrationNumber?: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'tax_id' })
@@ -136,17 +150,37 @@ export class Tenant extends BaseEntity {
   @Column({ type: 'varchar', length: 7, nullable: true, name: 'primary_color' })
   primaryColor?: string;
 
-  @Column({ type: 'varchar', length: 7, nullable: true, name: 'secondary_color' })
+  @Column({
+    type: 'varchar',
+    length: 7,
+    nullable: true,
+    name: 'secondary_color',
+  })
   secondaryColor?: string;
 
   // Billing
-  @Column({ type: 'varchar', length: 255, nullable: true, name: 'billing_email' })
+  @Column({
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+    name: 'billing_email',
+  })
   billingEmail?: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true, name: 'stripe_customer_id' })
+  @Column({
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+    name: 'stripe_customer_id',
+  })
   stripeCustomerId?: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true, name: 'stripe_subscription_id' })
+  @Column({
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+    name: 'stripe_subscription_id',
+  })
   stripeSubscriptionId?: string;
 
   // Metadata
@@ -171,9 +205,6 @@ export class Tenant extends BaseEntity {
   }
 
   get isSubscriptionActive(): boolean {
-    return (
-      this.subscriptionEndDate &&
-      new Date() < this.subscriptionEndDate
-    );
+    return this.subscriptionEndDate && new Date() < this.subscriptionEndDate;
   }
 }

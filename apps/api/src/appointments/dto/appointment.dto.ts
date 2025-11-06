@@ -40,7 +40,10 @@ export class CreateAppointmentDto {
   @IsString()
   notes?: string;
 
-  @ApiPropertyOptional({ enum: AppointmentStatus, example: AppointmentStatus.SCHEDULED })
+  @ApiPropertyOptional({
+    enum: AppointmentStatus,
+    example: AppointmentStatus.SCHEDULED,
+  })
   @IsOptional()
   @IsEnum(AppointmentStatus)
   status?: AppointmentStatus;
@@ -77,7 +80,10 @@ export class UpdateAppointmentDto {
   @IsString()
   notes?: string;
 
-  @ApiPropertyOptional({ enum: AppointmentStatus, example: AppointmentStatus.COMPLETED })
+  @ApiPropertyOptional({
+    enum: AppointmentStatus,
+    example: AppointmentStatus.COMPLETED,
+  })
   @IsOptional()
   @IsEnum(AppointmentStatus)
   status?: AppointmentStatus;
@@ -104,7 +110,10 @@ export class AppointmentQueryDto {
   @IsString()
   search?: string;
 
-  @ApiPropertyOptional({ enum: AppointmentStatus, example: AppointmentStatus.SCHEDULED })
+  @ApiPropertyOptional({
+    enum: AppointmentStatus,
+    example: AppointmentStatus.SCHEDULED,
+  })
   @IsOptional()
   @IsEnum(AppointmentStatus)
   status?: AppointmentStatus;
@@ -131,7 +140,10 @@ export class AppointmentQueryDto {
 }
 
 export class UpdateAppointmentStatusDto {
-  @ApiProperty({ enum: AppointmentStatus, example: AppointmentStatus.COMPLETED })
+  @ApiProperty({
+    enum: AppointmentStatus,
+    example: AppointmentStatus.COMPLETED,
+  })
   @IsEnum(AppointmentStatus)
   status: AppointmentStatus;
 }

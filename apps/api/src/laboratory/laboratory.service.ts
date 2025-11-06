@@ -41,7 +41,9 @@ export class LaboratoryService {
         },
       });
 
-      this.logger.log(`Lab test created: ${labTest.id} for tenant: ${tenantId}`);
+      this.logger.log(
+        `Lab test created: ${labTest.id} for tenant: ${tenantId}`,
+      );
 
       return {
         success: true,
@@ -49,7 +51,10 @@ export class LaboratoryService {
         data: labTest,
       };
     } catch (error) {
-      this.logger.error(`Error creating lab test: ${error.message}`, error.stack);
+      this.logger.error(
+        `Error creating lab test: ${error.message}`,
+        error.stack,
+      );
       if (error instanceof BadRequestException) {
         throw error;
       }
@@ -120,7 +125,10 @@ export class LaboratoryService {
         data: test,
       };
     } catch (error) {
-      this.logger.error(`Error updating lab test: ${error.message}`, error.stack);
+      this.logger.error(
+        `Error updating lab test: ${error.message}`,
+        error.stack,
+      );
       throw new BadRequestException('Failed to update lab test');
     }
   }
@@ -139,7 +147,10 @@ export class LaboratoryService {
         message: 'Lab test deactivated successfully',
       };
     } catch (error) {
-      this.logger.error(`Error deactivating lab test: ${error.message}`, error.stack);
+      this.logger.error(
+        `Error deactivating lab test: ${error.message}`,
+        error.stack,
+      );
       throw new BadRequestException('Failed to deactivate lab test');
     }
   }
@@ -193,7 +204,9 @@ export class LaboratoryService {
         },
       });
 
-      this.logger.log(`Lab order created: ${labOrder.id} for tenant: ${tenantId}`);
+      this.logger.log(
+        `Lab order created: ${labOrder.id} for tenant: ${tenantId}`,
+      );
 
       return {
         success: true,
@@ -201,7 +214,10 @@ export class LaboratoryService {
         data: labOrder,
       };
     } catch (error) {
-      this.logger.error(`Error creating lab order: ${error.message}`, error.stack);
+      this.logger.error(
+        `Error creating lab order: ${error.message}`,
+        error.stack,
+      );
       throw new BadRequestException('Failed to create lab order');
     }
   }
@@ -449,14 +465,7 @@ export class LaboratoryService {
   }
 
   private buildLabOrderWhereClause(tenantId: string, query: LabOrderQueryDto) {
-    const {
-      search,
-      status,
-      patientId,
-      doctorId,
-      startDate,
-      endDate,
-    } = query;
+    const { search, status, patientId, doctorId, startDate, endDate } = query;
 
     const where: any = {
       tenantId,

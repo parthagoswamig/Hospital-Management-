@@ -12,9 +12,7 @@ describe('Health Check (e2e)', () => {
   });
 
   it('should return 200 for health check endpoint', async () => {
-    const response = await testApp.getRequest()
-      .get('/health')
-      .expect(200);
+    const response = await testApp.getRequest().get('/health').expect(200);
 
     expect(response.body).toHaveProperty('status', 'ok');
   });

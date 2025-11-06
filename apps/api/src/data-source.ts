@@ -15,5 +15,6 @@ export const AppDataSource = new DataSource({
   migrations: [__dirname + '/migrations/*{.ts,.js}'],
   synchronize: false, // Never use synchronize in production
   logging: process.env.DATABASE_LOGGING === 'true',
-  ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : false,
+  ssl:
+    process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : false,
 });
