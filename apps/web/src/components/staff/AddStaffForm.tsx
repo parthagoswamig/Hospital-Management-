@@ -175,6 +175,8 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ onSuccess, onCancel }) => {
       if (formData.joiningDate) cleanedData.joiningDate = formData.joiningDate;
       if (formData.employeeId) cleanedData.employeeId = formData.employeeId;
 
+      console.log('📤 Submitting staff data:', cleanedData);
+
       await staffService.createStaff(cleanedData);
       
       notifications.show({
@@ -185,14 +187,29 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ onSuccess, onCancel }) => {
       
       onSuccess();
     } catch (error: any) {
-      console.error('Error creating staff:', error);
-      const errorMessage = error.response?.data?.message || 
-                          error.message || 
-                          'Failed to add staff member';
+      console.error('❌ Error creating staff:', error);
+      console.error('❌ Error response:', error.response?.data);
+      
+      // Extract detailed error message
+      let errorMessage = 'Failed to add staff member';
+      
+      if (error.response?.data?.message) {
+        const msg = error.response.data.message;
+        if (Array.isArray(msg)) {
+          errorMessage = msg.join('\n• ');
+          errorMessage = '• ' + errorMessage;
+        } else {
+          errorMessage = msg;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       notifications.show({
-        title: 'Error',
-        message: Array.isArray(errorMessage) ? errorMessage.join(', ') : errorMessage,
+        title: 'Error Creating Staff',
+        message: errorMessage,
         color: 'red',
+        autoClose: 10000, // Show for 10 seconds
       });
     } finally {
       setLoading(false);
