@@ -17,9 +17,7 @@ export class StripeService {
       return;
     }
 
-    this.stripe = new Stripe(stripeSecretKey, {
-      apiVersion: '2025-09-30.clover',
-    });
+    this.stripe = new Stripe(stripeSecretKey);
 
     this.logger.log('Stripe service initialized successfully');
   }

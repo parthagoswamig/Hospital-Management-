@@ -3,14 +3,31 @@
   "builds": [
     {
       "src": "api/index.ts",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": {
+        "maxDuration": 30,
+        "memory": 1024
+      }
     }
   ],
   "routes": [
+    {
+      "src": "/docs/(.*)",
+      "dest": "api/index.ts",
+      "methods": ["GET"]
+    },
+    {
+      "src": "/health",
+      "dest": "api/index.ts",
+      "methods": ["GET"]
+    },
     {
       "src": "/(.*)",
       "dest": "api/index.ts",
       "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
     }
-  ]
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
 }

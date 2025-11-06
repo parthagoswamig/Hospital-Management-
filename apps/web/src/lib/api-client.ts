@@ -13,11 +13,12 @@ const apiClient: AxiosInstance = axios.create({
   },
 });
 
-// Request interceptor - Add auth token to requests
+// Request interceptor - Add auth token and tenant ID to requests
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     // Get token from localStorage
     const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+    const tenantId = typeof window !== 'undefined' ? localStorage.getItem('tenantId') : null;
 
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -26,11 +27,18 @@ apiClient.interceptors.request.use(
       console.warn('⚠️ No token found in localStorage - request will be unauthorized');
     }
 
+    // Add tenant ID header if available
+    if (tenantId && config.headers) {
+      config.headers['X-Tenant-Id'] = tenantId;
+      console.log('✅ Tenant ID attached to request:', tenantId);
+    }
+
     // Log request for debugging
     console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`, {
       data: config.data,
       params: config.params,
       hasAuth: !!token,
+      hasTenant: !!tenantId,
     });
 
     return config;

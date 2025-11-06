@@ -35,6 +35,7 @@ export class ApiError extends Error {
  */
 async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const token = getAuthToken();
+  const tenantId = typeof window !== 'undefined' ? localStorage.getItem('tenantId') : null;
 
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
@@ -43,6 +44,10 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
 
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  if (tenantId) {
+    headers['X-Tenant-Id'] = tenantId;
   }
 
   const config: RequestInit = {

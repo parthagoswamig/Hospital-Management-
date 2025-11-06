@@ -14,6 +14,7 @@
     "build:web": "npm --workspace web run build",
     "build:web-only": "npm install && npm --workspace web run build",
     "build:api": "npm --workspace api run build",
+    "build:api-vercel": "npm --workspace api run vercel-build",
     "start": "npm-run-all -p start:web start:api",
     "start:web": "npm --workspace web run start",
     "start:api": "npm --workspace api run start",
@@ -23,7 +24,10 @@
     "test:e2e": "cross-env NODE_ENV=test jest --config=./jest.config.js",
     "lint": "npm-run-all -p lint:web lint:api",
     "lint:web": "npm --workspace web run lint || exit 0",
-    "lint:api": "npm --workspace api run lint || exit 0"
+    "lint:api": "npm --workspace api run lint || exit 0",
+    "typecheck": "npm-run-all -p typecheck:web typecheck:api",
+    "typecheck:web": "npm --workspace web run tsc --noEmit || exit 0",
+    "typecheck:api": "npm --workspace api run tsc --noEmit || exit 0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",

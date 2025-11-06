@@ -24,7 +24,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
           expiresIn: configService.get<string>(
             'JWT_ACCESS_TOKEN_EXPIRY',
             '15m',
-          ),
+          ) as any,
         },
       }),
     }),
