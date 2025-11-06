@@ -1,9 +1,13 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
+import { PrismaService } from './prisma/prisma.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private readonly prisma: PrismaService,
+  ) {}
 
   @Get()
   getRoot() {
@@ -21,12 +25,29 @@ export class AppController {
   }
 
   @Get('health')
-  getHealth() {
+  async getHealth() {
+    let dbStatus = 'disconnected';
+    let dbError = null;
+    
+    try {
+      // Test database connection
+      await this.prisma.$queryRaw`SELECT 1`;
+      dbStatus = 'connected';
+    } catch (error) {
+      dbError = error instanceof Error ? error.message : 'Unknown error';
+    }
+    
     return {
-      status: 'ok',
+      status: dbStatus === 'connected' ? 'ok' : 'error',
       timestamp: new Date().toISOString(),
       service: 'HMS SaaS API',
-      database: 'connected',
+      database: dbStatus,
+      ...(dbError && { dbError }),
+      environment: {
+        nodeEnv: process.env.NODE_ENV,
+        hasDatabaseUrl: !!process.env.DATABASE_URL,
+        hasDirectUrl: !!process.env.DIRECT_URL,
+      },
     };
   }
 }
