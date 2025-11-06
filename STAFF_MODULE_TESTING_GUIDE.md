@@ -1,579 +1,342 @@
-# Staff Management Module - Testing Guide
+# Staff Module - Quick Testing Guide
 
-## 🚀 Quick Start Testing
+## 🚀 How to Test the Staff Module
 
 ### Prerequisites
-1. Backend server running on `http://localhost:3001`
-2. Frontend server running on `http://localhost:3000`
-3. Valid user account with appropriate role
-4. Tenant ID available in localStorage
+1. Backend running on `http://localhost:3001` (or your configured API URL)
+2. Frontend running on `http://localhost:3000`
+3. User logged in with valid JWT token
+4. TenantId set in localStorage
 
 ---
 
-## 📝 Test Scenarios
+## 📝 Test 1: Add New Staff Member
 
-### 1. Create Staff Member
-
-**Steps:**
+### Steps:
 1. Navigate to `/dashboard/staff`
-2. Click "Add Staff" button
+2. Click **"Add Staff"** button (top right)
 3. Fill in the form:
-   - First Name: `John`
-   - Last Name: `Doe`
-   - Email: `john.doe@hospital.com`
-   - Password: `Password123!`
-   - Role: `DOCTOR`
-   - Designation: `Senior Cardiologist` (optional)
-   - Specialization: `Cardiology` (optional)
-   - License Number: `MED123456` (optional)
-   - Qualification: `MBBS, MD` (optional)
-   - Experience: `5 years` (optional)
-   - Joining Date: `2024-01-15` (optional)
+   ```
+   First Name: John
+   Last Name: Doe
+   Email: john.doe@hospital.com
+   Password: Password123!
+   Role: Doctor
+   Designation: Senior Cardiologist
+   Specialization: Cardiology
+   License Number: MED12345
+   Qualification: MBBS, MD Cardiology
+   Experience: 8 years in cardiac care
+   ```
+4. Click **"Add Staff"** button
 
-**Expected Results:**
-- ✅ Form validates all required fields
-- ✅ Email format is validated
-- ✅ Password length is validated (min 8 chars)
-- ✅ Success notification appears
-- ✅ Modal closes automatically
-- ✅ Staff list refreshes with new member
-- ✅ Stats update (total staff count increases)
+### Expected Result:
+- ✅ Success toast: "Staff member added successfully"
+- ✅ Modal closes
+- ✅ Staff list refreshes and shows new member
+- ✅ Statistics update (Total Staff +1, Active Staff +1)
+- ✅ New staff appears in "Active Staff" tab
 
-**API Call:**
-```http
-POST http://localhost:3001/staff
-Authorization: Bearer <token>
-X-Tenant-Id: <tenantId>
-Content-Type: application/json
-
-{
-  "firstName": "John",
-  "lastName": "Doe",
-  "email": "john.doe@hospital.com",
-  "password": "Password123!",
-  "role": "DOCTOR",
-  "designation": "Senior Cardiologist",
-  "specialization": "Cardiology",
-  "licenseNumber": "MED123456",
-  "qualification": "MBBS, MD",
-  "experience": "5 years",
-  "joiningDate": "2024-01-15"
-}
-```
-
-**Expected Response:**
-```json
-{
-  "success": true,
-  "message": "Staff member added successfully",
-  "data": {
-    "id": "uuid",
-    "employeeId": "EMP20240001",
-    "userId": "user-uuid",
-    "designation": "Senior Cardiologist",
-    "joiningDate": "2024-01-15T00:00:00.000Z",
-    "qualification": "MBBS, MD",
-    "experience": "5 years",
-    "isActive": true,
-    "user": {
-      "id": "user-uuid",
-      "email": "john.doe@hospital.com",
-      "firstName": "John",
-      "lastName": "Doe",
-      "role": "DOCTOR",
-      "specialization": "Cardiology",
-      "licenseNumber": "MED123456"
-    },
-    "department": null,
-    "tenantId": "tenant-uuid",
-    "createdAt": "2024-01-15T10:00:00.000Z",
-    "updatedAt": "2024-01-15T10:00:00.000Z"
-  }
-}
-```
+### Possible Errors:
+- ❌ **400 Bad Request**: Check if all required fields filled
+- ❌ **401 Unauthorized**: Check JWT token in localStorage
+- ❌ **403 Forbidden**: User doesn't have permission (check role)
 
 ---
 
-### 2. View Staff List
+## ✏️ Test 2: Edit Staff Member
 
-**Steps:**
-1. Navigate to `/dashboard/staff`
-2. Observe the staff list table
+### Steps:
+1. On staff list, click **Edit icon** (green pencil) on any staff member
+2. Modify some fields:
+   ```
+   Designation: Chief Cardiologist
+   Specialization: Interventional Cardiology
+   Experience: 10 years
+   Role: Doctor (can be changed)
+   ```
+3. Click **"Update Staff"** button
 
-**Expected Results:**
-- ✅ List loads from API
-- ✅ Shows all staff members for current tenant only
-- ✅ Displays: Name, Employee ID, Role, Department, Experience, Status
-- ✅ Shows empty state if no staff members
-- ✅ Pagination works (if more than 10 staff)
-
-**API Call:**
-```http
-GET http://localhost:3001/staff?page=1&limit=10
-Authorization: Bearer <token>
-X-Tenant-Id: <tenantId>
-```
-
-**Expected Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "staff": [
-      {
-        "id": "uuid",
-        "employeeId": "EMP20240001",
-        "user": {
-          "firstName": "John",
-          "lastName": "Doe",
-          "email": "john.doe@hospital.com",
-          "role": "DOCTOR"
-        },
-        "isActive": true
-      }
-    ],
-    "pagination": {
-      "total": 1,
-      "page": 1,
-      "limit": 10,
-      "pages": 1
-    }
-  }
-}
-```
-
----
-
-### 3. Search Staff
-
-**Steps:**
-1. Navigate to `/dashboard/staff`
-2. Enter search query in search box: `John`
-3. Observe filtered results
-
-**Expected Results:**
-- ✅ List filters to show only matching staff
-- ✅ Searches by: firstName, lastName, email, employeeId
-- ✅ Case-insensitive search
-
-**API Call:**
-```http
-GET http://localhost:3001/staff?search=John
-Authorization: Bearer <token>
-X-Tenant-Id: <tenantId>
-```
-
----
-
-### 4. Filter by Role
-
-**Steps:**
-1. Navigate to `/dashboard/staff`
-2. Select "Doctor" from Role dropdown
-3. Observe filtered results
-
-**Expected Results:**
-- ✅ Shows only doctors
-- ✅ Other roles hidden
-
-**API Call:**
-```http
-GET http://localhost:3001/staff?role=DOCTOR
-Authorization: Bearer <token>
-X-Tenant-Id: <tenantId>
-```
-
----
-
-### 5. Filter by Status
-
-**Steps:**
-1. Navigate to `/dashboard/staff`
-2. Select "Active" from Status dropdown
-3. Observe filtered results
-
-**Expected Results:**
-- ✅ Shows only active staff
-- ✅ Inactive staff hidden
-
-**API Call:**
-```http
-GET http://localhost:3001/staff?status=active
-Authorization: Bearer <token>
-X-Tenant-Id: <tenantId>
-```
-
----
-
-### 6. Edit Staff Member
-
-**Steps:**
-1. Navigate to `/dashboard/staff`
-2. Click edit icon (green pencil) on a staff member
-3. Modify fields:
-   - First Name: `Jane`
-   - Designation: `Chief Cardiologist`
-4. Click "Update Staff"
-
-**Expected Results:**
-- ✅ Form pre-populates with existing data
-- ✅ Form validates required fields
-- ✅ Success notification appears
-- ✅ Modal closes automatically
+### Expected Result:
+- ✅ Success toast: "Staff member updated successfully"
+- ✅ Modal closes
 - ✅ Staff list refreshes with updated data
+- ✅ Changes visible immediately in the list
 
-**API Call:**
-```http
-PATCH http://localhost:3001/staff/{staffId}
-Authorization: Bearer <token>
-X-Tenant-Id: <tenantId>
-Content-Type: application/json
+### Possible Errors:
+- ❌ **404 Not Found**: Staff member doesn't exist
+- ❌ **400 Bad Request**: Validation failed (check name length)
 
+---
+
+## 🗑️ Test 3: Delete (Deactivate) Staff
+
+### Steps:
+1. On "Active Staff" tab, click **Delete icon** (red trash) on staff member
+2. Confirm deletion in the browser alert
+3. Wait for operation to complete
+
+### Expected Result:
+- ✅ Success toast: "Staff member deactivated successfully"
+- ✅ Staff disappears from "Active Staff" tab
+- ✅ Statistics update (Active Staff -1, Deactivated +1)
+- ✅ Switch to "Deactivated" tab - staff member appears there
+
+### Note:
+- Staff is **soft deleted** (isActive: false)
+- Data is NOT permanently removed
+- Can be reactivated via Edit form (toggle "Active Status")
+
+---
+
+## 🔄 Test 4: Tab Switching
+
+### Steps:
+1. Click **"Active Staff"** tab
+2. Note the staff list
+3. Click **"Deactivated"** tab
+4. Note the deactivated staff
+5. Switch back to **"Active Staff"** tab
+
+### Expected Result:
+- ✅ Active tab shows only `isActive: true` staff
+- ✅ Deactivated tab shows only `isActive: false` staff
+- ✅ Data refreshes on each tab switch
+- ✅ Count badges show correct numbers
+
+---
+
+## 🔍 Test 5: Search & Filters
+
+### Search Test:
+1. Enter a staff name in search box
+2. Press Enter or click **"Search"** button
+3. Verify filtered results
+
+### Role Filter Test:
+1. Select "Doctor" from Role dropdown
+2. Click **"Search"**
+3. Verify only doctors shown
+
+### Clear Filters:
+1. Click **"Clear"** button
+2. Verify all filters reset
+3. Verify all staff shown
+
+### Expected Result:
+- ✅ Search filters by name, email, employeeId
+- ✅ Role filter works correctly
+- ✅ Filters can be combined
+- ✅ Clear button resets everything
+
+---
+
+## 📊 Test 6: Statistics Display
+
+### Check Stats Cards:
+1. Note the 4 stat cards at top
+2. Add a new staff member
+3. Verify "Total Staff" increases
+4. Verify "Active Staff" increases
+5. Delete a staff member
+6. Verify "Active Staff" decreases
+7. Verify "Deactivated" increases
+
+### Expected Result:
+- ✅ Total Staff = active + inactive
+- ✅ Active Staff count matches tab badge
+- ✅ Deactivated count matches tab badge
+- ✅ Doctor count shows only doctors
+- ✅ Stats update after every mutation
+
+---
+
+## ❌ Test 7: Validation Errors
+
+### Test Invalid Email:
+```
+Email: notanemail
+Expected: "Please enter a valid email address"
+```
+
+### Test Short Password:
+```
+Password: abc123
+Expected: "Password must be at least 8 characters long"
+```
+
+### Test Missing Required Fields:
+```
+Leave firstName empty
+Expected: "Please fill in all required fields"
+```
+
+### Test Short Names:
+```
+First Name: J
+Expected: "First name must be at least 2 characters long"
+```
+
+---
+
+## 🔐 Test 8: RBAC (Role-Based Access Control)
+
+### Admin/HR Manager User:
+- ✅ Can see "Add Staff" button
+- ✅ Can edit staff
+- ✅ Can delete staff
+
+### Regular User (Doctor/Nurse):
+- ❌ Should NOT see "Add Staff" button
+- ❌ Should NOT see Edit/Delete icons
+- ✅ CAN view staff list
+
+### Test Method:
+1. Login as admin → Verify all buttons visible
+2. Login as doctor → Verify buttons hidden
+3. Try direct API call as doctor → Should get 403 Forbidden
+
+---
+
+## 🐛 Common Issues & Solutions
+
+### Issue: "No staff members found"
+**Solution:** 
+- Check if API is running
+- Check browser console for errors
+- Verify tenantId is set
+- Try adding a new staff member
+
+### Issue: "Failed to load staff list"
+**Solution:**
+- Check API URL in `.env.local`
+- Verify JWT token in localStorage
+- Check backend logs for errors
+- Verify tenant has staff members
+
+### Issue: 400 Bad Request on create
+**Solution:**
+- Check all required fields filled
+- Verify email format is correct
+- Ensure password is at least 8 characters
+- Check browser console for validation errors
+
+### Issue: 401 Unauthorized
+**Solution:**
+- Clear localStorage and login again
+- Check token expiry
+- Verify backend auth is working
+
+### Issue: 403 Forbidden
+**Solution:**
+- User doesn't have required role
+- Login with admin account
+- Check user role in database
+
+---
+
+## 📱 API Testing with Postman/cURL
+
+### Create Staff:
+```bash
+POST http://localhost:3001/staff
+Headers:
+  Authorization: Bearer YOUR_JWT_TOKEN
+  X-Tenant-Id: YOUR_TENANT_ID
+  Content-Type: application/json
+Body:
 {
   "firstName": "Jane",
-  "designation": "Chief Cardiologist"
+  "lastName": "Smith",
+  "email": "jane.smith@hospital.com",
+  "password": "SecurePass123!",
+  "role": "NURSE",
+  "designation": "Senior Nurse",
+  "specialization": "ICU Care"
 }
 ```
 
-**Expected Response:**
-```json
+### Get Staff List:
+```bash
+GET http://localhost:3001/staff?status=active&page=1&limit=10
+Headers:
+  Authorization: Bearer YOUR_JWT_TOKEN
+  X-Tenant-Id: YOUR_TENANT_ID
+```
+
+### Update Staff:
+```bash
+PATCH http://localhost:3001/staff/{STAFF_ID}
+Headers:
+  Authorization: Bearer YOUR_JWT_TOKEN
+  X-Tenant-Id: YOUR_TENANT_ID
+  Content-Type: application/json
+Body:
 {
-  "success": true,
-  "message": "Staff member updated successfully",
-  "data": {
-    "id": "uuid",
-    "employeeId": "EMP20240001",
-    "designation": "Chief Cardiologist",
-    "user": {
-      "firstName": "Jane",
-      "lastName": "Doe",
-      "email": "john.doe@hospital.com",
-      "role": "DOCTOR"
-    },
-    "isActive": true
-  }
+  "designation": "Chief Nurse",
+  "isActive": true
 }
 ```
 
----
-
-### 7. Delete Staff Member (Soft Delete)
-
-**Steps:**
-1. Navigate to `/dashboard/staff`
-2. Click three dots menu on a staff member
-3. Click "Delete"
-4. Confirm deletion in confirmation dialog
-
-**Expected Results:**
-- ✅ Confirmation dialog appears
-- ✅ Success notification appears
-- ✅ Staff member removed from active list
-- ✅ Staff appears when filtering by "Inactive" status
-- ✅ Stats update (active staff count decreases)
-
-**API Call:**
-```http
-DELETE http://localhost:3001/staff/{staffId}
-Authorization: Bearer <token>
-X-Tenant-Id: <tenantId>
+### Delete Staff:
+```bash
+DELETE http://localhost:3001/staff/{STAFF_ID}
+Headers:
+  Authorization: Bearer YOUR_JWT_TOKEN
+  X-Tenant-Id: YOUR_TENANT_ID
 ```
 
-**Expected Response:**
-```json
-{
-  "success": true,
-  "message": "Staff member deactivated successfully"
-}
-```
-
----
-
-### 8. View Staff Statistics
-
-**Steps:**
-1. Navigate to `/dashboard/staff`
-2. Observe statistics cards at the top
-
-**Expected Results:**
-- ✅ Total Staff count displayed
-- ✅ Active Staff count displayed
-- ✅ Doctors count displayed
-- ✅ Nurses count displayed
-- ✅ Stats update after CRUD operations
-
-**API Call:**
-```http
+### Get Statistics:
+```bash
 GET http://localhost:3001/staff/stats
-Authorization: Bearer <token>
-X-Tenant-Id: <tenantId>
-```
-
-**Expected Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "totalStaff": 10,
-    "activeStaff": 8,
-    "inactiveStaff": 2,
-    "byRole": {
-      "doctors": 5,
-      "nurses": 3,
-      "labTechnicians": 1,
-      "pharmacists": 1
-    }
-  }
-}
-```
-
----
-
-## 🔐 RBAC Testing
-
-### Test Create Permission
-
-**Allowed Roles:**
-- SUPER_ADMIN ✅
-- TENANT_ADMIN ✅
-- HOSPITAL_ADMIN ✅
-- HR_MANAGER ✅
-
-**Denied Roles:**
-- DOCTOR ❌
-- NURSE ❌
-- RECEPTIONIST ❌
-
-**Test:**
-1. Login as DOCTOR
-2. Try to create staff
-3. Should receive 403 Forbidden error
-
----
-
-### Test Update Permission
-
-**Allowed Roles:**
-- SUPER_ADMIN ✅
-- TENANT_ADMIN ✅
-- HOSPITAL_ADMIN ✅
-- HR_MANAGER ✅
-
-**Denied Roles:**
-- DOCTOR ❌
-- NURSE ❌
-- RECEPTIONIST ❌
-
----
-
-### Test Delete Permission
-
-**Allowed Roles:**
-- SUPER_ADMIN ✅
-- TENANT_ADMIN ✅
-- HOSPITAL_ADMIN ✅
-
-**Denied Roles:**
-- HR_MANAGER ❌
-- DOCTOR ❌
-- NURSE ❌
-
----
-
-## 🏢 Tenant Isolation Testing
-
-### Test 1: Cross-Tenant Access Prevention
-
-**Steps:**
-1. Login as User A (Tenant 1)
-2. Create a staff member
-3. Note the staff ID
-4. Login as User B (Tenant 2)
-5. Try to access staff member from Tenant 1 using API
-
-**Expected Result:**
-- ❌ Should receive 403 Forbidden or 404 Not Found
-- ✅ Cannot see staff from other tenants
-
-### Test 2: Tenant Header Validation
-
-**Steps:**
-1. Make API request without `X-Tenant-Id` header
-2. Make API request with wrong `X-Tenant-Id`
-
-**Expected Result:**
-- ✅ TenantGuard extracts tenant from JWT token
-- ✅ Request succeeds with correct tenant context
-- ❌ Cannot access data from other tenants
-
----
-
-## ⚠️ Error Scenarios
-
-### 1. Missing Required Fields
-
-**Test:**
-```json
-POST /staff
-{
-  "email": "test@example.com"
-  // Missing firstName, lastName, password, role
-}
-```
-
-**Expected:**
-```json
-{
-  "statusCode": 400,
-  "message": [
-    "firstName should not be empty",
-    "lastName should not be empty",
-    "password should not be empty",
-    "role must be a valid enum value"
-  ],
-  "error": "Bad Request"
-}
-```
-
----
-
-### 2. Invalid Email Format
-
-**Test:**
-```json
-POST /staff
-{
-  "email": "invalid-email",
-  "firstName": "John",
-  "lastName": "Doe",
-  "password": "Password123!",
-  "role": "DOCTOR"
-}
-```
-
-**Expected:**
-```json
-{
-  "statusCode": 400,
-  "message": ["email must be an email"],
-  "error": "Bad Request"
-}
-```
-
----
-
-### 3. Password Too Short
-
-**Test:**
-```json
-POST /staff
-{
-  "email": "test@example.com",
-  "firstName": "John",
-  "lastName": "Doe",
-  "password": "123",
-  "role": "DOCTOR"
-}
-```
-
-**Expected:**
-```json
-{
-  "statusCode": 400,
-  "message": ["password must be longer than or equal to 8 characters"],
-  "error": "Bad Request"
-}
-```
-
----
-
-### 4. Unauthorized Access
-
-**Test:**
-```http
-POST /staff
-(No Authorization header)
-```
-
-**Expected:**
-```json
-{
-  "statusCode": 401,
-  "message": "Unauthorized"
-}
-```
-
----
-
-### 5. Insufficient Permissions
-
-**Test:**
-```http
-POST /staff
-Authorization: Bearer <doctor-token>
-```
-
-**Expected:**
-```json
-{
-  "statusCode": 403,
-  "message": "Forbidden resource"
-}
+Headers:
+  Authorization: Bearer YOUR_JWT_TOKEN
+  X-Tenant-Id: YOUR_TENANT_ID
 ```
 
 ---
 
 ## ✅ Success Criteria
 
-All tests should pass:
-- ✅ Create staff works with valid data
-- ✅ List loads and displays correctly
-- ✅ Search and filters work
-- ✅ Edit updates data correctly
-- ✅ Delete soft-deletes (sets isActive=false)
-- ✅ RBAC enforced correctly
-- ✅ Tenant isolation working
-- ✅ Validation errors displayed properly
-- ✅ Success notifications shown
-- ✅ Data refreshes after operations
-- ✅ No mock data used
-- ✅ All API calls include tenant headers
+All tests pass if:
+- ✅ Can create staff with all required fields
+- ✅ Staff appears in Active list immediately
+- ✅ Can edit and see changes reflected
+- ✅ Can switch between Active/Deactivated tabs
+- ✅ Delete moves staff to Deactivated tab
+- ✅ Statistics update in real-time
+- ✅ Search and filters work correctly
+- ✅ Validation catches errors
+- ✅ RBAC enforces permissions
+- ✅ No console errors
+- ✅ All toasts appear correctly
 
 ---
 
-## 🐛 Common Issues & Solutions
+## 🎯 Quick Smoke Test (5 minutes)
 
-### Issue: "No staff members" shown but staff exists
-**Solution:** Check if `X-Tenant-Id` header is being sent correctly
+1. ✅ Load page - staff list appears
+2. ✅ Click "Add Staff" - modal opens
+3. ✅ Fill form and submit - success toast
+4. ✅ New staff appears in list
+5. ✅ Click Edit - form pre-fills
+6. ✅ Change designation - updates successfully
+7. ✅ Click Delete - staff moves to Deactivated
+8. ✅ Switch tabs - data loads correctly
+9. ✅ Search works - finds staff
+10. ✅ Stats match actual counts
 
-### Issue: 403 Forbidden when creating staff
-**Solution:** Verify user has correct role (SUPER_ADMIN, TENANT_ADMIN, HOSPITAL_ADMIN, or HR_MANAGER)
-
-### Issue: Form doesn't submit
-**Solution:** Check browser console for validation errors
-
-### Issue: Staff from other tenants visible
-**Solution:** Verify TenantGuard is applied to controller
-
-### Issue: Password validation fails
-**Solution:** Ensure password is at least 8 characters
+**If all 10 pass → Module is working correctly! 🎉**
 
 ---
 
-## 📊 Performance Benchmarks
+## 📞 Support
 
-- List load time: < 500ms
-- Create operation: < 1s
-- Update operation: < 1s
-- Delete operation: < 500ms
-- Search response: < 300ms
+If issues persist:
+1. Check `STAFF_MODULE_FIX_SUMMARY.md` for detailed info
+2. Review backend logs: `apps/api/logs/`
+3. Check browser console for frontend errors
+4. Verify database has proper schema
+5. Ensure all migrations are run
 
----
-
-## 🔍 Debugging Tips
-
-1. **Check Browser Console:** Look for API errors
-2. **Check Network Tab:** Verify requests include headers
-3. **Check Backend Logs:** Look for validation errors
-4. **Verify Token:** Ensure JWT token is valid and not expired
-5. **Check Tenant ID:** Verify tenantId in localStorage matches user's tenant
+**Happy Testing!** 🚀

@@ -5,6 +5,7 @@ import {
   Stack,
   SimpleGrid,
   TextInput,
+  Select,
   Button,
   Group,
   Switch,
@@ -29,6 +30,7 @@ const EditStaffForm: React.FC<EditStaffFormProps> = ({
   const [formData, setFormData] = useState<UpdateStaffDto>({
     firstName: '',
     lastName: '',
+    role: undefined,
     designation: '',
     specialization: '',
     licenseNumber: '',
@@ -44,6 +46,7 @@ const EditStaffForm: React.FC<EditStaffFormProps> = ({
       setFormData({
         firstName: initialData.user?.firstName || initialData.firstName || '',
         lastName: initialData.user?.lastName || initialData.lastName || '',
+        role: initialData.user?.role || initialData.role || undefined,
         designation: initialData.designation || '',
         specialization: initialData.user?.specialization || initialData.specialization || '',
         licenseNumber: initialData.user?.licenseNumber || initialData.licenseNumber || '',
@@ -132,61 +135,77 @@ const EditStaffForm: React.FC<EditStaffFormProps> = ({
           />
         </SimpleGrid>
 
-        {/* Professional Information */}
+        {/* Role and Designation */}
         <SimpleGrid cols={2}>
+          <Select
+            label="Role"
+            placeholder="Select role"
+            value={formData.role}
+            onChange={(value) => handleChange('role', value as any)}
+            data={[
+              { value: 'DOCTOR', label: 'Doctor' },
+              { value: 'NURSE', label: 'Nurse' },
+              { value: 'LAB_TECHNICIAN', label: 'Lab Technician' },
+              { value: 'PHARMACIST', label: 'Pharmacist' },
+              { value: 'RECEPTIONIST', label: 'Receptionist' },
+              { value: 'ADMIN', label: 'Admin' },
+            ]}
+          />
           <TextInput
             label="Designation"
             placeholder="e.g., Senior Doctor"
             value={formData.designation}
             onChange={(e) => handleChange('designation', e.target.value)}
           />
+        </SimpleGrid>
+
+        {/* Professional Information */}
+        <SimpleGrid cols={2}>
           <TextInput
             label="Specialization"
             placeholder="e.g., Cardiology"
             value={formData.specialization}
             onChange={(e) => handleChange('specialization', e.target.value)}
           />
-        </SimpleGrid>
-
-        {/* License and Qualification */}
-        <SimpleGrid cols={2}>
           <TextInput
             label="License Number"
             placeholder="Enter license number"
             value={formData.licenseNumber}
             onChange={(e) => handleChange('licenseNumber', e.target.value)}
           />
+        </SimpleGrid>
+
+        {/* Qualification and Experience */}
+        <SimpleGrid cols={2}>
           <TextInput
             label="Qualification"
             placeholder="e.g., MBBS, MD"
             value={formData.qualification}
             onChange={(e) => handleChange('qualification', e.target.value)}
           />
-        </SimpleGrid>
-
-        {/* Experience and Employee ID */}
-        <SimpleGrid cols={2}>
           <TextInput
             label="Experience"
             placeholder="e.g., 5 years in Cardiology"
             value={formData.experience}
             onChange={(e) => handleChange('experience', e.target.value)}
           />
+        </SimpleGrid>
+
+        {/* Employee ID and Joining Date */}
+        <SimpleGrid cols={2}>
           <TextInput
             label="Employee ID"
             placeholder="Employee ID"
             value={formData.employeeId}
             onChange={(e) => handleChange('employeeId', e.target.value)}
           />
+          <TextInput
+            label="Joining Date"
+            type="date"
+            value={formData.joiningDate}
+            onChange={(e) => handleChange('joiningDate', e.target.value)}
+          />
         </SimpleGrid>
-
-        {/* Joining Date */}
-        <TextInput
-          label="Joining Date"
-          type="date"
-          value={formData.joiningDate}
-          onChange={(e) => handleChange('joiningDate', e.target.value)}
-        />
 
         {/* Active Status */}
         <Switch

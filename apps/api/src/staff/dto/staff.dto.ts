@@ -160,6 +160,11 @@ export class UpdateStaffDto {
   @MaxLength(50)
   lastName?: string;
 
+  @ApiPropertyOptional({ enum: StaffRole, example: StaffRole.DOCTOR })
+  @IsOptional()
+  @IsEnum(StaffRole)
+  role?: StaffRole;
+
   @ApiPropertyOptional({ example: 'Cardiology' })
   @IsOptional()
   @IsString()

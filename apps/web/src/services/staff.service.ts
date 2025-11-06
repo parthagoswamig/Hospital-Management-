@@ -26,6 +26,7 @@ export interface CreateStaffDto {
 export interface UpdateStaffDto {
   firstName?: string;
   lastName?: string;
+  role?: 'DOCTOR' | 'NURSE' | 'LAB_TECHNICIAN' | 'PHARMACIST' | 'RECEPTIONIST' | 'ADMIN';
   designation?: string;
   specialization?: string;
   departmentId?: string;

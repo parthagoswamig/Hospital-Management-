@@ -148,20 +148,17 @@ export class StaffService {
       }
 
       // Update user details if provided
-      if (
-        updateStaffDto.firstName ||
-        updateStaffDto.lastName ||
-        updateStaffDto.specialization ||
-        updateStaffDto.licenseNumber
-      ) {
+      const userUpdateData: any = {};
+      if (updateStaffDto.firstName) userUpdateData.firstName = updateStaffDto.firstName;
+      if (updateStaffDto.lastName) userUpdateData.lastName = updateStaffDto.lastName;
+      if (updateStaffDto.specialization !== undefined) userUpdateData.specialization = updateStaffDto.specialization;
+      if (updateStaffDto.licenseNumber !== undefined) userUpdateData.licenseNumber = updateStaffDto.licenseNumber;
+      if (updateStaffDto.role) userUpdateData.role = updateStaffDto.role;
+
+      if (Object.keys(userUpdateData).length > 0) {
         await this.prisma.user.update({
           where: { id: staff.userId },
-          data: {
-            firstName: updateStaffDto.firstName,
-            lastName: updateStaffDto.lastName,
-            specialization: updateStaffDto.specialization,
-            licenseNumber: updateStaffDto.licenseNumber,
-          },
+          data: userUpdateData,
         });
       }
 
