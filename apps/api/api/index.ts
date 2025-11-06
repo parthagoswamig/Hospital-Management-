@@ -1,25 +1,23 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../src/app.module';
-import { ExpressAdapter } from '@nestjs/platform-express';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import express, { Request, Response } from 'express';
+import { Request, Response } from 'express';
+import { INestApplication } from '@nestjs/common';
 
-const expressApp = express();
 const logger = new Logger('ServerlessHandler');
 
-let app: any;
+let cachedServer: any;
 
 async function bootstrap() {
-  if (!app) {
+  if (!cachedServer) {
     logger.log('🚀 Initializing NestJS application for Vercel serverless...');
     
-    const adapter = new ExpressAdapter(expressApp);
-    app = await NestFactory.create(AppModule, adapter, {
+    const app = await NestFactory.create(AppModule, {
       logger: process.env.NODE_ENV === 'production' 
         ? ['error', 'warn', 'log'] 
         : ['error', 'warn', 'log', 'debug'],
-      cors: false, // We'll configure CORS manually
+      bodyParser: false, // Disable automatic body parser to avoid Express router check
     });
 
     // CORS Configuration with strict allow-list
@@ -98,24 +96,25 @@ async function bootstrap() {
       },
     });
 
-    // Initialize without Express middleware registration
+    // Get the Express instance and manually add body parsers
+    const expressInstance = app.getHttpAdapter().getInstance();
+    const express = require('express');
+    
+    // Manually add body parsers (since we disabled automatic registration)
+    expressInstance.use(express.json({ limit: '10mb' }));
+    expressInstance.use(express.urlencoded({ extended: true, limit: '10mb' }));
+    
+    // Now initialize the app (routes will be set up)
     await app.init();
+    
+    cachedServer = expressInstance;
     logger.log('✅ NestJS application initialized successfully');
   }
   
-  return expressApp;
+  return cachedServer;
 }
 
 export default async (req: Request, res: Response) => {
-  try {
-    await bootstrap();
-    expressApp(req, res);
-  } catch (error) {
-    logger.error('❌ Serverless function error:', error);
-    res.status(500).json({
-      error: 'Internal Server Error',
-      message: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString(),
-    });
-  }
+  const server = await bootstrap();
+  return server(req, res);
 };
