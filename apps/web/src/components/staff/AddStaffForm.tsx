@@ -192,6 +192,7 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ onSuccess, onCancel }) => {
         cleanedData.employeeId = formData.employeeId;
       }
 
+      // Fixed: Filter out empty strings for optional fields
       console.log('📤 Submitting staff data:', cleanedData);
 
       await staffService.createStaff(cleanedData);
