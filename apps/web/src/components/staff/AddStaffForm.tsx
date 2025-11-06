@@ -165,15 +165,32 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ onSuccess, onCancel }) => {
         role: formData.role,
       };
 
-      // Only include optional fields if they have values
-      if (formData.designation) cleanedData.designation = formData.designation;
-      if (formData.specialization) cleanedData.specialization = formData.specialization;
-      if (formData.departmentId) cleanedData.departmentId = formData.departmentId;
-      if (formData.licenseNumber) cleanedData.licenseNumber = formData.licenseNumber;
-      if (formData.qualification) cleanedData.qualification = formData.qualification;
-      if (formData.experience) cleanedData.experience = formData.experience;
-      if (formData.joiningDate) cleanedData.joiningDate = formData.joiningDate;
-      if (formData.employeeId) cleanedData.employeeId = formData.employeeId;
+      // Only include optional fields if they have values (not empty strings)
+      if (formData.designation && formData.designation.trim()) {
+        cleanedData.designation = formData.designation;
+      }
+      if (formData.specialization && formData.specialization.trim()) {
+        cleanedData.specialization = formData.specialization;
+      }
+      if (formData.departmentId && formData.departmentId.trim()) {
+        cleanedData.departmentId = formData.departmentId;
+      }
+      if (formData.licenseNumber && formData.licenseNumber.trim()) {
+        cleanedData.licenseNumber = formData.licenseNumber;
+      }
+      if (formData.qualification && formData.qualification.trim()) {
+        cleanedData.qualification = formData.qualification;
+      }
+      if (formData.experience && formData.experience.trim()) {
+        cleanedData.experience = formData.experience;
+      }
+      if (formData.joiningDate && formData.joiningDate.trim()) {
+        // Ensure ISO 8601 format (YYYY-MM-DD)
+        cleanedData.joiningDate = formData.joiningDate;
+      }
+      if (formData.employeeId && formData.employeeId.trim()) {
+        cleanedData.employeeId = formData.employeeId;
+      }
 
       console.log('📤 Submitting staff data:', cleanedData);
 
