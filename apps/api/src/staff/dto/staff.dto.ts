@@ -8,6 +8,7 @@ import {
   IsBoolean,
   MinLength,
   MaxLength,
+  ValidateIf,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
@@ -25,6 +26,7 @@ export enum StaffRole {
 export class CreateStaffDto {
   @ApiPropertyOptional({ example: 'user-uuid-123' })
   @IsOptional()
+  @ValidateIf((o) => o.userId !== '' && o.userId !== null)
   @IsUUID()
   userId?: string;
 
@@ -42,6 +44,7 @@ export class CreateStaffDto {
 
   @ApiPropertyOptional({ example: 'dept-uuid-123' })
   @IsOptional()
+  @ValidateIf((o) => o.departmentId !== '' && o.departmentId !== null)
   @IsUUID()
   departmentId?: string;
 
@@ -121,6 +124,7 @@ export class UpdateStaffDto {
 
   @ApiPropertyOptional({ example: 'dept-uuid-123' })
   @IsOptional()
+  @ValidateIf((o) => o.departmentId !== '' && o.departmentId !== null)
   @IsUUID()
   departmentId?: string;
 

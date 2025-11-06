@@ -29,12 +29,10 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ onSuccess, onCancel }) => {
     role: 'DOCTOR',
     designation: '',
     specialization: '',
-    departmentId: '',
     licenseNumber: '',
     qualification: '',
     experience: '',
     joiningDate: new Date().toISOString().split('T')[0],
-    employeeId: '',
   });
 
   const handleChange = (field: keyof CreateStaffDto, value: any) => {
@@ -77,7 +75,27 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ onSuccess, onCancel }) => {
 
     try {
       setLoading(true);
-      await staffService.createStaff(formData);
+      
+      // Clean up empty optional fields
+      const cleanedData: any = {
+        email: formData.email,
+        password: formData.password,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        role: formData.role,
+      };
+
+      // Only include optional fields if they have values
+      if (formData.designation) cleanedData.designation = formData.designation;
+      if (formData.specialization) cleanedData.specialization = formData.specialization;
+      if (formData.departmentId) cleanedData.departmentId = formData.departmentId;
+      if (formData.licenseNumber) cleanedData.licenseNumber = formData.licenseNumber;
+      if (formData.qualification) cleanedData.qualification = formData.qualification;
+      if (formData.experience) cleanedData.experience = formData.experience;
+      if (formData.joiningDate) cleanedData.joiningDate = formData.joiningDate;
+      if (formData.employeeId) cleanedData.employeeId = formData.employeeId;
+
+      await staffService.createStaff(cleanedData);
       
       notifications.show({
         title: 'Success',
