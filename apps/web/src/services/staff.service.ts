@@ -9,10 +9,10 @@ import { enhancedApiClient } from '../lib/api-client';
 export interface CreateStaffDto {
   userId?: string;
   email: string;
-  password?: string;
+  password: string;
   firstName: string;
   lastName: string;
-  role: 'DOCTOR' | 'NURSE' | 'LAB_TECHNICIAN' | 'PHARMACIST' | 'RECEPTIONIST' | 'ADMIN';
+  role: 'DOCTOR' | 'NURSE' | 'LAB_TECHNICIAN' | 'PHARMACIST' | 'RECEPTIONIST' | 'ADMIN' | 'ACCOUNTANT' | 'RADIOLOGIST' | 'TECHNICIAN' | 'HR_MANAGER';
   designation?: string;
   specialization?: string;
   departmentId?: string;
@@ -21,12 +21,13 @@ export interface CreateStaffDto {
   experience?: string;
   joiningDate?: string;
   employeeId?: string;
+  phone?: string;
 }
 
 export interface UpdateStaffDto {
   firstName?: string;
   lastName?: string;
-  role?: 'DOCTOR' | 'NURSE' | 'LAB_TECHNICIAN' | 'PHARMACIST' | 'RECEPTIONIST' | 'ADMIN';
+  role?: 'DOCTOR' | 'NURSE' | 'LAB_TECHNICIAN' | 'PHARMACIST' | 'RECEPTIONIST' | 'ADMIN' | 'ACCOUNTANT' | 'RADIOLOGIST' | 'TECHNICIAN' | 'HR_MANAGER';
   designation?: string;
   specialization?: string;
   departmentId?: string;

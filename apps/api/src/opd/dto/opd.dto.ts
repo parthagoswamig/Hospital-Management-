@@ -5,26 +5,30 @@ import {
   IsEnum,
   IsDateString,
   IsUUID,
+  IsNumber,
+  IsInt,
+  Min,
+  Max,
+  ValidateNested,
+  IsArray,
 } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
 /**
  * Enum for OPD visit status
  */
-export enum OpdVisitStatus {
-  WAITING = 'WAITING',
-  ARRIVED = 'ARRIVED',
-  IN_CONSULTATION = 'IN_CONSULTATION',
+export enum OPDVisitStatus {
+  PENDING = 'PENDING',
+  IN_PROGRESS = 'IN_PROGRESS',
   COMPLETED = 'COMPLETED',
   CANCELLED = 'CANCELLED',
-  NO_SHOW = 'NO_SHOW',
 }
 
 /**
  * DTO for creating OPD visits
  */
-export class CreateOpdVisitDto {
+export class CreateOPDVisitDto {
   @ApiProperty({
     example: 'patient-uuid-123',
     description: 'ID of the patient visiting OPD',
@@ -34,39 +38,39 @@ export class CreateOpdVisitDto {
   @IsUUID()
   patientId: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'doctor-uuid-123',
-    description: 'ID of the doctor for the consultation',
+    description: 'ID of the doctor (auto-assigned if not provided)',
   })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
   @IsUUID()
-  doctorId: string;
+  doctorId?: string;
 
   @ApiPropertyOptional({
     example: 'department-uuid-123',
-    description: 'ID of the department (optional)',
+    description: 'ID of the department',
   })
   @IsOptional()
   @IsString()
   @IsUUID()
   departmentId?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
+    example: '2024-01-15T10:00:00.000Z',
+    description: 'Visit date and time',
+  })
+  @IsOptional()
+  @IsDateString()
+  visitDate?: string;
+
+  @ApiPropertyOptional({
     example: 'Severe headache for past 3 days',
     description: 'Chief complaint of the patient',
   })
-  @IsString()
-  @IsNotEmpty()
-  chiefComplaint: string;
-
-  @ApiPropertyOptional({
-    example: 'Nausea, dizziness, blurred vision',
-    description: 'Additional symptoms reported by patient',
-  })
   @IsOptional()
   @IsString()
-  symptoms?: string;
+  complaint?: string;
 
   @ApiPropertyOptional({
     example: 'Migraine - suspected tension headache',
@@ -77,15 +81,15 @@ export class CreateOpdVisitDto {
   diagnosis?: string;
 
   @ApiPropertyOptional({
-    example: 'Prescribed pain medication and rest',
-    description: 'Treatment provided or recommended',
+    example: 'Prescribed pain medication and rest for 3 days',
+    description: 'Treatment plan',
   })
   @IsOptional()
   @IsString()
-  treatment?: string;
+  treatmentPlan?: string;
 
   @ApiPropertyOptional({
-    example: 'Patient advised to monitor symptoms',
+    example: 'Patient advised to monitor symptoms and return if worsens',
     description: 'Additional notes about the visit',
   })
   @IsOptional()
@@ -93,108 +97,177 @@ export class CreateOpdVisitDto {
   notes?: string;
 
   @ApiPropertyOptional({
-    example: '2024-12-17T10:00:00.000Z',
-    description: 'Follow-up appointment date if required',
-  })
-  @IsOptional()
-  @IsDateString()
-  followUpDate?: string;
-
-  @ApiPropertyOptional({
-    enum: OpdVisitStatus,
-    example: OpdVisitStatus.WAITING,
-    default: OpdVisitStatus.WAITING,
+    enum: OPDVisitStatus,
+    example: OPDVisitStatus.PENDING,
+    default: OPDVisitStatus.PENDING,
     description: 'Current status of the visit',
   })
   @IsOptional()
-  @IsEnum(OpdVisitStatus)
-  status?: OpdVisitStatus;
+  @IsEnum(OPDVisitStatus)
+  status?: OPDVisitStatus;
 }
 
 /**
  * DTO for updating OPD visits
  */
-export class UpdateOpdVisitDto {
-  @ApiPropertyOptional({
-    example: 'doctor-uuid-456',
-    description: 'Updated doctor ID for the consultation',
+export class UpdateOPDVisitDto extends PartialType(CreateOPDVisitDto) {}
+
+/**
+ * DTO for creating OPD vitals
+ */
+export class CreateOPDVitalsDto {
+  @ApiProperty({
+    example: 'visit-uuid-123',
+    description: 'ID of the OPD visit',
   })
-  @IsOptional()
   @IsString()
+  @IsNotEmpty()
   @IsUUID()
-  doctorId?: string;
+  visitId: string;
 
   @ApiPropertyOptional({
-    example: 'department-uuid-456',
-    description: 'Updated department ID',
+    example: 175.5,
+    description: 'Height in cm',
+  })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(300)
+  height?: number;
+
+  @ApiPropertyOptional({
+    example: 70.5,
+    description: 'Weight in kg',
+  })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(500)
+  weight?: number;
+
+  @ApiPropertyOptional({
+    example: '120/80',
+    description: 'Blood pressure',
   })
   @IsOptional()
   @IsString()
-  @IsUUID()
-  departmentId?: string;
+  bp?: string;
 
   @ApiPropertyOptional({
-    example: 'Persistent headache with light sensitivity',
-    description: 'Updated chief complaint',
+    example: 72,
+    description: 'Pulse rate (bpm)',
   })
   @IsOptional()
-  @IsString()
-  chiefComplaint?: string;
+  @IsInt()
+  @Min(0)
+  @Max(300)
+  pulse?: number;
 
   @ApiPropertyOptional({
-    example: 'Added photophobia and phonophobia',
-    description: 'Updated symptoms',
+    example: 98.6,
+    description: 'Temperature in Fahrenheit',
   })
   @IsOptional()
-  @IsString()
-  symptoms?: string;
+  @IsNumber()
+  @Min(90)
+  @Max(110)
+  temperature?: number;
 
   @ApiPropertyOptional({
-    example: 'Confirmed migraine diagnosis',
-    description: 'Updated diagnosis',
+    example: 16,
+    description: 'Respiration rate (breaths per minute)',
   })
   @IsOptional()
-  @IsString()
-  diagnosis?: string;
+  @IsInt()
+  @Min(0)
+  @Max(100)
+  respirationRate?: number;
 
   @ApiPropertyOptional({
-    example: 'Increased medication dosage',
-    description: 'Updated treatment plan',
+    example: 98,
+    description: 'Oxygen saturation (%)',
   })
   @IsOptional()
-  @IsString()
-  treatment?: string;
+  @IsInt()
+  @Min(0)
+  @Max(100)
+  spo2?: number;
 
   @ApiPropertyOptional({
-    example: 'Patient responding well to treatment',
-    description: 'Updated visit notes',
+    example: 'Patient appears stable',
+    description: 'Additional notes about vitals',
   })
   @IsOptional()
   @IsString()
   notes?: string;
 
   @ApiPropertyOptional({
-    example: '2024-12-20T14:00:00.000Z',
-    description: 'Updated follow-up date',
+    example: 'nurse-uuid-123',
+    description: 'ID of the person who recorded vitals',
   })
   @IsOptional()
-  @IsDateString()
-  followUpDate?: string;
+  @IsString()
+  recordedBy?: string;
+}
+
+/**
+ * DTO for creating OPD prescription
+ */
+export class CreateOPDPrescriptionDto {
+  @ApiProperty({
+    example: 'visit-uuid-123',
+    description: 'ID of the OPD visit',
+  })
+  @IsString()
+  @IsNotEmpty()
+  @IsUUID()
+  visitId: string;
+
+  @ApiProperty({
+    example: 'Paracetamol 500mg',
+    description: 'Name of the medication',
+  })
+  @IsString()
+  @IsNotEmpty()
+  medicationName: string;
+
+  @ApiProperty({
+    example: '500mg',
+    description: 'Dosage of the medication',
+  })
+  @IsString()
+  @IsNotEmpty()
+  dosage: string;
+
+  @ApiProperty({
+    example: 'Twice daily',
+    description: 'Frequency of medication',
+  })
+  @IsString()
+  @IsNotEmpty()
+  frequency: string;
+
+  @ApiProperty({
+    example: '5 days',
+    description: 'Duration of medication',
+  })
+  @IsString()
+  @IsNotEmpty()
+  duration: string;
 
   @ApiPropertyOptional({
-    enum: OpdVisitStatus,
-    example: OpdVisitStatus.IN_CONSULTATION,
-    description: 'Updated visit status',
+    example: 'Take after meals',
+    description: 'Additional instructions',
   })
   @IsOptional()
-  @IsEnum(OpdVisitStatus)
-  status?: OpdVisitStatus;
+  @IsString()
+  notes?: string;
 }
 
 /**
  * DTO for filtering OPD visits
  */
-export class OpdVisitFilterDto {
+export class OPDVisitQueryDto {
   @ApiPropertyOptional({
     example: 1,
     minimum: 1,
@@ -217,13 +290,13 @@ export class OpdVisitFilterDto {
   limit?: number = 10;
 
   @ApiPropertyOptional({
-    enum: OpdVisitStatus,
-    example: OpdVisitStatus.WAITING,
+    enum: OPDVisitStatus,
+    example: OPDVisitStatus.PENDING,
     description: 'Filter by visit status',
   })
   @IsOptional()
-  @IsEnum(OpdVisitStatus)
-  status?: OpdVisitStatus;
+  @IsEnum(OPDVisitStatus)
+  status?: OPDVisitStatus;
 
   @ApiPropertyOptional({
     example: 'doctor-uuid-123',
@@ -244,7 +317,7 @@ export class OpdVisitFilterDto {
   departmentId?: string;
 
   @ApiPropertyOptional({
-    example: '2024-12-10',
+    example: '2024-01-15',
     description: 'Filter by specific date (YYYY-MM-DD format)',
   })
   @IsOptional()
@@ -262,32 +335,9 @@ export class OpdVisitFilterDto {
 
   @ApiPropertyOptional({
     example: 'headache',
-    description: 'Search in chief complaint, symptoms, or diagnosis',
+    description: 'Search in complaint or diagnosis',
   })
   @IsOptional()
   @IsString()
   search?: string;
-}
-
-/**
- * DTO for queue filters
- */
-export class OpdQueueFilterDto {
-  @ApiPropertyOptional({
-    example: 'doctor-uuid-123',
-    description: 'Filter queue by specific doctor',
-  })
-  @IsOptional()
-  @IsString()
-  @IsUUID()
-  doctorId?: string;
-
-  @ApiPropertyOptional({
-    example: 'department-uuid-123',
-    description: 'Filter queue by specific department',
-  })
-  @IsOptional()
-  @IsString()
-  @IsUUID()
-  departmentId?: string;
 }

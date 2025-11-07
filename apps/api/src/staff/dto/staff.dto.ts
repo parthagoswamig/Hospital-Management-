@@ -21,6 +21,9 @@ export enum StaffRole {
   PHARMACIST = 'PHARMACIST',
   RECEPTIONIST = 'RECEPTIONIST',
   ACCOUNTANT = 'ACCOUNTANT',
+  ADMIN = 'ADMIN',
+  TECHNICIAN = 'TECHNICIAN',
+  HR_MANAGER = 'HR_MANAGER',
 }
 
 export class CreateStaffDto {

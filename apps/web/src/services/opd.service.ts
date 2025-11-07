@@ -2,39 +2,62 @@ import { enhancedApiClient } from '../lib/api-client';
 
 /**
  * OPD (Out-Patient Department) API Service
- * Handles all OPD operations including visit management and queue tracking
+ * Handles all OPD operations including visit management, vitals, and prescriptions
  */
 
-// Types matching backend DTOs
-export interface CreateOpdVisitDto {
-  patientId: string;
-  doctorId: string;
-  departmentId?: string;
-  chiefComplaint: string;
-  symptoms?: string;
-  diagnosis?: string;
-  treatment?: string;
-  notes?: string;
-  followUpDate?: string;
-  status?: 'WAITING' | 'ARRIVED' | 'IN_CONSULTATION' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW';
-}
+// ==================== Types ====================
 
-export interface UpdateOpdVisitDto {
+export type OPDVisitStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+
+export interface CreateOPDVisitDto {
+  patientId: string;
   doctorId?: string;
   departmentId?: string;
-  chiefComplaint?: string;
-  symptoms?: string;
+  visitDate?: string;
+  complaint?: string;
   diagnosis?: string;
-  treatment?: string;
+  treatmentPlan?: string;
   notes?: string;
-  followUpDate?: string;
-  status?: 'WAITING' | 'ARRIVED' | 'IN_CONSULTATION' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW';
+  status?: OPDVisitStatus;
 }
 
-export interface OpdVisitFilters {
+export interface UpdateOPDVisitDto {
+  doctorId?: string;
+  departmentId?: string;
+  visitDate?: string;
+  complaint?: string;
+  diagnosis?: string;
+  treatmentPlan?: string;
+  notes?: string;
+  status?: OPDVisitStatus;
+}
+
+export interface CreateOPDVitalsDto {
+  visitId: string;
+  height?: number;
+  weight?: number;
+  bp?: string;
+  pulse?: number;
+  temperature?: number;
+  respirationRate?: number;
+  spo2?: number;
+  notes?: string;
+  recordedBy?: string;
+}
+
+export interface CreateOPDPrescriptionDto {
+  visitId: string;
+  medicationName: string;
+  dosage: string;
+  frequency: string;
+  duration: string;
+  notes?: string;
+}
+
+export interface OPDVisitQueryDto {
   page?: number;
   limit?: number;
-  status?: string;
+  status?: OPDVisitStatus;
   doctorId?: string;
   departmentId?: string;
   patientId?: string;
@@ -42,57 +65,95 @@ export interface OpdVisitFilters {
   search?: string;
 }
 
-export interface OpdQueueFilters {
-  doctorId?: string;
-  departmentId?: string;
-  status?: string;
+export interface Patient {
+  id: string;
+  firstName: string;
+  lastName: string;
+  medicalRecordNumber: string;
+  phone?: string;
+  email?: string;
+  dateOfBirth?: string;
+  gender?: string;
+  bloodType?: string;
+  allergies?: any;
+  chronicConditions?: any;
+  address?: string;
 }
 
-export interface OpdVisitResponse {
+export interface Doctor {
+  id: string;
+  firstName: string;
+  lastName: string;
+  specialization?: string;
+  licenseNumber?: string;
+  signature?: string;
+}
+
+export interface Department {
+  id: string;
+  name: string;
+  code?: string;
+}
+
+export interface OPDVitals {
+  id: string;
+  visitId: string;
+  height?: number;
+  weight?: number;
+  bp?: string;
+  pulse?: number;
+  temperature?: number;
+  respirationRate?: number;
+  spo2?: number;
+  notes?: string;
+  recordedBy?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OPDPrescription {
+  id: string;
+  visitId: string;
+  medicationName: string;
+  dosage: string;
+  frequency: string;
+  duration: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OPDVisit {
+  id: string;
+  patientId: string;
+  doctorId: string;
+  departmentId?: string;
+  visitDate: string;
+  complaint?: string;
+  diagnosis?: string;
+  treatmentPlan?: string;
+  notes?: string;
+  status: OPDVisitStatus;
+  tenantId: string;
+  createdAt: string;
+  updatedAt: string;
+  patient?: Patient;
+  doctor?: Doctor;
+  department?: Department;
+  vitals?: OPDVitals[];
+  prescriptions?: OPDPrescription[];
+}
+
+export interface OPDVisitResponse {
   success: boolean;
   message?: string;
-  data: {
-    id: string;
-    patientId: string;
-    doctorId: string;
-    departmentId?: string;
-    visitDate: string;
-    reason: string;
-    chiefComplaint?: string;
-    status: 'WAITING' | 'IN_CONSULTATION' | 'COMPLETED' | 'CANCELLED';
-    diagnosis?: string;
-    prescription?: string;
-    vitalSigns?: any;
-    followUpDate?: string;
-    notes?: string;
-    queueNumber?: number;
-    patient?: {
-      id: string;
-      firstName: string;
-      lastName: string;
-      phone?: string;
-      email?: string;
-      medicalRecordNumber?: string;
-    };
-    doctor?: {
-      id: string;
-      firstName: string;
-      lastName: string;
-      specialization?: string;
-    };
-    department?: {
-      id: string;
-      name: string;
-    };
-    createdAt: string;
-    updatedAt: string;
-  };
+  data: OPDVisit;
 }
 
-export interface OpdVisitsListResponse {
+export interface OPDVisitsListResponse {
   success: boolean;
   data: {
-    items: OpdVisitResponse['data'][];
+    visits: OPDVisit[];
     pagination: {
       total: number;
       page: number;
@@ -102,21 +163,19 @@ export interface OpdVisitsListResponse {
   };
 }
 
-export interface OpdQueueResponse {
+export interface OPDVitalsResponse {
   success: boolean;
-  data: OpdVisitResponse['data'][];
+  message?: string;
+  data: OPDVitals;
 }
 
-export interface OpdStatsResponse {
+export interface OPDPrescriptionResponse {
   success: boolean;
-  data: {
-    totalVisitsToday: number;
-    waiting: number;
-    inConsultation: number;
-    completed: number;
-    cancelled: number;
-  };
+  message?: string;
+  data: OPDPrescription;
 }
+
+// ==================== Service ====================
 
 const opdService = {
   // ==================== OPD VISIT OPERATIONS ====================
@@ -124,54 +183,63 @@ const opdService = {
   /**
    * Create new OPD visit
    */
-  createVisit: async (data: CreateOpdVisitDto): Promise<OpdVisitResponse> => {
+  createVisit: async (data: CreateOPDVisitDto): Promise<OPDVisitResponse> => {
     return enhancedApiClient.post('/opd/visits', data);
   },
 
   /**
    * Get all OPD visits with filters
    */
-  getVisits: async (filters?: OpdVisitFilters): Promise<OpdVisitsListResponse> => {
-    return enhancedApiClient.get('/opd/visits', filters);
+  getVisits: async (query?: OPDVisitQueryDto): Promise<OPDVisitsListResponse> => {
+    return enhancedApiClient.get('/opd/visits', query);
   },
 
   /**
    * Get OPD visit by ID
    */
-  getVisitById: async (id: string): Promise<OpdVisitResponse> => {
+  getVisitById: async (id: string): Promise<OPDVisitResponse> => {
     return enhancedApiClient.get(`/opd/visits/${id}`);
   },
 
   /**
    * Update OPD visit
    */
-  updateVisit: async (id: string, data: UpdateOpdVisitDto): Promise<OpdVisitResponse> => {
+  updateVisit: async (id: string, data: UpdateOPDVisitDto): Promise<OPDVisitResponse> => {
     return enhancedApiClient.patch(`/opd/visits/${id}`, data);
   },
 
   /**
-   * Cancel OPD visit
+   * Delete OPD visit (soft delete)
    */
-  cancelVisit: async (id: string): Promise<OpdVisitResponse> => {
+  deleteVisit: async (id: string): Promise<{ success: boolean; message: string }> => {
     return enhancedApiClient.delete(`/opd/visits/${id}`);
   },
 
-  // ==================== OPD QUEUE ====================
+  // ==================== OPD VITALS OPERATIONS ====================
 
   /**
-   * Get OPD queue
+   * Add vitals to an OPD visit
    */
-  getQueue: async (filters?: OpdQueueFilters): Promise<OpdQueueResponse> => {
-    return enhancedApiClient.get('/opd/queue', filters);
+  addVitals: async (data: CreateOPDVitalsDto): Promise<OPDVitalsResponse> => {
+    return enhancedApiClient.post('/opd/vitals', data);
   },
 
-  // ==================== STATISTICS ====================
+  // ==================== OPD PRESCRIPTION OPERATIONS ====================
 
   /**
-   * Get OPD statistics
+   * Add prescription to an OPD visit
    */
-  getStats: async (): Promise<OpdStatsResponse> => {
-    return enhancedApiClient.get('/opd/stats');
+  addPrescription: async (data: CreateOPDPrescriptionDto): Promise<OPDPrescriptionResponse> => {
+    return enhancedApiClient.post('/opd/prescriptions', data);
+  },
+
+  // ==================== SUMMARY OPERATIONS ====================
+
+  /**
+   * Get complete visit summary
+   */
+  getVisitSummary: async (visitId: string): Promise<OPDVisitResponse> => {
+    return enhancedApiClient.get(`/opd/summary/${visitId}`);
   },
 };
 

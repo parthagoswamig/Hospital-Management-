@@ -285,11 +285,16 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ onSuccess, onCancel }) => {
               { value: 'DOCTOR', label: 'Doctor' },
               { value: 'NURSE', label: 'Nurse' },
               { value: 'LAB_TECHNICIAN', label: 'Lab Technician' },
+              { value: 'RADIOLOGIST', label: 'Radiologist' },
               { value: 'PHARMACIST', label: 'Pharmacist' },
               { value: 'RECEPTIONIST', label: 'Receptionist' },
+              { value: 'ACCOUNTANT', label: 'Accountant' },
               { value: 'ADMIN', label: 'Admin' },
+              { value: 'TECHNICIAN', label: 'Technician' },
+              { value: 'HR_MANAGER', label: 'HR Manager' },
             ]}
             required
+            searchable
           />
           <TextInput
             label="Designation"

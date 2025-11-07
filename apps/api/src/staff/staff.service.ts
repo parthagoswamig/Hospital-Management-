@@ -20,6 +20,18 @@ export class StaffService {
 
       // If userId not provided, create a new user
       if (!userId && createStaffDto.email && createStaffDto.password) {
+        // Check if email already exists
+        const existingUser = await this.prisma.user.findFirst({
+          where: {
+            email: createStaffDto.email,
+            tenantId,
+          },
+        });
+
+        if (existingUser) {
+          throw new BadRequestException('Email already exists for this tenant');
+        }
+
         const hashedPassword = await bcrypt.hash(createStaffDto.password, 10);
 
         const user = await this.prisma.user.create({
@@ -28,7 +40,7 @@ export class StaffService {
             passwordHash: hashedPassword,
             firstName: createStaffDto.firstName || '',
             lastName: createStaffDto.lastName || '',
-            role: createStaffDto.role || 'DOCTOR',
+            role: (createStaffDto.role as any) || 'DOCTOR',
             specialization: createStaffDto.specialization,
             licenseNumber: createStaffDto.licenseNumber,
             tenantId,
@@ -39,6 +51,18 @@ export class StaffService {
 
       if (!userId) {
         throw new BadRequestException('User ID or user details are required');
+      }
+
+      // Check if staff already exists for this user
+      const existingStaff = await this.prisma.staff.findFirst({
+        where: {
+          userId,
+          tenantId,
+        },
+      });
+
+      if (existingStaff) {
+        throw new BadRequestException('Staff record already exists for this user');
       }
 
       // Generate employee ID if not provided
@@ -86,7 +110,10 @@ export class StaffService {
       };
     } catch (error) {
       this.logger.error(`Error creating staff: ${error.message}`, error.stack);
-      throw new BadRequestException('Failed to create staff member');
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException(error.message || 'Failed to create staff member');
     }
   }
 

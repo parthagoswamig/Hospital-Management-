@@ -169,10 +169,20 @@ const StaffManagement = () => {
         return 'green';
       case 'LAB_TECHNICIAN':
         return 'purple';
+      case 'RADIOLOGIST':
+        return 'indigo';
       case 'PHARMACIST':
         return 'cyan';
       case 'RECEPTIONIST':
         return 'orange';
+      case 'ACCOUNTANT':
+        return 'teal';
+      case 'ADMIN':
+        return 'red';
+      case 'TECHNICIAN':
+        return 'violet';
+      case 'HR_MANAGER':
+        return 'pink';
       default:
         return 'gray';
     }
@@ -273,12 +283,18 @@ const StaffManagement = () => {
                 { value: 'DOCTOR', label: 'Doctor' },
                 { value: 'NURSE', label: 'Nurse' },
                 { value: 'LAB_TECHNICIAN', label: 'Lab Technician' },
+                { value: 'RADIOLOGIST', label: 'Radiologist' },
                 { value: 'PHARMACIST', label: 'Pharmacist' },
                 { value: 'RECEPTIONIST', label: 'Receptionist' },
+                { value: 'ACCOUNTANT', label: 'Accountant' },
+                { value: 'ADMIN', label: 'Admin' },
+                { value: 'TECHNICIAN', label: 'Technician' },
+                { value: 'HR_MANAGER', label: 'HR Manager' },
               ]}
               value={selectedRole}
               onChange={(value) => setSelectedRole(value || '')}
               clearable
+              searchable
               style={{ minWidth: 200 }}
             />
             <Button variant="light" onClick={handleSearch}>

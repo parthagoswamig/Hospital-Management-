@@ -1,232 +1,162 @@
-import { enhancedApiClient } from '../lib/api-client';
+import apiClient from './api-client';
 
-/**
- * IPD (In-Patient Department) API Service
- * Handles all IPD operations including ward and bed management
- */
-
-// Types
-export interface CreateWardDto {
-  name: string;
-  description?: string;
-  capacity: number;
-  location?: string;
-  floor?: string;
+export enum IPDAdmissionStatus {
+  ADMITTED = 'ADMITTED',
+  DISCHARGED = 'DISCHARGED',
 }
 
-export interface UpdateWardDto {
-  name?: string;
-  description?: string;
-  capacity?: number;
-  location?: string;
-  floor?: string;
-}
+// ============= TYPE DEFINITIONS =============
 
-export interface CreateBedDto {
-  wardId: string;
-  bedNumber: string;
-  description?: string;
-  status?: 'AVAILABLE' | 'OCCUPIED' | 'MAINTENANCE' | 'RESERVED';
-}
-
-export interface UpdateBedStatusDto {
-  status: 'AVAILABLE' | 'OCCUPIED' | 'MAINTENANCE' | 'RESERVED';
-  notes?: string;
-}
-
-export interface WardFilters {
-  page?: number;
-  limit?: number;
-  type?: string;
-  search?: string;
-  isActive?: boolean;
-}
-
-export interface BedFilters {
-  page?: number;
-  limit?: number;
+export interface IPDAdmission {
+  id: string;
+  patientId: string;
+  admissionDate: string;
+  departmentId?: string;
   wardId?: string;
-  status?: string;
-  search?: string;
-  isActive?: boolean;
-}
-
-export interface WardResponse {
-  success: boolean;
-  message?: string;
-  data: {
+  bedId?: string;
+  doctorId: string;
+  diagnosis?: string;
+  admissionReason?: string;
+  status: IPDAdmissionStatus;
+  notes?: string;
+  dischargeDate?: string;
+  tenantId: string;
+  createdAt: string;
+  updatedAt: string;
+  patient?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    medicalRecordNumber: string;
+    phone?: string;
+    email?: string;
+    gender?: string;
+    bloodType?: string;
+    dateOfBirth?: string;
+    address?: string;
+  };
+  doctor?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    specialization?: string;
+    licenseNumber?: string;
+  };
+  department?: {
     id: string;
     name: string;
-    description?: string;
-    capacity: number;
-    location?: string;
-    floor?: string;
-    isActive: boolean;
-    tenantId: string;
-    beds?: BedResponse['data'][];
-    _count?: {
-      beds: number;
-    };
-    createdAt: string;
-    updatedAt: string;
   };
-}
-
-export interface WardsListResponse {
-  success: boolean;
-  data: {
-    items: WardResponse['data'][];
-    pagination: {
-      total: number;
-      page: number;
-      limit: number;
-      pages: number;
-    };
-  };
-}
-
-export interface BedResponse {
-  success: boolean;
-  message?: string;
-  data: {
+  ward?: {
     id: string;
-    wardId: string;
+    name: string;
+  };
+  bed?: {
+    id: string;
     bedNumber: string;
-    description?: string;
-    status: 'AVAILABLE' | 'OCCUPIED' | 'MAINTENANCE' | 'RESERVED';
-    isActive: boolean;
-    tenantId: string;
-    ward?: {
-      id: string;
-      name: string;
-      type?: string;
-      location?: string;
-    };
-    createdAt: string;
-    updatedAt: string;
   };
+  treatments?: IPDTreatment[];
+  dischargeSummary?: IPDDischargeSummary;
 }
 
-export interface BedsListResponse {
-  success: boolean;
-  data: {
-    items: BedResponse['data'][];
-    pagination: {
-      total: number;
-      page: number;
-      limit: number;
-      pages: number;
-    };
-  };
-}
-
-export interface AvailableBedsResponse {
-  success: boolean;
-  data: BedResponse['data'][];
-}
-
-export interface IpdStatsResponse {
-  success: boolean;
-  data: {
-    wards: {
-      total: number;
-    };
-    beds: {
-      total: number;
-      available: number;
-      occupied: number;
-      maintenance: number;
-      reserved: number;
-    };
-    occupancyRate: number;
-  };
-}
-
-// ==================== ADMISSION TYPES ====================
-
-export interface CreateAdmissionDto {
-  patientId: string;
-  bedId: string;
+export interface IPDTreatment {
+  id: string;
+  admissionId: string;
+  treatmentDate: string;
   doctorId: string;
-  reason: string;
-  diagnosis?: string;
   notes?: string;
-  expectedDischargeDate?: string;
+  treatmentPlan?: string;
+  tenantId: string;
+  createdAt: string;
+  updatedAt: string;
+  doctor?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    specialization?: string;
+  };
 }
 
-export interface UpdateAdmissionDto {
+export interface IPDDischargeSummary {
+  id: string;
+  admissionId: string;
+  dischargeDate: string;
+  finalDiagnosis?: string;
+  treatmentGiven?: string;
+  conditionAtDischarge?: string;
+  followUpAdvice?: string;
+  createdBy: string;
+  tenantId: string;
+  createdAt: string;
+  updatedAt: string;
+  creator?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  };
+}
+
+// ============= DTO TYPES =============
+
+export interface CreateIPDAdmissionDto {
+  patientId: string;
+  admissionDate?: string;
+  departmentId?: string;
+  wardId?: string;
+  bedId?: string;
   doctorId?: string;
   diagnosis?: string;
-  notes?: string;
-  expectedDischargeDate?: string;
-}
-
-export interface DischargePatientDto {
-  dischargeSummary: string;
-  dischargeInstructions?: string;
-  followUpDate?: string;
-}
-
-export interface TransferPatientDto {
-  newBedId: string;
-  reason: string;
+  admissionReason?: string;
   notes?: string;
 }
 
-export interface AdmissionFilters {
+export interface UpdateIPDAdmissionDto {
+  patientId?: string;
+  admissionDate?: string;
+  departmentId?: string;
+  wardId?: string;
+  bedId?: string;
+  doctorId?: string;
+  diagnosis?: string;
+  admissionReason?: string;
+  notes?: string;
+  status?: IPDAdmissionStatus;
+  dischargeDate?: string;
+}
+
+export interface IPDAdmissionQueryDto {
   page?: number;
   limit?: number;
-  status?: 'ADMITTED' | 'DISCHARGED' | 'TRANSFERRED';
-  wardId?: string;
-  doctorId?: string;
-  patientId?: string;
   search?: string;
+  status?: IPDAdmissionStatus;
+  doctorId?: string;
+  departmentId?: string;
+  wardId?: string;
+  date?: string;
 }
 
-export interface AdmissionResponse {
-  success: boolean;
-  message?: string;
-  data: {
-    id: string;
-    patientId: string;
-    doctorId: string;
-    bedId?: string;
-    recordType: string;
-    title: string;
-    description?: string;
-    date: string;
-    status?: string;
-    patient?: {
-      id: string;
-      firstName: string;
-      lastName: string;
-      phone?: string;
-      email?: string;
-      medicalRecordNumber?: string;
-    };
-    doctor?: {
-      id: string;
-      firstName: string;
-      lastName: string;
-      specialization?: string;
-    };
-    bed?: {
-      id: string;
-      bedNumber: string;
-      ward: {
-        id: string;
-        name: string;
-      };
-    };
-    createdAt: string;
-    updatedAt: string;
-  };
+export interface CreateIPDTreatmentDto {
+  admissionId: string;
+  treatmentDate?: string;
+  doctorId?: string;
+  notes?: string;
+  treatmentPlan?: string;
 }
 
-export interface AdmissionsListResponse {
+export interface CreateIPDDischargeSummaryDto {
+  admissionId: string;
+  dischargeDate?: string;
+  finalDiagnosis?: string;
+  treatmentGiven?: string;
+  conditionAtDischarge?: string;
+  followUpAdvice?: string;
+}
+
+// ============= RESPONSE TYPES =============
+
+export interface IPDAdmissionsListResponse {
   success: boolean;
   data: {
-    admissions: AdmissionResponse['data'][];
+    admissions: IPDAdmission[];
     pagination: {
       total: number;
       page: number;
@@ -236,118 +166,85 @@ export interface AdmissionsListResponse {
   };
 }
 
+export interface IPDAdmissionResponse {
+  success: boolean;
+  message?: string;
+  data: IPDAdmission;
+}
+
+export interface IPDTreatmentResponse {
+  success: boolean;
+  message?: string;
+  data: IPDTreatment;
+}
+
+export interface IPDDischargeSummaryResponse {
+  success: boolean;
+  message?: string;
+  data: IPDDischargeSummary;
+}
+
+export interface IPDStatsResponse {
+  success: boolean;
+  data: {
+    totalAdmitted: number;
+    totalDischarged: number;
+    availableBeds: number;
+    occupiedBeds: number;
+    bedOccupancyRate: string;
+  };
+}
+
+// ============= API SERVICE =============
+
 const ipdService = {
-  // ==================== WARD OPERATIONS ====================
-
-  /**
-   * Create new ward
-   */
-  createWard: async (data: CreateWardDto): Promise<WardResponse> => {
-    return enhancedApiClient.post('/ipd/wards', data);
+  // Admission APIs
+  async admitPatient(data: CreateIPDAdmissionDto): Promise<IPDAdmissionResponse> {
+    const response = await apiClient.post('/ipd/admit', data) as any;
+    return response.data;
   },
 
-  /**
-   * Get all wards with filters
-   */
-  getWards: async (filters?: WardFilters): Promise<WardsListResponse> => {
-    return enhancedApiClient.get('/ipd/wards', filters);
+  async getAdmissions(params?: IPDAdmissionQueryDto): Promise<IPDAdmissionsListResponse> {
+    const response = await apiClient.get('/ipd/admissions', { params }) as any;
+    return response.data;
   },
 
-  /**
-   * Get ward by ID
-   */
-  getWardById: async (id: string): Promise<WardResponse> => {
-    return enhancedApiClient.get(`/ipd/wards/${id}`);
+  async getAdmission(id: string): Promise<IPDAdmissionResponse> {
+    const response = await apiClient.get(`/ipd/admissions/${id}`) as any;
+    return response.data;
   },
 
-  /**
-   * Update ward
-   */
-  updateWard: async (id: string, data: UpdateWardDto): Promise<WardResponse> => {
-    return enhancedApiClient.patch(`/ipd/wards/${id}`, data);
+  async updateAdmission(id: string, data: UpdateIPDAdmissionDto): Promise<IPDAdmissionResponse> {
+    const response = await apiClient.patch(`/ipd/admissions/${id}`, data) as any;
+    return response.data;
   },
 
-  // ==================== BED OPERATIONS ====================
-
-  /**
-   * Create new bed
-   */
-  createBed: async (data: CreateBedDto): Promise<BedResponse> => {
-    return enhancedApiClient.post('/ipd/beds', data);
+  async dischargePatient(id: string): Promise<IPDAdmissionResponse> {
+    const response = await apiClient.delete(`/ipd/admissions/${id}/discharge`) as any;
+    return response.data;
   },
 
-  /**
-   * Get all beds with filters
-   */
-  getBeds: async (filters?: BedFilters): Promise<BedsListResponse> => {
-    return enhancedApiClient.get('/ipd/beds', filters);
+  // Treatment APIs
+  async addTreatment(data: CreateIPDTreatmentDto): Promise<IPDTreatmentResponse> {
+    const response = await apiClient.post('/ipd/treatment', data) as any;
+    return response.data;
   },
 
-  /**
-   * Get available beds
-   */
-  getAvailableBeds: async (): Promise<AvailableBedsResponse> => {
-    return enhancedApiClient.get('/ipd/beds/available');
+  // Discharge Summary APIs
+  async createDischargeSummary(data: CreateIPDDischargeSummaryDto): Promise<IPDDischargeSummaryResponse> {
+    const response = await apiClient.post('/ipd/discharge-summary', data) as any;
+    return response.data;
   },
 
-  /**
-   * Update bed status
-   */
-  updateBedStatus: async (id: string, data: UpdateBedStatusDto): Promise<BedResponse> => {
-    return enhancedApiClient.patch(`/ipd/beds/${id}/status`, data);
+  async getAdmissionSummary(admissionId: string): Promise<IPDAdmissionResponse> {
+    const response = await apiClient.get(`/ipd/summary/${admissionId}`) as any;
+    return response.data;
   },
 
-  // ==================== STATISTICS ====================
-
-  /**
-   * Get IPD statistics
-   */
-  getStats: async (): Promise<IpdStatsResponse> => {
-    return enhancedApiClient.get('/ipd/stats');
-  },
-
-  // ==================== ADMISSION OPERATIONS ====================
-
-  /**
-   * Admit a patient
-   */
-  admitPatient: async (data: CreateAdmissionDto): Promise<AdmissionResponse> => {
-    return enhancedApiClient.post('/ipd/admissions', data);
-  },
-
-  /**
-   * Get all admissions with filters
-   */
-  getAdmissions: async (filters?: AdmissionFilters): Promise<AdmissionsListResponse> => {
-    return enhancedApiClient.get('/ipd/admissions', filters);
-  },
-
-  /**
-   * Get admission by ID
-   */
-  getAdmissionById: async (id: string): Promise<AdmissionResponse> => {
-    return enhancedApiClient.get(`/ipd/admissions/${id}`);
-  },
-
-  /**
-   * Update admission
-   */
-  updateAdmission: async (id: string, data: UpdateAdmissionDto): Promise<AdmissionResponse> => {
-    return enhancedApiClient.patch(`/ipd/admissions/${id}`, data);
-  },
-
-  /**
-   * Discharge patient
-   */
-  dischargePatient: async (id: string, data: DischargePatientDto): Promise<AdmissionResponse> => {
-    return enhancedApiClient.post(`/ipd/admissions/${id}/discharge`, data);
-  },
-
-  /**
-   * Transfer patient to another bed
-   */
-  transferPatient: async (id: string, data: TransferPatientDto): Promise<AdmissionResponse> => {
-    return enhancedApiClient.post(`/ipd/admissions/${id}/transfer`, data);
+  // Stats API
+  async getStats(): Promise<IPDStatsResponse> {
+    const response = await apiClient.get('/ipd/stats') as any;
+    return response.data;
   },
 };
 

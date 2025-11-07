@@ -24,6 +24,7 @@
     "@tanstack/react-query-devtools": "^5.90.2",
     "@types/uuid": "^10.0.0",
     "axios": "^1.12.2",
+    "date-fns": "^4.1.0",
     "dayjs": "^1.11.18",
     "next": "15.5.4",
     "react": "19.1.0",

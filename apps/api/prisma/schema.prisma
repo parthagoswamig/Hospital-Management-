@@ -6,7 +6,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_DATABASE_URL")
+  // directUrl = env("DIRECT_DATABASE_URL")
 }
 
 model Department {
@@ -19,6 +19,8 @@ model Department {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   appointments Appointment[]
+  opdVisits    OPDVisit[]
+  ipdAdmissions IPDAdmission[]
   tenant       Tenant        @relation(fields: [tenantId], references: [id])
   staff        Staff[]
 
@@ -115,6 +117,12 @@ model Tenant {
   videoRooms                VideoRoom[]
   wards                     Ward[]
   patients                  Patient[]
+  opdVisits                 OPDVisit[]
+  opdVitals                 OPDVitals[]
+  opdPrescriptions          OPDPrescription[]
+  ipdAdmissions             IPDAdmission[]
+  ipdTreatments             IPDTreatment[]
+  ipdDischargeSummaries     IPDDischargeSummary[]
 
   @@index([slug])
 }
@@ -148,6 +156,10 @@ model User {
   refreshTokens         RefreshToken[]
   staff                 Staff?                     @relation("UserStaff")
   doctorTelemedicine    TelemedicineConsultation[] @relation("DoctorTelemedicine")
+  doctorOPDVisits       OPDVisit[]                 @relation("DoctorOPDVisits")
+  doctorIPDAdmissions   IPDAdmission[]             @relation("DoctorIPDAdmissions")
+  doctorIPDTreatments   IPDTreatment[]             @relation("DoctorIPDTreatments")
+  doctorDischargeSummaries IPDDischargeSummary[]   @relation("DoctorDischargeSummaries")
   tenant                Tenant                     @relation(fields: [tenantId], references: [id])
   tenantRole            TenantRole?                @relation("UserRoleVirtual", fields: [roleId], references: [id], onDelete: SetNull)
 
@@ -230,6 +242,8 @@ model Patient {
   studies                   Study[]
   surgeries                 Surgery[]
   telemedicineConsultations TelemedicineConsultation[]
+  opdVisits                 OPDVisit[]
+  ipdAdmissions             IPDAdmission[]
   tenant                    Tenant                     @relation(fields: [tenantId], references: [id])
 
   @@index([tenantId])
@@ -307,6 +321,151 @@ model PrescriptionItem {
   @@index([prescriptionId])
   @@index([medicationId])
   @@index([isDispensed])
+}
+
+model OPDVisit {
+  id            String              @id @default(cuid())
+  patientId     String
+  visitDate     DateTime            @default(now())
+  departmentId  String?
+  doctorId      String
+  complaint     String?
+  diagnosis     String?
+  treatmentPlan String?
+  notes         String?
+  status        OPDVisitStatus      @default(PENDING)
+  tenantId      String
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  patient       Patient             @relation(fields: [patientId], references: [id])
+  doctor        User                @relation("DoctorOPDVisits", fields: [doctorId], references: [id])
+  department    Department?         @relation(fields: [departmentId], references: [id])
+  tenant        Tenant              @relation(fields: [tenantId], references: [id])
+  vitals        OPDVitals[]
+  prescriptions OPDPrescription[]
+
+  @@index([patientId])
+  @@index([doctorId])
+  @@index([departmentId])
+  @@index([status])
+  @@index([visitDate])
+  @@index([tenantId])
+}
+
+model OPDVitals {
+  id              String   @id @default(cuid())
+  visitId         String
+  height          Float?
+  weight          Float?
+  bp              String?
+  pulse           Int?
+  temperature     Float?
+  respirationRate Int?
+  spo2            Int?
+  notes           String?
+  recordedBy      String?
+  tenantId        String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  visit           OPDVisit @relation(fields: [visitId], references: [id], onDelete: Cascade)
+  tenant          Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([visitId])
+  @@index([tenantId])
+}
+
+model OPDPrescription {
+  id             String   @id @default(cuid())
+  visitId        String
+  medicationName String
+  dosage         String
+  frequency      String
+  duration       String
+  notes          String?
+  tenantId       String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  visit          OPDVisit @relation(fields: [visitId], references: [id], onDelete: Cascade)
+  tenant         Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([visitId])
+  @@index([tenantId])
+}
+
+model IPDAdmission {
+  id              String                 @id @default(cuid())
+  patientId       String
+  admissionDate   DateTime               @default(now())
+  departmentId    String?
+  wardId          String?
+  bedId           String?
+  doctorId        String
+  diagnosis       String?
+  admissionReason String?
+  status          IPDAdmissionStatus     @default(ADMITTED)
+  notes           String?
+  dischargeDate   DateTime?
+  tenantId        String
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  patient         Patient                @relation(fields: [patientId], references: [id])
+  doctor          User                   @relation("DoctorIPDAdmissions", fields: [doctorId], references: [id])
+  department      Department?            @relation(fields: [departmentId], references: [id])
+  ward            Ward?                  @relation(fields: [wardId], references: [id])
+  bed             Bed?                   @relation(fields: [bedId], references: [id])
+  tenant          Tenant                 @relation(fields: [tenantId], references: [id])
+  treatments      IPDTreatment[]
+  dischargeSummary IPDDischargeSummary?
+
+  @@index([patientId])
+  @@index([doctorId])
+  @@index([departmentId])
+  @@index([wardId])
+  @@index([bedId])
+  @@index([status])
+  @@index([admissionDate])
+  @@index([tenantId])
+}
+
+model IPDTreatment {
+  id            String       @id @default(cuid())
+  admissionId   String
+  treatmentDate DateTime     @default(now())
+  doctorId      String
+  notes         String?
+  treatmentPlan String?
+  tenantId      String
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  admission     IPDAdmission @relation(fields: [admissionId], references: [id], onDelete: Cascade)
+  doctor        User         @relation("DoctorIPDTreatments", fields: [doctorId], references: [id])
+  tenant        Tenant       @relation(fields: [tenantId], references: [id])
+
+  @@index([admissionId])
+  @@index([doctorId])
+  @@index([treatmentDate])
+  @@index([tenantId])
+}
+
+model IPDDischargeSummary {
+  id                    String       @id @default(cuid())
+  admissionId           String       @unique
+  dischargeDate         DateTime     @default(now())
+  finalDiagnosis        String?
+  treatmentGiven        String?
+  conditionAtDischarge  String?
+  followUpAdvice        String?
+  createdBy             String
+  tenantId              String
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+  admission             IPDAdmission @relation(fields: [admissionId], references: [id], onDelete: Cascade)
+  creator               User         @relation("DoctorDischargeSummaries", fields: [createdBy], references: [id])
+  tenant                Tenant       @relation(fields: [tenantId], references: [id])
+
+  @@index([admissionId])
+  @@index([dischargeDate])
+  @@index([tenantId])
 }
 
 model MedicalRecord {
@@ -860,6 +1019,7 @@ model Ward {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   beds        Bed[]
+  ipdAdmissions IPDAdmission[]
   tenant      Tenant   @relation(fields: [tenantId], references: [id])
 
   @@index([name])
@@ -875,6 +1035,7 @@ model Bed {
   tenantId  String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  ipdAdmissions IPDAdmission[]
   tenant    Tenant    @relation(fields: [tenantId], references: [id])
   ward      Ward      @relation(fields: [wardId], references: [id])
 
@@ -1256,6 +1417,18 @@ enum AppointmentStatus {
   CANCELLED
   NO_SHOW
   RESCHEDULED
+}
+
+enum OPDVisitStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum IPDAdmissionStatus {
+  ADMITTED
+  DISCHARGED
 }
 
 enum PrescriptionStatus {

@@ -10,6 +10,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  Request,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -21,15 +22,17 @@ import {
 } from '@nestjs/swagger';
 import { OpdService } from './opd.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { TenantGuard } from '../core/rbac/guards/tenant.guard';
 import { TenantId } from '../shared/decorators/tenant-id.decorator';
 import { Roles } from '../core/rbac/decorators/roles.decorator';
 import { RolesGuard } from '../core/rbac/guards/roles.guard';
 import { UserRole } from '../core/rbac/enums/roles.enum';
 import {
-  CreateOpdVisitDto,
-  UpdateOpdVisitDto,
-  OpdVisitFilterDto,
-  OpdQueueFilterDto,
+  CreateOPDVisitDto,
+  UpdateOPDVisitDto,
+  CreateOPDVitalsDto,
+  CreateOPDPrescriptionDto,
+  OPDVisitQueryDto,
 } from './dto';
 
 @ApiTags('OPD')
@@ -40,9 +43,11 @@ import {
   required: true,
 })
 @Controller('opd')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, TenantGuard, RolesGuard)
 export class OpdController {
   constructor(private readonly opdService: OpdService) {}
+
+  // ==================== OPD Visit Endpoints ====================
 
   /**
    * Create a new OPD visit
@@ -50,6 +55,7 @@ export class OpdController {
   @Post('visits')
   @HttpCode(HttpStatus.CREATED)
   @Roles(
+    UserRole.SUPER_ADMIN,
     UserRole.TENANT_ADMIN,
     UserRole.HOSPITAL_ADMIN,
     UserRole.DOCTOR,
@@ -72,16 +78,25 @@ export class OpdController {
     description: 'Patient or doctor not found',
   })
   async createVisit(
-    @Body() createOpdVisitDto: CreateOpdVisitDto,
+    @Body() createDto: CreateOPDVisitDto,
     @TenantId() tenantId: string,
+    @Request() req: any,
   ) {
-    return this.opdService.createVisit(createOpdVisitDto, tenantId);
+    return this.opdService.createVisit(createDto, tenantId, req.user.userId);
   }
 
   /**
    * Get all OPD visits with filters
    */
   @Get('visits')
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.TENANT_ADMIN,
+    UserRole.HOSPITAL_ADMIN,
+    UserRole.DOCTOR,
+    UserRole.NURSE,
+    UserRole.RECEPTIONIST,
+  )
   @ApiOperation({
     summary: 'Get all OPD visits',
     description: 'Retrieves paginated list of OPD visits with optional filters',
@@ -91,19 +106,32 @@ export class OpdController {
     description: 'OPD visits retrieved successfully',
   })
   async findAllVisits(
-    @Query() filters: OpdVisitFilterDto,
+    @Query() query: OPDVisitQueryDto,
     @TenantId() tenantId: string,
   ) {
-    return this.opdService.findAllVisits(tenantId, filters);
+    return this.opdService.findAllVisits(tenantId, query);
   }
 
   /**
    * Get OPD visit by ID
    */
   @Get('visits/:id')
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.TENANT_ADMIN,
+    UserRole.HOSPITAL_ADMIN,
+    UserRole.DOCTOR,
+    UserRole.NURSE,
+    UserRole.RECEPTIONIST,
+  )
   @ApiOperation({
     summary: 'Get OPD visit by ID',
     description: 'Retrieves a specific OPD visit with all details',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'OPD visit ID',
+    type: 'string',
   })
   @ApiResponse({
     status: 200,
@@ -113,12 +141,10 @@ export class OpdController {
     status: 404,
     description: 'OPD visit not found',
   })
-  @ApiParam({
-    name: 'id',
-    description: 'OPD visit ID',
-    example: 'visit-uuid-123',
-  })
-  async findOneVisit(@Param('id') id: string, @TenantId() tenantId: string) {
+  async findOneVisit(
+    @Param('id') id: string,
+    @TenantId() tenantId: string,
+  ) {
     return this.opdService.findOneVisit(id, tenantId);
   }
 
@@ -127,13 +153,20 @@ export class OpdController {
    */
   @Patch('visits/:id')
   @Roles(
+    UserRole.SUPER_ADMIN,
     UserRole.TENANT_ADMIN,
     UserRole.HOSPITAL_ADMIN,
     UserRole.DOCTOR,
+    UserRole.RECEPTIONIST,
   )
   @ApiOperation({
     summary: 'Update OPD visit',
     description: 'Updates an existing OPD visit',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'OPD visit ID',
+    type: 'string',
   })
   @ApiResponse({
     status: 200,
@@ -143,82 +176,148 @@ export class OpdController {
     status: 404,
     description: 'OPD visit not found',
   })
-  @ApiParam({
-    name: 'id',
-    description: 'OPD visit ID',
-    example: 'visit-uuid-123',
-  })
   async updateVisit(
     @Param('id') id: string,
-    @Body() updateOpdVisitDto: UpdateOpdVisitDto,
+    @Body() updateDto: UpdateOPDVisitDto,
     @TenantId() tenantId: string,
   ) {
-    return this.opdService.updateVisit(id, updateOpdVisitDto, tenantId);
+    return this.opdService.updateVisit(id, updateDto, tenantId);
   }
 
   /**
-   * Cancel OPD visit
+   * Delete OPD visit (soft delete)
    */
   @Delete('visits/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Roles(
+    UserRole.SUPER_ADMIN,
     UserRole.TENANT_ADMIN,
     UserRole.HOSPITAL_ADMIN,
-    UserRole.DOCTOR,
   )
   @ApiOperation({
-    summary: 'Cancel OPD visit',
-    description: 'Cancels an existing OPD visit',
+    summary: 'Delete OPD visit',
+    description: 'Soft deletes an OPD visit by setting status to CANCELLED',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'OPD visit ID',
+    type: 'string',
   })
   @ApiResponse({
-    status: 200,
-    description: 'OPD visit cancelled successfully',
+    status: 204,
+    description: 'OPD visit deleted successfully',
   })
   @ApiResponse({
     status: 404,
     description: 'OPD visit not found',
   })
-  @ApiParam({
-    name: 'id',
-    description: 'OPD visit ID',
-    example: 'visit-uuid-123',
-  })
-  async removeVisit(@Param('id') id: string, @TenantId() tenantId: string) {
+  async removeVisit(
+    @Param('id') id: string,
+    @TenantId() tenantId: string,
+  ) {
     return this.opdService.removeVisit(id, tenantId);
   }
 
-  /**
-   * Get OPD queue
-   */
-  @Get('queue')
-  @ApiOperation({
-    summary: 'Get OPD queue',
-    description: 'Retrieves the current OPD queue with waiting patients',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'OPD queue retrieved successfully',
-  })
-  async getQueue(
-    @Query() filters: OpdQueueFilterDto,
-    @TenantId() tenantId: string,
-  ) {
-    return this.opdService.getQueue(tenantId, filters);
-  }
+  // ==================== OPD Vitals Endpoints ====================
 
   /**
-   * Get OPD statistics
+   * Add vitals to an OPD visit
    */
-  @Get('stats')
+  @Post('vitals')
+  @HttpCode(HttpStatus.CREATED)
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.TENANT_ADMIN,
+    UserRole.HOSPITAL_ADMIN,
+    UserRole.DOCTOR,
+    UserRole.NURSE,
+  )
   @ApiOperation({
-    summary: 'Get OPD statistics',
-    description:
-      'Retrieves OPD statistics for today including patient counts and status distribution',
+    summary: 'Add vitals to OPD visit',
+    description: 'Records vital signs for an OPD visit',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Vitals added successfully',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'OPD visit not found',
+  })
+  async addVitals(
+    @Body() createDto: CreateOPDVitalsDto,
+    @TenantId() tenantId: string,
+  ) {
+    return this.opdService.addVitals(createDto, tenantId);
+  }
+
+  // ==================== OPD Prescription Endpoints ====================
+
+  /**
+   * Add prescription to an OPD visit
+   */
+  @Post('prescriptions')
+  @HttpCode(HttpStatus.CREATED)
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.TENANT_ADMIN,
+    UserRole.HOSPITAL_ADMIN,
+    UserRole.DOCTOR,
+  )
+  @ApiOperation({
+    summary: 'Add prescription to OPD visit',
+    description: 'Adds a medication prescription to an OPD visit',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Prescription added successfully',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'OPD visit not found',
+  })
+  async addPrescription(
+    @Body() createDto: CreateOPDPrescriptionDto,
+    @TenantId() tenantId: string,
+  ) {
+    return this.opdService.addPrescription(createDto, tenantId);
+  }
+
+  // ==================== Summary Endpoints ====================
+
+  /**
+   * Get complete visit summary
+   */
+  @Get('summary/:visitId')
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.TENANT_ADMIN,
+    UserRole.HOSPITAL_ADMIN,
+    UserRole.DOCTOR,
+    UserRole.NURSE,
+    UserRole.RECEPTIONIST,
+  )
+  @ApiOperation({
+    summary: 'Get visit summary',
+    description: 'Retrieves complete summary of an OPD visit including vitals and prescriptions',
+  })
+  @ApiParam({
+    name: 'visitId',
+    description: 'OPD visit ID',
+    type: 'string',
   })
   @ApiResponse({
     status: 200,
-    description: 'OPD statistics retrieved successfully',
+    description: 'Visit summary retrieved successfully',
   })
-  async getStats(@TenantId() tenantId: string) {
-    return this.opdService.getStats(tenantId);
+  @ApiResponse({
+    status: 404,
+    description: 'OPD visit not found',
+  })
+  async getVisitSummary(
+    @Param('visitId') visitId: string,
+    @TenantId() tenantId: string,
+  ) {
+    return this.opdService.getVisitSummary(visitId, tenantId);
   }
 }
