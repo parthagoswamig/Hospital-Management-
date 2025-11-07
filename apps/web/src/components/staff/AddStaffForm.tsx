@@ -80,7 +80,10 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ onSuccess, onCancel }) => {
         body: JSON.stringify(newDepartment),
       });
 
-      if (!response.ok) throw new Error('Failed to create department');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to create department');
+      }
 
       const data = await response.json();
       
@@ -100,6 +103,7 @@ const AddStaffForm: React.FC<AddStaffFormProps> = ({ onSuccess, onCancel }) => {
       setShowAddDepartment(false);
       setNewDepartment({ name: '', code: '', description: '' });
     } catch (error: any) {
+      console.error('Department creation error:', error);
       notifications.show({
         title: 'Error',
         message: error.message || 'Failed to create department',

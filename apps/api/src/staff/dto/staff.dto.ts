@@ -50,6 +50,7 @@ export class CreateStaffDto {
 
   @ApiPropertyOptional({ example: '2024-01-15' })
   @IsOptional()
+  @ValidateIf((o) => o.joiningDate && o.joiningDate.toString().trim() !== '')
   @IsDateString()
   joiningDate?: Date;
 
@@ -130,6 +131,7 @@ export class UpdateStaffDto {
 
   @ApiPropertyOptional({ example: '2024-01-15' })
   @IsOptional()
+  @ValidateIf((o) => o.joiningDate && o.joiningDate.toString().trim() !== '')
   @IsDateString()
   joiningDate?: Date;
 
